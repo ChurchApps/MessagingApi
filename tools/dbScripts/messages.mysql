@@ -1,0 +1,14 @@
+DROP TABLE IF EXISTS `messages`;
+
+CREATE TABLE `messages` (
+  `id` char(11) NOT NULL,
+  `churchId` char(11) DEFAULT NULL,
+  `conversationId` char(11) DEFAULT NULL,
+  `userId` char(11) DEFAULT NULL,
+  `displayName` varchar(45) DEFAULT NULL,
+  `timeSent` datetime DEFAULT NULL,
+  `messageType` varchar(45) DEFAULT NULL,
+  `content` text,
+  PRIMARY KEY (`id`),
+  KEY `ix_churchId` (`churchId`,`conversationId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

@@ -1,0 +1,12 @@
+DROP TABLE IF EXISTS `conversations`;
+
+CREATE TABLE `conversations` (
+  `id` char(11) NOT NULL,
+  `churchId` char(11) DEFAULT NULL,
+  `contentType` varchar(45) DEFAULT NULL,
+  `contentId` char(11) DEFAULT NULL,
+  `title` varchar(255) DEFAULT NULL,
+  `dateCreated` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_churchId` (`churchId`,`contentType`,`contentId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
