@@ -4,12 +4,16 @@ import { UniqueIdHelper } from "../helpers";
 
 export class ConnectionRepository {
 
-    public async loadById(id: string) {
-        return DB.queryOne("SELECT * FROM connections WHERE id=?;", [id]);
+    public async loadById(churchId: string, id: string) {
+        return DB.queryOne("SELECT * FROM connections WHERE id=? and churchId=?;", [id, churchId]);
     }
 
     public async loadForConversation(churchId: string, conversationId: string) {
         return DB.query("SELECT * FROM connections WHERE churchId=? AND conversationId=?", [churchId, conversationId]);
+    }
+
+    public async delete(churchId: number, id: number) {
+        DB.query("DELETE FROM connections WHERE id=? AND churchId=?;", [id, churchId]);
     }
 
     public async save(connection: Connection) {
@@ -24,8 +28,8 @@ export class ConnectionRepository {
     }
 
     public async update(connection: Connection) {
-        const sql = "UPDATE churchApps SET userId=?, displayName=? WHERE id=?;";
-        const params = [connection.userId, connection.displayName, connection.id]
+        const sql = "UPDATE connections SET userId=?, displayName=? WHERE id=? AND churchId=?;";
+        const params = [connection.userId, connection.displayName, connection.id, connection.churchId]
         return DB.query(sql, params).then(() => { return connection });
     }
 
