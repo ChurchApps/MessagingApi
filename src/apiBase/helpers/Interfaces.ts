@@ -1,1 +1,0 @@
-export interface IPermission { contentType: string; action: string; }
