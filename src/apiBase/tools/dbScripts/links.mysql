@@ -1,0 +1,15 @@
+DROP TABLE IF EXISTS `links`;
+
+CREATE TABLE `links` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `churchId` int(11) DEFAULT NULL,
+  `category` varchar(45) DEFAULT NULL,
+  `url` varchar(255) DEFAULT NULL,
+  `linkType` varchar(45) DEFAULT NULL,
+  `linkData` varchar(45) DEFAULT NULL,
+  `icon` varchar(45) DEFAULT NULL,
+  `text` varchar(255) DEFAULT NULL,
+  `sort` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `churchId` (`churchId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

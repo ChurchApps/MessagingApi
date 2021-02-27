@@ -1,0 +1,14 @@
+DROP TABLE IF EXISTS `notes`;
+
+CREATE TABLE `notes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `churchId` int(11) DEFAULT NULL,
+  `contentType` varchar(50) DEFAULT NULL,
+  `contentId` int(11) DEFAULT NULL,
+  `noteType` varchar(50) DEFAULT NULL,
+  `addedBy` int(11) DEFAULT NULL,
+  `dateAdded` datetime DEFAULT NULL,
+  `contents` text,
+  PRIMARY KEY (`id`),
+  KEY `churchId` (`churchId`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=latin1;
