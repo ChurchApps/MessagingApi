@@ -12,7 +12,11 @@ export class ConnectionRepository {
         return DB.query("SELECT * FROM connections WHERE churchId=? AND conversationId=?", [churchId, conversationId]);
     }
 
-    public async delete(churchId: number, id: number) {
+    public async loadBySocketId(socketId: string) {
+        return DB.query("SELECT * FROM connections WHERE socketId=?", [socketId]);
+    }
+
+    public async delete(churchId: string, id: string) {
         DB.query("DELETE FROM connections WHERE id=? AND churchId=?;", [id, churchId]);
     }
 

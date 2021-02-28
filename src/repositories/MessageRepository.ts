@@ -12,7 +12,7 @@ export class MessageRepository {
         return DB.query("SELECT * FROM messages WHERE churchId=? AND conversationId=?", [churchId, conversationId]);
     }
 
-    public async delete(churchId: number, id: number) {
+    public async delete(churchId: string, id: string) {
         DB.query("DELETE FROM messages WHERE id=? AND churchId=?;", [id, churchId]);
     }
 

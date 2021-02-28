@@ -12,12 +12,20 @@ export class ConversationRepository {
         return DB.query("SELECT * FROM conversations WHERE churchId=? AND contentType=? AND contentId=?", [churchId, contentType, contentId]);
     }
 
-    public async delete(churchId: number, id: number) {
+    public async delete(churchId: string, id: string) {
         DB.query("DELETE FROM conversations WHERE id=? AND churchId=?;", [id, churchId]);
     }
 
     public async save(conversation: Conversation) {
         if (UniqueIdHelper.isMissing(conversation.id)) return this.create(conversation); else return this.update(conversation);
+    }
+
+    public async loadHostConversation(churchId: string, id: string) {
+        const sql = "select c2.*"
+            + " FROM conversations c"
+            + "INNER JOIN conversations c2 on c2.churchId=c.churchId and c2.contentType='hostChat' and c2.contentId=c.contentId"
+            + "where c.id=? and c.churchId=? LIMIT 1;"
+        return DB.queryOne(sql, [id, churchId]);
     }
 
     public async create(conversation: Conversation) {

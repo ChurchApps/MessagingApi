@@ -1,7 +1,7 @@
 import { Repositories } from "../repositories";
 import { CustomBaseController } from "../apiBase/controllers"
 
-export class AccessBaseController extends CustomBaseController {
+export class MessagingBaseController extends CustomBaseController {
 
     public repositories: Repositories;
 
@@ -9,5 +9,6 @@ export class AccessBaseController extends CustomBaseController {
         super();
         this.repositories = Repositories.getCurrent();
     }
+
 
 }
