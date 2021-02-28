@@ -6,7 +6,7 @@ export interface MessageInterface extends PayloadInterface, Message { }
 export interface AttendanceInterface extends PayloadInterface { viewers?: ViewerInterface[], totalViewers?: number, conversationId: string }
 
 
-interface ViewerInterface { displayName: string, count: number }
+export interface ViewerInterface { displayName: string, count: number }
 
 /*
 export interface ConnectionInterface {

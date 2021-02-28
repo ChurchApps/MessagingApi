@@ -1,8 +1,16 @@
 import { DB } from "../apiBase/db";
 import { Connection } from "../models";
 import { UniqueIdHelper } from "../helpers";
+import { ViewerInterface } from "../helpers/Interfaces";
 
 export class ConnectionRepository {
+
+    public async loadAttendance(churchId: string, conversationId: string) {
+        const sql = "SELECT displayName as name, count(*) as count FROM connections WHERE churchId=? AND conversationId=? GROUP BY displayName ORDER BY name;"
+        const data: ViewerInterface[] = await DB.query(sql, [churchId, conversationId]);
+        data.forEach((d: any) => { if (d.name === '') d.name = 'Anonymous'; });
+        return data;
+    }
 
     public async loadById(churchId: string, id: string) {
         return DB.queryOne("SELECT * FROM connections WHERE id=? and churchId=?;", [id, churchId]);
