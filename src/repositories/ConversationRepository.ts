@@ -20,11 +20,20 @@ export class ConversationRepository {
         if (UniqueIdHelper.isMissing(conversation.id)) return this.create(conversation); else return this.update(conversation);
     }
 
+    public async loadCurrent(churchId: string, contentType: string, contentId: string) {
+        const cutOff = new Date();
+        cutOff.setDate(cutOff.getDate() - 1);
+        const sql = "select *"
+            + " FROM conversations"
+            + " WHERE churchId=? and contentType=? AND contentId=? AND dateCreated>=? LIMIT 1;"
+        return DB.queryOne(sql, [churchId, contentType, contentId, cutOff]);
+    }
+
     public async loadHostConversation(churchId: string, id: string) {
         const sql = "select c2.*"
             + " FROM conversations c"
-            + "INNER JOIN conversations c2 on c2.churchId=c.churchId and c2.contentType='hostChat' and c2.contentId=c.contentId"
-            + "where c.id=? and c.churchId=? LIMIT 1;"
+            + " INNER JOIN conversations c2 on c2.churchId=c.churchId and c2.contentType='hostChat' and c2.contentId=c.contentId"
+            + " WHERE c.id=? AND c.churchId=? LIMIT 1;"
         return DB.queryOne(sql, [id, churchId]);
     }
 

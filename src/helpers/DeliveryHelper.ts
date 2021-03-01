@@ -36,9 +36,6 @@ export class DeliveryHelper {
         await DeliveryHelper.sendMessages({ churchId, conversationId, action: "attendance", data });
     }
 
-
-
-
     private static sendAws = async (connection: Connection, payload: PayloadInterface) => {
         const apigwManagementApi = new ApiGatewayManagementApi({ apiVersion: '2020-04-16', endpoint: process.env.apiUrl });
         let success = true;

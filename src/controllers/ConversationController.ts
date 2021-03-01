@@ -1,12 +1,25 @@
-import { controller, httpGet, httpPost } from "inversify-express-utils";
+import { controller, httpGet, httpPost, requestParam } from "inversify-express-utils";
 import express from "express";
 import { MessagingBaseController } from "./MessagingBaseController"
 import { Permissions } from "../helpers/Permissions";
+import { Conversation } from "../models";
 
 
 @controller("/conversations")
 export class ConversationController extends MessagingBaseController {
 
+
+    @httpGet("/current/:churchId/:contentType/:contentId")
+    public async current(@requestParam("churchId") churchId: string, @requestParam("contentType") contentType: string, @requestParam("contentId") contentId: string, req: express.Request<{}, {}, {}>, res: express.Response): Promise<any> {
+        return this.actionWrapperAnon(req, res, async () => {
+            let result: Conversation = await this.repositories.conversation.loadCurrent(churchId, contentType, contentId);
+            if (result === null) {
+                result = { contentId, contentType, dateCreated: new Date(), title: contentType + " #" + contentId, churchId }
+                result = await this.repositories.conversation.save(result);
+            }
+            return result;
+        });
+    }
 
     @httpPost("/updateConfig")
     public async updateConfig(req: express.Request<{}, {}, { churchId: string, conversationId: string }>, res: express.Response): Promise<any> {
