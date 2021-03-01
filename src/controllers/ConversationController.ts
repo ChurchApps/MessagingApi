@@ -1,7 +1,6 @@
-import { controller, httpGet, httpPost, requestParam, httpDelete, interfaces } from "inversify-express-utils";
+import { controller, httpGet, httpPost } from "inversify-express-utils";
 import express from "express";
 import { MessagingBaseController } from "./MessagingBaseController"
-import { Message, Connection, Conversation } from "../models";
 import { Permissions } from "../helpers/Permissions";
 
 

@@ -2,6 +2,7 @@ import { controller, httpGet, httpPost, requestParam } from "inversify-express-u
 import express from "express";
 import { MessagingBaseController } from "./MessagingBaseController"
 import { Connection } from "../models";
+import { DeliveryHelper } from "../helpers/DeliveryHelper";
 
 
 @controller("/connections")
@@ -21,7 +22,10 @@ export class ConnectionController extends MessagingBaseController {
         return this.actionWrapperAnon(req, res, async () => {
             const promises: Promise<Connection>[] = [];
             req.body.forEach((connection: Connection) => {
-                promises.push(this.repositories.connection.save(connection));
+                promises.push(this.repositories.connection.save(connection).then(async c => {
+                    await DeliveryHelper.sendAttendance(c.churchId, c.conversationId);
+                    return c;
+                }));
             });
             return this.repositories.connection.convertAllToModel(await Promise.all(promises));
         });
@@ -34,7 +38,10 @@ export class ConnectionController extends MessagingBaseController {
             const promises: Promise<Connection>[] = [];
             connections.forEach((connection: Connection) => {
                 connection.displayName = req.body.name;
-                promises.push(this.repositories.connection.save(connection));
+                promises.push(this.repositories.connection.save(connection).then(async c => {
+                    await DeliveryHelper.sendAttendance(c.churchId, c.conversationId);
+                    return c;
+                }));
             });
             return this.repositories.connection.convertAllToModel(await Promise.all(promises));
         });
