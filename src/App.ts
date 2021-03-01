@@ -7,6 +7,8 @@ import { bindings } from "./inversify.config";
 import express from "express";
 import { CustomAuthProvider } from "./apiBase/auth";
 import cors from "cors"
+import { SocketHelper } from "./helpers/SocketHelper";
+
 
 export const init = async () => {
     dotenv.config();
@@ -21,5 +23,8 @@ export const init = async () => {
     };
 
     const server = app.setConfig(configFunction).build();
+
+    SocketHelper.init();
+
     return server;
 }

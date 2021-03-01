@@ -13,7 +13,7 @@ export class ConversationController extends MessagingBaseController {
         return this.actionWrapper(req, res, async (au) => {
             if (!au.checkAccess(Permissions.chat.host)) return this.json({}, 401);
             else {
-                //await this.repositories.message.delete(au.churchId, id);
+                // await this.repositories.message.delete(au.churchId, id);
                 return "";
             }
         });
