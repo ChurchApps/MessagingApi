@@ -1,15 +1,31 @@
 import { DB } from "../apiBase/db";
 import { Connection } from "../models";
 import { UniqueIdHelper } from "../helpers";
+import { ViewerInterface } from "../helpers/Interfaces";
 
 export class ConnectionRepository {
 
-    public async loadById(id: string) {
-        return DB.queryOne("SELECT * FROM connections WHERE id=?;", [id]);
+    public async loadAttendance(churchId: string, conversationId: string) {
+        const sql = "SELECT displayName as name, count(*) as count FROM connections WHERE churchId=? AND conversationId=? GROUP BY displayName ORDER BY name;"
+        const data: ViewerInterface[] = await DB.query(sql, [churchId, conversationId]);
+        data.forEach((d: any) => { if (d.name === '') d.name = 'Anonymous'; });
+        return data;
+    }
+
+    public async loadById(churchId: string, id: string) {
+        return DB.queryOne("SELECT * FROM connections WHERE id=? and churchId=?;", [id, churchId]);
     }
 
     public async loadForConversation(churchId: string, conversationId: string) {
         return DB.query("SELECT * FROM connections WHERE churchId=? AND conversationId=?", [churchId, conversationId]);
+    }
+
+    public async loadBySocketId(socketId: string) {
+        return DB.query("SELECT * FROM connections WHERE socketId=?", [socketId]);
+    }
+
+    public async delete(churchId: string, id: string) {
+        DB.query("DELETE FROM connections WHERE id=? AND churchId=?;", [id, churchId]);
     }
 
     public async save(connection: Connection) {
@@ -24,8 +40,8 @@ export class ConnectionRepository {
     }
 
     public async update(connection: Connection) {
-        const sql = "UPDATE churchApps SET userId=?, displayName=? WHERE id=?;";
-        const params = [connection.userId, connection.displayName, connection.id]
+        const sql = "UPDATE connections SET userId=?, displayName=? WHERE id=? AND churchId=?;";
+        const params = [connection.userId, connection.displayName, connection.id, connection.churchId]
         return DB.query(sql, params).then(() => { return connection });
     }
 
