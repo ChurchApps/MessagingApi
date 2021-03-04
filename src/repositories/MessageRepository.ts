@@ -24,13 +24,13 @@ export class MessageRepository {
         message.id = UniqueIdHelper.shortId();
         const sql = "INSERT INTO messages (id, churchId, conversationId, userId, displayName, timeSent, messageType, content) VALUES (?, ?, ?, ?, ?, NOW(), ?, ?);";
         const params = [message.id, message.churchId, message.conversationId, message.userId, message.displayName, message.messageType, message.content];
-        return DB.query(sql, params);
+        return DB.query(sql, params).then(() => message);
     }
 
     public async update(message: Message) {
         const sql = "UPDATE messages SET userId=?, displayName=?, content=? WHERE id=? AND churchId=?;";
         const params = [message.userId, message.displayName, message.content, message.id, message.churchId]
-        return DB.query(sql, params);
+        return DB.query(sql, params).then(() => message);
     }
 
     public convertToModel(data: any) {

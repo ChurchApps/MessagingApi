@@ -18,7 +18,7 @@ export class DeliveryHelper {
         await Promise.all(promises);
     }
 
-    static sendMessage = async (connection: Connection, payload: PayloadInterface, socket?: WebSocket) => {
+    static sendMessage = async (connection: Connection, payload: PayloadInterface) => {
         let success = true;
         if (process.env.DELIVERY_PROVIDER === "aws") success = await DeliveryHelper.sendAws(connection, payload);
         else success = await DeliveryHelper.sendLocal(connection, payload);
