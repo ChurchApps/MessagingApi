@@ -16,7 +16,6 @@ export class SocketHelper {
             SocketHelper.wss.on('connection', (socket) => {
                 const sc: SocketConnectionInterface = { id: UniqueIdHelper.shortId(), socket }
                 SocketHelper.connections.push(sc);
-                console.log("Connection established - " + sc.id);
                 const payload: PayloadInterface = { churchId: "", conversationId: "", action: "socketId", data: sc.id }
                 sc.socket.send(JSON.stringify(payload));
             });

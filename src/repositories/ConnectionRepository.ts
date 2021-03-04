@@ -8,6 +8,7 @@ export class ConnectionRepository {
     public async loadAttendance(churchId: string, conversationId: string) {
         const sql = "SELECT displayName as name, count(*) as count FROM connections WHERE churchId=? AND conversationId=? GROUP BY displayName ORDER BY name;"
         const data: ViewerInterface[] = await DB.query(sql, [churchId, conversationId]);
+        console.log(JSON.stringify(data));
         data.forEach((d: any) => { if (d.name === '') d.name = 'Anonymous'; });
         return data;
     }
@@ -25,6 +26,7 @@ export class ConnectionRepository {
     }
 
     public async delete(churchId: string, id: string) {
+        console.log("DELETE FROM connections WHERE id='" + id + "' AND churchId='" + churchId + "';")
         DB.query("DELETE FROM connections WHERE id=? AND churchId=?;", [id, churchId]);
     }
 
