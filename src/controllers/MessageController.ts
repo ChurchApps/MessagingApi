@@ -54,21 +54,6 @@ export class MessageController extends MessagingBaseController {
         });
     }
 
-    @httpGet("/requestPrayer/:churchId/:connectionId")
-    public async requestPrayer(@requestParam("churchId") churchId: string, @requestParam("connectionId") connectionId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
-        return this.actionWrapperAnon(req, res, async () => {
-            const connection: Connection = await this.repositories.connection.loadById(churchId, connectionId);
-            if (connection !== null) {
-                const hostConversation: Conversation = await this.repositories.conversation.loadHostConversation(churchId, connection.conversationId);
-                if (hostConversation !== null) {
-                    const prayerConversation = await this.createPrayerConversation(connection);
-                    await DeliveryHelper.sendMessages({ churchId: hostConversation.churchId, conversationId: hostConversation.id, action: "prayerRequest", data: prayerConversation.id });
-                    return { conversationId: prayerConversation.id };
-                }
-            }
-            return null;
-        });
-    }
 
     @httpGet("/catchup/:churchId/:conversationId")
     public async catchup(@requestParam("churchId") churchId: string, @requestParam("conversationId") conversationId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
