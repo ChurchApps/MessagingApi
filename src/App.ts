@@ -24,7 +24,7 @@ export const init = async () => {
 
     const server = app.setConfig(configFunction).build();
 
-    SocketHelper.init();
+    if (process.env.DELIVERY_PROVIDER === "local") SocketHelper.init();
 
     return server;
 }
