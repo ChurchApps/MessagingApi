@@ -9,7 +9,7 @@ export class MessageRepository {
     }
 
     public async loadForConversation(churchId: string, conversationId: string) {
-        return DB.query("SELECT * FROM messages WHERE churchId=? AND conversationId=?", [churchId, conversationId]);
+        return DB.query("SELECT * FROM messages WHERE churchId=? AND conversationId=? ORDER BY timeSent", [churchId, conversationId]);
     }
 
     public async delete(churchId: string, id: string) {

@@ -11,13 +11,15 @@ export class ConversationController extends MessagingBaseController {
 
     @httpGet("/current/:churchId/:contentType/:contentId")
     public async current(@requestParam("churchId") churchId: string, @requestParam("contentType") contentType: string, @requestParam("contentId") contentId: string, req: express.Request<{}, {}, {}>, res: express.Response): Promise<any> {
-        return this.actionWrapperAnon(req, res, async () => {
-            let result: Conversation = await this.repositories.conversation.loadCurrent(churchId, contentType, contentId);
-            if (result === null) {
-                result = { contentId, contentType, dateCreated: new Date(), title: contentType + " #" + contentId, churchId }
-                result = await this.repositories.conversation.save(result);
-            }
-            return result;
+        return this.actionWrapper(req, res, async (au) => {
+            if (contentType === "streamingLive" || au.checkAccess(Permissions.chat.host)) {
+                let result: Conversation = await this.repositories.conversation.loadCurrent(churchId, contentType, contentId);
+                if (result === null) {
+                    result = { contentId, contentType, dateCreated: new Date(), title: contentType + " #" + contentId, churchId }
+                    result = await this.repositories.conversation.save(result);
+                }
+                return result;
+            } else return this.json({}, 401);
         });
     }
 

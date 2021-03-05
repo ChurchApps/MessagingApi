@@ -55,7 +55,7 @@ export class MessageController extends MessagingBaseController {
     }
 
     @httpGet("/requestPrayer/:churchId/:connectionId")
-    public async loadAll(@requestParam("churchId") churchId: string, @requestParam("connectionId") connectionId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+    public async requestPrayer(@requestParam("churchId") churchId: string, @requestParam("connectionId") connectionId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
         return this.actionWrapperAnon(req, res, async () => {
             const connection: Connection = await this.repositories.connection.loadById(churchId, connectionId);
             if (connection !== null) {
@@ -67,6 +67,14 @@ export class MessageController extends MessagingBaseController {
                 }
             }
             return null;
+        });
+    }
+
+    @httpGet("/catchup/:churchId/:conversationId")
+    public async catchup(@requestParam("churchId") churchId: string, @requestParam("conversationId") conversationId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+        return this.actionWrapperAnon(req, res, async () => {
+            const messages: Message[] = await this.repositories.message.loadForConversation(churchId, conversationId);
+            return this.repositories.message.convertAllToModel(messages);
         });
     }
 
