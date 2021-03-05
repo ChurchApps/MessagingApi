@@ -40,7 +40,7 @@ export class DeliveryHelper {
     }
 
     private static sendAws = async (connection: Connection, payload: PayloadInterface) => {
-        const apigwManagementApi = new ApiGatewayManagementApi({ apiVersion: '2020-04-16', endpoint: process.env.apiUrl });
+        const apigwManagementApi = new ApiGatewayManagementApi({ apiVersion: '2020-04-16', endpoint: process.env.SOCKET_URL });
         let success = true;
         try {
             await apigwManagementApi.postToConnection({ ConnectionId: connection.socketId, Data: JSON.stringify(payload) }).promise();
