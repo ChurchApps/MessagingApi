@@ -11,36 +11,36 @@ export class DeliveryHelper {
     static sendMessages = async (payload: PayloadInterface) => {
         const repos = Repositories.getCurrent();
         const connections = repos.connection.convertAllToModel(await repos.connection.loadForConversation(payload.churchId, payload.conversationId));
-        const promises: Promise<any>[] = [];
+        const promises: Promise<boolean>[] = [];
         connections.forEach(connection => {
             promises.push(DeliveryHelper.sendMessage(connection, payload));
         });
-        await Promise.all(promises);
+        const results = await Promise.all(promises);
+        let allSuccess = true;
+        results.forEach(r => { if (!r) allSuccess = false; })
+        if (!allSuccess) DeliveryHelper.sendAttendance(payload.churchId, payload.conversationId)
     }
 
-    static sendMessage = async (connection: Connection, payload: PayloadInterface, socket?: WebSocket) => {
+    static sendMessage = async (connection: Connection, payload: PayloadInterface) => {
         let success = true;
         if (process.env.DELIVERY_PROVIDER === "aws") success = await DeliveryHelper.sendAws(connection, payload);
         else success = await DeliveryHelper.sendLocal(connection, payload);
-        if (!success) {
-            Repositories.getCurrent().connection.delete(connection.churchId, connection.id);
-            DeliveryHelper.sendAttendance(connection.churchId, connection.conversationId)
-        }
+        if (!success) await Repositories.getCurrent().connection.delete(connection.churchId, connection.id);
+        return success;
+
     }
 
     static sendAttendance = async (churchId: string, conversationId: string) => {
         const viewers = await Repositories.getCurrent().connection.loadAttendance(churchId, conversationId);
+        console.log(viewers.length);
         let totalViewers = 0;
         viewers.forEach(v => { totalViewers += v.count });
         const data: AttendanceInterface = { conversationId, viewers, totalViewers };
         await DeliveryHelper.sendMessages({ churchId, conversationId, action: "attendance", data });
     }
 
-
-
-
     private static sendAws = async (connection: Connection, payload: PayloadInterface) => {
-        const apigwManagementApi = new ApiGatewayManagementApi({ apiVersion: '2020-04-16', endpoint: process.env.apiUrl });
+        const apigwManagementApi = new ApiGatewayManagementApi({ apiVersion: '2020-04-16', endpoint: process.env.SOCKET_URL });
         let success = true;
         try {
             await apigwManagementApi.postToConnection({ ConnectionId: connection.socketId, Data: JSON.stringify(payload) }).promise();

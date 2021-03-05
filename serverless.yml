@@ -1,0 +1,19 @@
+service: messaging-api
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  memorySize: 512
+  timeout: 10
+  region: us-east-2
+
+functions:
+  web:
+    handler: LambdaEntry.handleWeb
+    events:
+      - http: ANY {proxy+}
+      - http: ANY /
+  socket:
+    handler: LambdaEntry.handleSocket
+    events:
+      - websocket: $default

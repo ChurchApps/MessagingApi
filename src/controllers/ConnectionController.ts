@@ -9,7 +9,7 @@ import { DeliveryHelper } from "../helpers/DeliveryHelper";
 export class ConnectionController extends MessagingBaseController {
 
     @httpGet("/:churchId/:conversationId")
-    public async loadAll(@requestParam("churchId") churchId: string, @requestParam("conversationId") conversationId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+    public async load(@requestParam("churchId") churchId: string, @requestParam("conversationId") conversationId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
         return this.actionWrapperAnon(req, res, async () => {
             const data = await this.repositories.connection.loadForConversation(churchId, conversationId);
             const connections = this.repositories.connection.convertAllToModel(data);

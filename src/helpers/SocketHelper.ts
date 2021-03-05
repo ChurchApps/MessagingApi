@@ -1,6 +1,6 @@
 import { UniqueIdHelper } from "../apiBase";
 import WebSocket from "ws"
-import { SocketConnectionInterface } from "./Interfaces";
+import { PayloadInterface, SocketConnectionInterface } from "./Interfaces";
 
 export class SocketHelper {
 
@@ -14,8 +14,10 @@ export class SocketHelper {
             console.log("Listening on websocket port " + port);
 
             SocketHelper.wss.on('connection', (socket) => {
-                SocketHelper.connections.push({ id: UniqueIdHelper.shortId(), socket });
-                console.log("Connection established");
+                const sc: SocketConnectionInterface = { id: UniqueIdHelper.shortId(), socket }
+                SocketHelper.connections.push(sc);
+                const payload: PayloadInterface = { churchId: "", conversationId: "", action: "socketId", data: sc.id }
+                sc.socket.send(JSON.stringify(payload));
             });
         }
     }
