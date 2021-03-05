@@ -30,6 +30,10 @@ export class ConnectionRepository {
         DB.query("DELETE FROM connections WHERE id=? AND churchId=?;", [id, churchId]);
     }
 
+    public async deleteForSocket(socketId: string) {
+        DB.query("DELETE FROM connections WHERE socketId=?;", [socketId]);
+    }
+
     public async save(connection: Connection) {
         if (UniqueIdHelper.isMissing(connection.id)) return this.create(connection); else return this.update(connection);
     }
