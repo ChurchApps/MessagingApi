@@ -1,14 +1,16 @@
 API_ENV=dev
 APP_NAME=MessagingApi
-SERVER_PORT=8086
-DELIVERY_PROVIDER=local #or aws
-SOCKET_PORT=8087    #For "local" DELIVERY_PROVIDER
-#SOCKET_URL=        #For "aws" DELIVERY_PROVIDER
-
 DB_HOST=localhost
 DB_DATABASE=messaging
 DB_USER=
 DB_PASSWORD=
-
 JWT_SECRET_KEY=this is a test key that is a sentence
 
+#Local config
+DELIVERY_PROVIDER=local
+SERVER_PORT=8086
+SOCKET_PORT=8087
+
+#AWS config
+#DELIVERY_PROVIDER=aws
+#SOCKET_URL=your.domain.org
