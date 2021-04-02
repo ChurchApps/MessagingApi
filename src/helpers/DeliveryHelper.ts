@@ -5,6 +5,7 @@ import { Connection } from "../models";
 import { AttendanceInterface } from "../helpers/Interfaces";
 import { ApiGatewayManagementApi } from 'aws-sdk';
 import { SocketHelper } from "./SocketHelper";
+import { LoggingHelper } from "../apiBase";
 
 export class DeliveryHelper {
 
@@ -27,7 +28,6 @@ export class DeliveryHelper {
         else success = await DeliveryHelper.sendLocal(connection, payload);
         if (!success) await Repositories.getCurrent().connection.delete(connection.churchId, connection.id);
         return success;
-
     }
 
     static sendAttendance = async (churchId: string, conversationId: string) => {
@@ -44,7 +44,10 @@ export class DeliveryHelper {
         let success = true;
         try {
             await apigwManagementApi.postToConnection({ ConnectionId: connection.socketId, Data: JSON.stringify(payload) }).promise();
-        } catch { success = false; }
+        } catch (ex: any) {
+            success = false;
+            LoggingHelper.getCurrent().error(ex);
+        }
         return success;
     }
 
