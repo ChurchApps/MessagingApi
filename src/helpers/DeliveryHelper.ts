@@ -44,7 +44,7 @@ export class DeliveryHelper {
         let success = true;
         try {
             await apigwManagementApi.postToConnection({ ConnectionId: connection.socketId, Data: JSON.stringify(payload) }).promise();
-        } catch (ex: any) {
+        } catch (ex) {
             success = false;
             LoggingHelper.getCurrent().error(ex);
         }
