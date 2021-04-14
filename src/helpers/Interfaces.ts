@@ -4,6 +4,6 @@ export type PayloadAction = "message" | "deleteMessage" | "callout" | "attendanc
 
 export interface PayloadInterface { churchId: string, conversationId: string, action: PayloadAction, data: any }
 export interface AttendanceInterface { viewers?: ViewerInterface[], totalViewers?: number, conversationId: string }
-export interface ViewerInterface { displayName: string, count: number }
+export interface ViewerInterface { displayName: string, id: string }
 export interface SocketConnectionInterface { id: string, socket: WebSocket }
 
