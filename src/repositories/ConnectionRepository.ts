@@ -6,10 +6,9 @@ import { ViewerInterface } from "../helpers/Interfaces";
 export class ConnectionRepository {
 
     public async loadAttendance(churchId: string, conversationId: string) {
-        const sql = "SELECT displayName as name, count(*) as count FROM connections WHERE churchId=? AND conversationId=? GROUP BY displayName ORDER BY name;"
+        const sql = "SELECT id, displayName FROM connections WHERE churchId=? AND conversationId=? ORDER BY displayName;"
         const data: ViewerInterface[] = await DB.query(sql, [churchId, conversationId]);
-        console.log(JSON.stringify(data));
-        data.forEach((d: any) => { if (d.name === '') d.name = 'Anonymous'; });
+        data.forEach((d: ViewerInterface) => { if (d.displayName === '') d.displayName = 'Anonymous'; });
         return data;
     }
 

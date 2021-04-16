@@ -9,6 +9,23 @@ import { DeliveryHelper } from "../helpers/DeliveryHelper";
 export class ConversationController extends MessagingBaseController {
 
 
+    @httpGet("/:privateMessage/:connectionId")
+    public async privateMessage(@requestParam("connectionId") connectionId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+        return this.actionWrapper(req, res, async (au) => {
+            if (!au.checkAccess(Permissions.chat.host)) return this.json({}, 401);
+            else {
+                const connection = await this.repositories.connection.loadById(au.churchId, connectionId);
+                if (connection !== null) {
+                    const privateConversation = await this.repositories.conversation.save({ contentId: connectionId, contentType: "privateMessage", dateCreated: new Date(), title: "Private Message", churchId: au.churchId });
+                    await DeliveryHelper.sendMessage(connection, { churchId: au.churchId, conversationId: privateConversation.id, action: "privateMessage", data: privateConversation });
+                    return privateConversation;
+                }
+            }
+
+        });
+    }
+
+
     @httpGet("/requestPrayer/:churchId/:conversationId")
     public async requestPrayer(@requestParam("churchId") churchId: string, @requestParam("conversationId") conversationId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
         return this.actionWrapperAnon(req, res, async () => {

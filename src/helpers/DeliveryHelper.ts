@@ -32,9 +32,7 @@ export class DeliveryHelper {
 
     static sendAttendance = async (churchId: string, conversationId: string) => {
         const viewers = await Repositories.getCurrent().connection.loadAttendance(churchId, conversationId);
-        console.log(viewers.length);
-        let totalViewers = 0;
-        viewers.forEach(v => { totalViewers += v.count });
+        const totalViewers = viewers.length;
         const data: AttendanceInterface = { conversationId, viewers, totalViewers };
         await DeliveryHelper.sendMessages({ churchId, conversationId, action: "attendance", data });
     }
