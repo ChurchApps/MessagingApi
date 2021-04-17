@@ -12,6 +12,10 @@ export class ConnectionRepository {
         return data;
     }
 
+    public async cleanup() {
+        return DB.query("CALL cleanup()", []);
+    }
+
     public async loadById(churchId: string, id: string) {
         return DB.queryOne("SELECT * FROM connections WHERE id=? and churchId=?;", [id, churchId]);
     }
@@ -34,6 +38,7 @@ export class ConnectionRepository {
     }
 
     public async save(connection: Connection) {
+        await this.cleanup();
         if (UniqueIdHelper.isMissing(connection.id)) return this.create(connection); else return this.update(connection);
     }
 
