@@ -38,10 +38,17 @@ export class ConnectionRepository {
     }
 
     public async create(connection: Connection) {
+        await this.deleteExisting(connection.churchId, connection.conversationId, connection.socketId)
         connection.id = UniqueIdHelper.shortId();
         const sql = "INSERT INTO connections (id, churchId, conversationId, userId, displayName, timeJoined, socketId) VALUES (?, ?, ?, ?, ?, NOW(), ?);";
         const params = [connection.id, connection.churchId, connection.conversationId, connection.userId, connection.displayName, connection.socketId];
         return DB.query(sql, params).then((row: any) => { return connection; });
+    }
+
+    private async deleteExisting(churchId: string, conversationId: string, socketId: string) {
+        const sql = "DELETE FROM connections WHERE churchId=? AND conversationId=? AND socketId=?;"
+        const params = [churchId, conversationId, socketId];
+        DB.query(sql, params);
     }
 
     public async update(connection: Connection) {
