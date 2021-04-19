@@ -18,6 +18,10 @@ export class ConversationController extends MessagingBaseController {
                 if (connection !== null) {
                     const privateConversation = await this.repositories.conversation.save({ contentId: connectionId, contentType: "privateMessage", dateCreated: new Date(), title: "Private Message", churchId: au.churchId });
                     await DeliveryHelper.sendMessage(connection, { churchId: au.churchId, conversationId: privateConversation.id, action: "privateMessage", data: privateConversation });
+
+                    const hostConversation = await this.repositories.conversation.loadHostConversation(connection.churchId, connection.conversationId)
+                    await DeliveryHelper.sendMessages({ churchId: au.churchId, conversationId: hostConversation.id, action: "privateRoomAdded", data: privateConversation });
+
                     return privateConversation;
                 }
             }

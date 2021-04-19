@@ -29,12 +29,12 @@ export class ConversationRepository {
         return DB.queryOne(sql, [churchId, contentType, contentId, cutOff]);
     }
 
-    public async loadHostConversation(churchId: string, id: string) {
+    public async loadHostConversation(churchId: string, mainConversationId: string) {
         const sql = "select c2.*"
             + " FROM conversations c"
             + " INNER JOIN conversations c2 on c2.churchId=c.churchId and c2.contentType='hostChat' and c2.contentId=c.contentId"
             + " WHERE c.id=? AND c.churchId=? LIMIT 1;"
-        return DB.queryOne(sql, [id, churchId]);
+        return DB.queryOne(sql, [mainConversationId, churchId]);
     }
 
     public async create(conversation: Conversation) {
