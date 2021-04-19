@@ -22,6 +22,7 @@ export class ConnectionController extends MessagingBaseController {
         return this.actionWrapperAnon(req, res, async () => {
             const promises: Promise<Connection>[] = [];
             req.body.forEach((connection: Connection) => {
+                if (connection.userId === undefined) connection.userId = null;
                 promises.push(this.repositories.connection.save(connection).then(async c => {
                     await DeliveryHelper.sendAttendance(c.churchId, c.conversationId);
                     return c;

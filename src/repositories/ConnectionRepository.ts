@@ -29,7 +29,6 @@ export class ConnectionRepository {
     }
 
     public async delete(churchId: string, id: string) {
-        console.log("DELETE FROM connections WHERE id='" + id + "' AND churchId='" + churchId + "';")
         DB.query("DELETE FROM connections WHERE id=? AND churchId=?;", [id, churchId]);
     }
 
@@ -47,7 +46,9 @@ export class ConnectionRepository {
         connection.id = UniqueIdHelper.shortId();
         const sql = "INSERT INTO connections (id, churchId, conversationId, userId, displayName, timeJoined, socketId) VALUES (?, ?, ?, ?, ?, NOW(), ?);";
         const params = [connection.id, connection.churchId, connection.conversationId, connection.userId, connection.displayName, connection.socketId];
-        return DB.query(sql, params).then((row: any) => { return connection; });
+        return DB.query(sql, params).then((row: any) => {
+            return connection;
+        });
     }
 
     private async deleteExisting(churchId: string, conversationId: string, socketId: string) {
