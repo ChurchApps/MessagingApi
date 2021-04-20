@@ -4,6 +4,10 @@ import { UniqueIdHelper } from "../helpers";
 
 export class ConversationRepository {
 
+    private async cleanup() {
+        return DB.query("CALL cleanup()", []);
+    }
+
     public async loadById(churchId: string, id: string) {
         return DB.queryOne("SELECT * FROM conversations WHERE id=? AND churchId=?;", [id, churchId]);
     }
@@ -17,6 +21,7 @@ export class ConversationRepository {
     }
 
     public async save(conversation: Conversation) {
+        await this.cleanup();
         if (UniqueIdHelper.isMissing(conversation.id)) return this.create(conversation); else return this.update(conversation);
     }
 
@@ -32,7 +37,7 @@ export class ConversationRepository {
     public async loadHostConversation(churchId: string, mainConversationId: string) {
         const sql = "select c2.*"
             + " FROM conversations c"
-            + " INNER JOIN conversations c2 on c2.churchId=c.churchId and c2.contentType='hostChat' and c2.contentId=c.contentId"
+            + " INNER JOIN conversations c2 on c2.churchId=c.churchId and c2.contentType='streamingLiveHost' and c2.contentId=c.contentId"
             + " WHERE c.id=? AND c.churchId=? LIMIT 1;"
         return DB.queryOne(sql, [mainConversationId, churchId]);
     }
