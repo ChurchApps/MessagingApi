@@ -2,7 +2,7 @@ import { controller, httpGet, httpPost, requestParam } from "inversify-express-u
 import express from "express";
 import { MessagingBaseController } from "./MessagingBaseController"
 import { Permissions } from "../helpers/Permissions";
-import { Conversation } from "../models";
+import { Conversation, Connection } from "../models";
 import { DeliveryHelper } from "../helpers/DeliveryHelper";
 
 @controller("/conversations")
@@ -14,9 +14,9 @@ export class ConversationController extends MessagingBaseController {
         return this.actionWrapper(req, res, async (au) => {
             if (!au.checkAccess(Permissions.chat.host)) return this.json({}, 401);
             else {
-                const connection = await this.repositories.connection.loadById(au.churchId, connectionId);
+                const connection: Connection = await this.repositories.connection.loadById(au.churchId, connectionId);
                 if (connection !== null) {
-                    const privateConversation = await this.repositories.conversation.save({ contentId: connectionId, contentType: "privateMessage", dateCreated: new Date(), title: "Private Message", churchId: au.churchId });
+                    const privateConversation = await this.repositories.conversation.save({ contentId: connectionId, contentType: "privateMessage", dateCreated: new Date(), title: "Private chat with " + connection.displayName, churchId: au.churchId });
                     await DeliveryHelper.sendMessage(connection, { churchId: au.churchId, conversationId: privateConversation.id, action: "privateMessage", data: privateConversation });
 
                     const hostConversation = await this.repositories.conversation.loadHostConversation(connection.churchId, connection.conversationId)
