@@ -7,8 +7,6 @@ import { DeliveryHelper } from "../helpers/DeliveryHelper";
 
 @controller("/conversations")
 export class ConversationController extends MessagingBaseController {
-
-
     @httpGet("/:privateMessage/:connectionId")
     public async privateMessage(@requestParam("connectionId") connectionId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
         return this.actionWrapper(req, res, async (au) => {
@@ -28,7 +26,6 @@ export class ConversationController extends MessagingBaseController {
 
         });
     }
-
 
     @httpGet("/requestPrayer/:churchId/:conversationId")
     public async requestPrayer(@requestParam("churchId") churchId: string, @requestParam("conversationId") conversationId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
