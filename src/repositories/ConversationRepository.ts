@@ -30,7 +30,7 @@ export class ConversationRepository {
         cutOff.setDate(cutOff.getDate() - 1);
         const sql = "select *"
             + " FROM conversations"
-            + " WHERE churchId=? and contentType=? AND contentId=? AND dateCreated>=? LIMIT 1;"
+            + " WHERE churchId=? and contentType=? AND contentId=? AND dateCreated>=? ORDER BY dateCreated desc LIMIT 1;"
         return DB.queryOne(sql, [churchId, contentType, contentId, cutOff]);
     }
 

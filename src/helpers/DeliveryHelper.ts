@@ -14,7 +14,7 @@ export class DeliveryHelper {
         const connections = repos.connection.convertAllToModel(await repos.connection.loadForConversation(payload.churchId, payload.conversationId));
         const promises: Promise<boolean>[] = [];
 
-        console.log("SENDING " + payload.action + ' to ' + connections.length + ' recipients');
+        // console.log("SENDING " + payload.action + ' to ' + connections.length + ' recipients');
         connections.forEach(connection => {
             promises.push(DeliveryHelper.sendMessage(connection, payload));
         });
