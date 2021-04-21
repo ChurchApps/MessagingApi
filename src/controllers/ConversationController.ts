@@ -7,6 +7,25 @@ import { DeliveryHelper } from "../helpers/DeliveryHelper";
 
 @controller("/conversations")
 export class ConversationController extends MessagingBaseController {
+
+    @httpGet("/:videoChat/:connectionId")
+    public async videoChat(@requestParam("connectionId") connectionId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+        return this.actionWrapper(req, res, async (au) => {
+            if (!au.checkAccess(Permissions.chat.host)) return this.json({}, 401);
+            else {
+                const connection: Connection = await this.repositories.connection.loadById(au.churchId, connectionId);
+                if (connection !== null) {
+                    await DeliveryHelper.sendMessage(connection, { churchId: au.churchId, conversationId: connection.conversationId, action: "videoChatInvite", data: "StreamingLiveTestRoom" });
+
+                    // const hostConversation = await this.repositories.conversation.loadHostConversation(connection.churchId, connection.conversationId)
+                    // await DeliveryHelper.sendMessages({ churchId: au.churchId, conversationId: hostConversation.id, action: "privateRoomAdded", data: privateConversation });
+                    return {}
+                }
+            }
+
+        });
+    }
+
     @httpGet("/:privateMessage/:connectionId")
     public async privateMessage(@requestParam("connectionId") connectionId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
         return this.actionWrapper(req, res, async (au) => {
