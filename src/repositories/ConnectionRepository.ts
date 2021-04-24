@@ -36,19 +36,24 @@ export class ConnectionRepository {
         if (UniqueIdHelper.isMissing(connection.id)) return this.create(connection); else return this.update(connection);
     }
 
-    public async create(connection: Connection) {
-        await this.deleteExisting(connection.churchId, connection.conversationId, connection.socketId)
+    public async create(connection: Connection): Promise<Connection> {
         connection.id = UniqueIdHelper.shortId();
+        await this.deleteExisting(connection.churchId, connection.conversationId, connection.socketId, connection.id)
         const sql = "INSERT INTO connections (id, churchId, conversationId, userId, displayName, timeJoined, socketId) VALUES (?, ?, ?, ?, ?, NOW(), ?);";
         const params = [connection.id, connection.churchId, connection.conversationId, connection.userId, connection.displayName, connection.socketId];
+        // LoggingHelper.getCurrent().error("CREATED ConnectionId: " + JSON.stringify(params));
         return DB.query(sql, params).then((row: any) => {
-            return connection;
+            // LoggingHelper.getCurrent().error(JSON.stringify(row));
+            return DB.query("SELECT * FROM connections WHERE id=?", [connection.id]).then(async (rows: any[]) => {
+                if (rows.length === 0) return await this.create(connection);    // Error handling hack
+                else return connection;
+            });
         });
     }
 
-    private async deleteExisting(churchId: string, conversationId: string, socketId: string) {
-        const sql = "DELETE FROM connections WHERE churchId=? AND conversationId=? AND socketId=?;"
-        const params = [churchId, conversationId, socketId];
+    private async deleteExisting(churchId: string, conversationId: string, socketId: string, id: string) {
+        const sql = "DELETE FROM connections WHERE churchId=? AND conversationId=? AND socketId=? AND id<>?;"
+        const params = [churchId, conversationId, socketId, id];
         DB.query(sql, params);
     }
 
