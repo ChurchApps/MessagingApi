@@ -8,18 +8,6 @@ import { DeliveryHelper } from "../helpers/DeliveryHelper";
 @controller("/connections")
 export class ConnectionController extends MessagingBaseController {
 
-
-    @httpGet("/test")
-    public async test(req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
-        return this.actionWrapperAnon(req, res, async () => {
-            console.log("ABOUT TO DELETE");
-            const data = await this.repositories.connection.deleteExisting("1", "1", "1", "1");
-            console.log(JSON.stringify(data));
-            console.log("MOVED ON");
-            return {};
-        });
-    }
-
     @httpGet("/:churchId/:conversationId")
     public async load(@requestParam("churchId") churchId: string, @requestParam("conversationId") conversationId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
         return this.actionWrapperAnon(req, res, async () => {
