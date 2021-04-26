@@ -54,7 +54,7 @@ export class ConnectionRepository {
     private async deleteExisting(churchId: string, conversationId: string, socketId: string, id: string) {
         const sql = "DELETE FROM connections WHERE churchId=? AND conversationId=? AND socketId=? AND id<>?;"
         const params = [churchId, conversationId, socketId, id];
-        DB.query(sql, params);
+        await DB.query(sql, params);
     }
 
     public async update(connection: Connection) {
