@@ -4,20 +4,20 @@ import { UniqueIdHelper } from "../helpers";
 
 export class ConversationRepository {
 
-    private async cleanup() {
+    private cleanup() {
         return DB.query("CALL cleanup()", []);
     }
 
-    public async loadById(churchId: string, id: string) {
+    public loadById(churchId: string, id: string) {
         return DB.queryOne("SELECT * FROM conversations WHERE id=? AND churchId=?;", [id, churchId]);
     }
 
-    public async loadForContent(churchId: string, contentType: string, contentId: string) {
+    public loadForContent(churchId: string, contentType: string, contentId: string) {
         return DB.query("SELECT * FROM conversations WHERE churchId=? AND contentType=? AND contentId=?", [churchId, contentType, contentId]);
     }
 
-    public async delete(churchId: string, id: string) {
-        DB.query("DELETE FROM conversations WHERE id=? AND churchId=?;", [id, churchId]);
+    public delete(churchId: string, id: string) {
+        return DB.query("DELETE FROM conversations WHERE id=? AND churchId=?;", [id, churchId]);
     }
 
     public async save(conversation: Conversation) {
@@ -25,7 +25,7 @@ export class ConversationRepository {
         if (UniqueIdHelper.isMissing(conversation.id)) return this.create(conversation); else return this.update(conversation);
     }
 
-    public async loadCurrent(churchId: string, contentType: string, contentId: string) {
+    public loadCurrent(churchId: string, contentType: string, contentId: string) {
         const cutOff = new Date();
         cutOff.setDate(cutOff.getDate() - 1);
         const sql = "select *"
@@ -34,7 +34,7 @@ export class ConversationRepository {
         return DB.queryOne(sql, [churchId, contentType, contentId, cutOff]);
     }
 
-    public async loadHostConversation(churchId: string, mainConversationId: string) {
+    public loadHostConversation(churchId: string, mainConversationId: string) {
         const sql = "select c2.*"
             + " FROM conversations c"
             + " INNER JOIN conversations c2 on c2.churchId=c.churchId and c2.contentType='streamingLiveHost' and c2.contentId=c.contentId"
@@ -46,13 +46,15 @@ export class ConversationRepository {
         conversation.id = UniqueIdHelper.shortId();
         const sql = "INSERT INTO conversations (id, churchId, contentType, contentId, title, dateCreated) VALUES (?, ?, ?, ?, ?, NOW());";
         const params = [conversation.id, conversation.churchId, conversation.contentType, conversation.contentId, conversation.title];
-        return DB.query(sql, params).then((row: any) => { return conversation; });
+        await DB.query(sql, params);
+        return conversation;
     }
 
     public async update(conversation: Conversation) {
         const sql = "UPDATE conversations SET title=? WHERE id=? AND churchId=?;";
         const params = [conversation.title, conversation.id, conversation.churchId]
-        return DB.query(sql, params).then(() => { return conversation });
+        await DB.query(sql, params)
+        return conversation;
     }
 
     public convertToModel(data: any) {
