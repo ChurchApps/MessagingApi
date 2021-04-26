@@ -7,19 +7,22 @@ const init = async () => {
   console.log("Connecting");
   Pool.initPool();
 
-  const tables: { title: string, file: string }[] = [
+  const tablesAndProcedure: { title: string, file: string, customDelimeter?: boolean }[] = [
     { title: "Connections", file: "connections.mysql" },
     { title: "Conversations", file: "conversations.mysql" },
-    { title: "Messages", file: "messages.mysql" }
+    { title: "Messages", file: "messages.mysql" },
+    { title: "Cleanup Procedure", file: "cleanup.mysql", customDelimeter: true }
   ];
 
-  await initTables("Messaging", tables);
+  await initTablesAndProcedures("Messaging", tablesAndProcedure);
 }
 
-const initTables = async (displayName: string, tables: { title: string, file: string }[]) => {
+const initTablesAndProcedures = async (displayName: string, entries: { title: string, file: string, customDelimeter?: boolean }[]) => {
   console.log("");
   console.log("SECTION: " + displayName);
-  for (const table of tables) await DBCreator.runScript(table.title, "./tools/dbScripts/" + table.file, false);
+  for (const entry of entries) {
+    await DBCreator.runScript(entry.title, "./tools/dbScripts/" + entry.file, entry.customDelimeter || false);
+  }
 }
 
 init()
