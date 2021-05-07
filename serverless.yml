@@ -17,3 +17,4 @@ functions:
     handler: LambdaEntry.handleSocket
     events:
       - websocket: $default
+      - websocket: $disconnect

@@ -14,6 +14,8 @@ export class DeliveryHelper {
         const connections = repos.connection.convertAllToModel(await repos.connection.loadForConversation(payload.churchId, payload.conversationId));
         const promises: Promise<boolean>[] = [];
 
+        // console.log("Connection count: " + connections.length);
+
         // console.log("SENDING " + payload.action + ' to ' + connections.length + ' recipients');
         connections.forEach(connection => {
             promises.push(DeliveryHelper.sendMessage(connection, payload));
@@ -21,6 +23,7 @@ export class DeliveryHelper {
         const results = await Promise.all(promises);
         let allSuccess = true;
         results.forEach(r => { if (!r) allSuccess = false; })
+        // console.log("All success: " + allSuccess.toString())
         if (!allSuccess) DeliveryHelper.sendAttendance(payload.churchId, payload.conversationId)
     }
 
@@ -46,7 +49,7 @@ export class DeliveryHelper {
             await apigwManagementApi.postToConnection({ ConnectionId: connection.socketId, Data: JSON.stringify(payload) }).promise();
         } catch (ex) {
             success = false;
-            LoggingHelper.getCurrent().error(ex);
+            if (ex.toString() !== "410") LoggingHelper.getCurrent().error("'" + ex + "'");
         }
         return success;
     }

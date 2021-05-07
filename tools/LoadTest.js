@@ -10,24 +10,24 @@ import ws from 'k6/ws';
 
 const ip = '192.168.1.36';
 const churchId = "Q5EjNf69beb";
-const conversationId = "u2dFEMSrd2I";
+const conversationId = "09BMbmxPkmm";
+
 const restUrl = 'http://' + ip + ':8086';
 const wsUrl = 'ws://' + ip + ':8087';
 
 
 export let options = {
     stages: [
-        { duration: '5s', target: 2 },
-        { duration: '5s', target: 10 },
-        { duration: '20s', target: 50 },
+        { duration: '15s', target: 100 },
+        { duration: '30s', target: 100 },
         /*
         { duration: '30s', target: 250 },
         { duration: '60s', target: 1000 },
         { duration: '60s', target: 1000 },
         { duration: '30s', target: 250 },
         */
-        { duration: '60s', target: 50 },
-        { duration: '5s', target: 0 },
+        //{ duration: '60s', target: 100 },
+        { duration: '20s', target: 0 },
     ],
 };
 
@@ -51,9 +51,9 @@ export default function () {
         });
         socket.on('close', () => console.log('disconnected'));
         socket.setTimeout(function () {
-            console.log('60 seconds passed, closing the socket');
+            console.log('100 seconds passed, closing the socket');
             socket.close();
-        }, 60 * 1000);
+        }, 100 * 1000);
         socket.setInterval(checkSendMessage, 1000);
     });
 }

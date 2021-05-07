@@ -1,6 +1,9 @@
 import { UniqueIdHelper } from "../apiBase";
 import WebSocket from "ws"
 import { PayloadInterface, SocketConnectionInterface } from "./Interfaces";
+import { Repositories } from "../repositories"
+import { Connection } from "../models"
+import { DeliveryHelper } from "./DeliveryHelper";
 
 export class SocketHelper {
 
@@ -18,8 +21,23 @@ export class SocketHelper {
                 SocketHelper.connections.push(sc);
                 const payload: PayloadInterface = { churchId: "", conversationId: "", action: "socketId", data: sc.id }
                 sc.socket.send(JSON.stringify(payload));
+                sc.socket.on('close', async () => {
+                    // console.log("DELETING " + sc.id);
+                    await SocketHelper.handleDisconnect(sc.id);
+                });
             });
         }
+    }
+
+    static handleDisconnect = async (socketId: string) => {
+        // console.log("handleDisconnect");
+        // console.log(socketId);
+        const connections = await Repositories.getCurrent().connection.loadBySocketId(socketId);
+        await Repositories.getCurrent().connection.deleteForSocket(socketId);
+        connections.forEach((c: Connection) => {
+            DeliveryHelper.sendAttendance(c.churchId, c.conversationId);
+        });
+
     }
 
     static getConnection = (id: string) => {
