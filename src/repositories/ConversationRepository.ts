@@ -22,7 +22,7 @@ export class ConversationRepository {
 
     public async save(conversation: Conversation) {
         await this.cleanup();
-        if (UniqueIdHelper.isMissing(conversation.id)) return this.create(conversation); else return this.update(conversation);
+        return conversation.id ? this.update(conversation) : this.create(conversation);
     }
 
     public loadCurrent(churchId: string, contentType: string, contentId: string) {
@@ -42,7 +42,7 @@ export class ConversationRepository {
         return DB.queryOne(sql, [mainConversationId, churchId]);
     }
 
-    public async create(conversation: Conversation) {
+    private async create(conversation: Conversation) {
         conversation.id = UniqueIdHelper.shortId();
         const sql = "INSERT INTO conversations (id, churchId, contentType, contentId, title, dateCreated) VALUES (?, ?, ?, ?, ?, NOW());";
         const params = [conversation.id, conversation.churchId, conversation.contentType, conversation.contentId, conversation.title];
@@ -50,7 +50,7 @@ export class ConversationRepository {
         return conversation;
     }
 
-    public async update(conversation: Conversation) {
+    private async update(conversation: Conversation) {
         const sql = "UPDATE conversations SET title=? WHERE id=? AND churchId=?;";
         const params = [conversation.title, conversation.id, conversation.churchId]
         await DB.query(sql, params)

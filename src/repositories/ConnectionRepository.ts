@@ -39,10 +39,10 @@ export class ConnectionRepository {
     }
 
     public save(connection: Connection) {
-        if (UniqueIdHelper.isMissing(connection.id)) return this.create(connection); else return this.update(connection);
+        return connection.id ? this.update(connection) : this.create(connection);
     }
 
-    public async create(connection: Connection): Promise<Connection> {
+    private async create(connection: Connection): Promise<Connection> {
         connection.id = UniqueIdHelper.shortId();
         await this.deleteExisting(connection.churchId, connection.conversationId, connection.socketId, connection.id)
         const sql = "INSERT INTO connections (id, churchId, conversationId, userId, displayName, timeJoined, socketId) VALUES (?, ?, ?, ?, ?, NOW(), ?);";
@@ -51,7 +51,7 @@ export class ConnectionRepository {
         return connection;
     }
 
-    public async update(connection: Connection) {
+    private async update(connection: Connection) {
         const sql = "UPDATE connections SET userId=?, displayName=? WHERE id=? AND churchId=?;";
         const params = [connection.userId, connection.displayName, connection.id, connection.churchId]
         await DB.query(sql, params);
