@@ -17,10 +17,10 @@ export class MessageRepository {
     }
 
     public save(message: Message) {
-        if (UniqueIdHelper.isMissing(message.id)) return this.create(message); else return this.update(message);
+        return message.id ? this.update(message) : this.create(message);
     }
 
-    public async create(message: Message) {
+    private async create(message: Message) {
         message.id = UniqueIdHelper.shortId();
         const sql = "INSERT INTO messages (id, churchId, conversationId, userId, displayName, timeSent, messageType, content) VALUES (?, ?, ?, ?, ?, NOW(), ?, ?);";
         const params = [message.id, message.churchId, message.conversationId, message.userId, message.displayName, message.messageType, message.content];
@@ -28,7 +28,7 @@ export class MessageRepository {
         return message;
     }
 
-    public async update(message: Message) {
+    private async update(message: Message) {
         const sql = "UPDATE messages SET userId=?, displayName=?, content=? WHERE id=? AND churchId=?;";
         const params = [message.userId, message.displayName, message.content, message.id, message.churchId]
         await DB.query(sql, params)
