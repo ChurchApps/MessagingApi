@@ -1,0 +1,11 @@
+{
+  "appEnv": "staging",
+  "appName": "MessagingApi",
+  "contentRoot": "https://content.staging.churchapps.org",
+  "fileStore": "S3",
+  "mailSystem": "SES",
+  "s3Bucket": "staging-churchapps-content",
+  "deliveryProvider": "aws",
+  "socketPort": 0,
+  "socketUrl": "wss://socket.staging.churchapps.org/"
+}

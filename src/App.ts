@@ -8,23 +8,24 @@ import express from "express";
 import { CustomAuthProvider } from "./apiBase/auth";
 import cors from "cors"
 import { SocketHelper } from "./helpers/SocketHelper";
+import { Environment } from "./helpers";
 
 
 export const init = async () => {
-    dotenv.config();
-    const container = new Container();
-    await container.loadAsync(bindings);
-    const app = new InversifyExpressServer(container, null, null, null, CustomAuthProvider);
+  dotenv.config();
+  const container = new Container();
+  await container.loadAsync(bindings);
+  const app = new InversifyExpressServer(container, null, null, null, CustomAuthProvider);
 
-    const configFunction = (expApp: express.Application) => {
-        expApp.use(bodyParser.urlencoded({ extended: true }));
-        expApp.use(bodyParser.json());
-        expApp.use(cors())
-    };
+  const configFunction = (expApp: express.Application) => {
+    expApp.use(bodyParser.urlencoded({ extended: true }));
+    expApp.use(bodyParser.json());
+    expApp.use(cors())
+  };
 
-    const server = app.setConfig(configFunction).build();
+  const server = app.setConfig(configFunction).build();
 
-    if (process.env.DELIVERY_PROVIDER === "local") SocketHelper.init();
+  if (Environment.deliveryProvider === "local") SocketHelper.init();
 
-    return server;
+  return server;
 }
