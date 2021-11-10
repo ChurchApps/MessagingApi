@@ -18,3 +18,11 @@ functions:
     events:
       - websocket: $default
       - websocket: $disconnect
+
+plugins:
+  - serverless-layers
+  
+custom:
+  serverless-layers:
+    dependenciesPath: ./package.json
+    layersDeploymentBucket: "lcs-layers"
