@@ -6,6 +6,7 @@ import { AttendanceInterface } from "../helpers/Interfaces";
 import { ApiGatewayManagementApi } from 'aws-sdk';
 import { SocketHelper } from "./SocketHelper";
 import { LoggingHelper } from "../apiBase";
+import { Environment } from "../helpers"
 
 export class DeliveryHelper {
 
@@ -29,7 +30,7 @@ export class DeliveryHelper {
 
     static sendMessage = async (connection: Connection, payload: PayloadInterface) => {
         let success = true;
-        if (process.env.DELIVERY_PROVIDER === "aws") success = await DeliveryHelper.sendAws(connection, payload);
+        if (Environment.deliveryProvider === "aws") success = await DeliveryHelper.sendAws(connection, payload);
         else success = await DeliveryHelper.sendLocal(connection, payload);
         if (!success) await Repositories.getCurrent().connection.delete(connection.churchId, connection.id);
         return success;
@@ -43,7 +44,7 @@ export class DeliveryHelper {
     }
 
     private static sendAws = async (connection: Connection, payload: PayloadInterface) => {
-        const apigwManagementApi = new ApiGatewayManagementApi({ apiVersion: '2020-04-16', endpoint: process.env.SOCKET_URL });
+        const apigwManagementApi = new ApiGatewayManagementApi({ apiVersion: '2020-04-16', endpoint: Environment.socketUrl });
         let success = true;
         try {
             await apigwManagementApi.postToConnection({ ConnectionId: connection.socketId, Data: JSON.stringify(payload) }).promise();
