@@ -1,16 +1,7 @@
 API_ENV=dev
-APP_NAME=MessagingApi
-DB_HOST=localhost
-DB_DATABASE=messaging
-DB_USER=
-DB_PASSWORD=
-JWT_SECRET_KEY=this is a test key that is a sentence
 
-#Local config
-DELIVERY_PROVIDER=local
+# sample connection - mysql://user:password@host:port/dbName
+CONNECTION_STRING=mysql://
+ENCRYPTION_KEY=aSecretKeyOfExactly192BitsLength
+JWT_SECRET=this is a test key that is a sentence
 SERVER_PORT=8086
-SOCKET_PORT=8087
-
-#AWS config
-#DELIVERY_PROVIDER=aws
-#SOCKET_URL=your.domain.org
