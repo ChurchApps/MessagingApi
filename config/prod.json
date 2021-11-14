@@ -7,5 +7,5 @@
   "s3Bucket": "churchapps-content",
   "deliveryProvider": "aws",
   "socketPort": 0,
-  "socketUrl": "wss://socket.churchapps.org/"
+  "socketUrl": "socket.churchapps.org"
 }
