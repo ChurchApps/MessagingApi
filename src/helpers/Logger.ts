@@ -31,11 +31,11 @@ export class Logger {
       // this._logger = winston.createLogger({ transports: [this.wc], format: winston.format.json() });
     }
     else if (Environment.appEnv === "staging") {
-      this.wc = new WinstonCloudWatch({ logGroupName: 'CoreApis', logStreamName: 'MessagingApi' });
+      this.wc = new WinstonCloudWatch({ logGroupName: 'CoreApis', logStreamName: 'MessagingApi', name: "CoreApis_MessagingApi" });
       this._logger = winston.createLogger({ transports: [this.wc], format: winston.format.json() });
     }
     else if (Environment.appEnv === "prod") {
-      this.wc = new WinstonCloudWatch({ logGroupName: 'CoreApis', logStreamName: 'MessagingApi' });
+      this.wc = new WinstonCloudWatch({ logGroupName: 'CoreApis', logStreamName: 'MessagingApi', name: "CoreApis_MessagingApi" });
       this._logger = winston.createLogger({ transports: [this.wc], format: winston.format.json() });
     }
     this._logger.info("Logger initialized");
