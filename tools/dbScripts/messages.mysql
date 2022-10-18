@@ -5,6 +5,7 @@ CREATE TABLE `messages` (
   `churchId` char(11) DEFAULT NULL,
   `conversationId` char(11) DEFAULT NULL,
   `userId` char(11) DEFAULT NULL,
+  `personId` char(11) DEFAULT NULL,
   `displayName` varchar(45) DEFAULT NULL,
   `timeSent` datetime DEFAULT NULL,
   `messageType` varchar(45) DEFAULT NULL,
