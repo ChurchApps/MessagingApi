@@ -33,28 +33,28 @@ export class MessageController extends MessagingBaseController {
   @httpPost("/setCallout")
   public async setCallout(req: express.Request<{}, {}, Message>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
-      if (!au.checkAccess(Permissions.chat.host)) return this.json({}, 401);
-      else {
-        req.body.messageType = "callout";
-        const m = this.repositories.message.convertToModel(await this.repositories.message.save(req.body));
-        await DeliveryHelper.sendMessages({ churchId: m.churchId, conversationId: m.conversationId, action: "callout", data: m });
-        return m;
-      }
+      // if (!au.checkAccess(Permissions.chat.host)) return this.json({}, 401);
+      // else {
+      req.body.messageType = "callout";
+      const m = this.repositories.message.convertToModel(await this.repositories.message.save(req.body));
+      await DeliveryHelper.sendMessages({ churchId: m.churchId, conversationId: m.conversationId, action: "callout", data: m });
+      return m;
+      // }
     });
   }
 
   @httpDelete("/:id")
   public async delete(@requestParam("id") id: string, req: express.Request<{}, {}, null>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapper(req, res, async (au) => {
-      if (!au.checkAccess(Permissions.chat.host)) return this.json({}, 401);
-      else {
-        const m = await this.repositories.message.loadById(au.churchId, id);
-        if (m !== null) {
-          await this.repositories.message.delete(au.churchId, id);
-          await DeliveryHelper.sendMessages({ churchId: au.churchId, conversationId: m.conversationId, action: "deleteMessage", data: m.id });
-          return m;
-        }
+      // if (!au.checkAccess(Permissions.chat.host)) return this.json({}, 401);
+      // else {
+      const m = await this.repositories.message.loadById(au.churchId, id);
+      if (m !== null) {
+        await this.repositories.message.delete(au.churchId, id);
+        await DeliveryHelper.sendMessages({ churchId: au.churchId, conversationId: m.conversationId, action: "deleteMessage", data: m.id });
+        return m;
       }
+      // }
     });
   }
 
