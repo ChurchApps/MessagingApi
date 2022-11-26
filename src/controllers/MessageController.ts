@@ -1,7 +1,7 @@
 import { controller, httpGet, httpPost, requestParam, httpDelete, interfaces } from "inversify-express-utils";
 import express from "express";
 import { MessagingBaseController } from "./MessagingBaseController"
-import { Message, Connection } from "../models";
+import { Message, Connection, Conversation } from "../models";
 import { Permissions } from "../helpers/Permissions";
 import { DeliveryHelper } from "../helpers/DeliveryHelper";
 
@@ -22,6 +22,7 @@ export class MessageController extends MessagingBaseController {
         }
 
         promises.push(this.repositories.message.save(message).then(async (m: Message) => {
+          this.repositories.conversation.updateStats(m.conversationId);
           await DeliveryHelper.sendMessages({ churchId: m.churchId, conversationId: m.conversationId, action: "message", data: m });
           return m;
         }));
@@ -51,9 +52,11 @@ export class MessageController extends MessagingBaseController {
       const m = await this.repositories.message.loadById(au.churchId, id);
       if (m !== null) {
         await this.repositories.message.delete(au.churchId, id);
+        this.repositories.conversation.updateStats(m.conversationId);
         await DeliveryHelper.sendMessages({ churchId: au.churchId, conversationId: m.conversationId, action: "deleteMessage", data: m.id });
         return m;
       }
+
       // }
     });
   }

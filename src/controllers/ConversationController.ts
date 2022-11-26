@@ -1,7 +1,6 @@
-import { controller, httpGet, httpPost, requestParam } from "inversify-express-utils";
+import { controller, httpGet, requestParam } from "inversify-express-utils";
 import express from "express";
 import { MessagingBaseController } from "./MessagingBaseController"
-import { Permissions } from "../helpers/Permissions";
 import { Conversation, Connection } from "../models";
 import { DeliveryHelper } from "../helpers/DeliveryHelper";
 
@@ -12,7 +11,7 @@ export class ConversationController extends MessagingBaseController {
   public async videoChat(@requestParam("connectionId") connectionId: string, @requestParam("room") room: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
 
-      //Permissions are controlled outside of MessagingApi.  If we need to restrict these actions, encrypt the room id in streaminglive app and pass it here to prove access.
+      // Permissions are controlled outside of MessagingApi.  If we need to restrict these actions, encrypt the room id in streaminglive app and pass it here to prove access.
 
       // if (!au.checkAccess(Permissions.chat.host)) return this.json({}, 401);
       // else {
@@ -49,7 +48,7 @@ export class ConversationController extends MessagingBaseController {
   public async requestPrayer(@requestParam("churchId") churchId: string, @requestParam("conversationId") conversationId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
     return this.actionWrapperAnon(req, res, async () => {
       const conversation = await this.repositories.conversation.loadById(churchId, conversationId);
-      const hostConversation = await this.getOrCreate(churchId, "streamingLiveHost", conversation.contentId);
+      const hostConversation = await this.getOrCreate(churchId, "streamingLiveHost", conversation.contentId, "hidden", true);
       const prayerConversation = await this.repositories.conversation.save({ contentId: conversation.contentId, contentType: "prayer", dateCreated: new Date(), title: "Prayer request", churchId });
       await DeliveryHelper.sendMessages({ churchId: hostConversation.churchId, conversationId: hostConversation.id, action: "prayerRequest", data: prayerConversation });
       return prayerConversation;
@@ -60,7 +59,7 @@ export class ConversationController extends MessagingBaseController {
   @httpGet("/current/:churchId/:contentType/:contentId")
   public async current(@requestParam("churchId") churchId: string, @requestParam("contentType") contentType: string, @requestParam("contentId") contentId: string, req: express.Request<{}, {}, {}>, res: express.Response): Promise<any> {
     return this.actionWrapperAnon(req, res, async () => {
-      return await this.getOrCreate(churchId, contentType, contentId);
+      return await this.getOrCreate(churchId, contentType, contentId, "public", true);
     });
   }
 
@@ -72,10 +71,10 @@ export class ConversationController extends MessagingBaseController {
     });
   }
 
-  private async getOrCreate(churchId: string, contentType: string, contentId: string) {
+  private async getOrCreate(churchId: string, contentType: string, contentId: string, visibility: string, allowAnonymousPosts: boolean) {
     let result: Conversation = await this.repositories.conversation.loadCurrent(churchId, contentType, contentId);
     if (result === null) {
-      result = { contentId, contentType, dateCreated: new Date(), title: contentType + " #" + contentId, churchId }
+      result = { contentId, contentType, dateCreated: new Date(), title: contentType + " #" + contentId, churchId, visibility, allowAnonymousPosts }
       result = await this.repositories.conversation.save(result);
     }
     return result;

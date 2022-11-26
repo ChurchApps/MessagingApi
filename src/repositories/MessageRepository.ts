@@ -1,6 +1,7 @@
 import { DB } from "../apiBase/db";
 import { Message } from "../models";
 import { UniqueIdHelper } from "../helpers";
+import { ConversationRepository } from "./ConversationRepository";
 
 export class MessageRepository {
 
@@ -29,8 +30,8 @@ export class MessageRepository {
   }
 
   private async update(message: Message) {
-    const sql = "UPDATE messages SET userId=?, displayName=?, content=? WHERE id=? AND churchId=?;";
-    const params = [message.userId, message.displayName, message.content, message.id, message.churchId]
+    const sql = "UPDATE messages SET userId=?, displayName=?, content=?, timeUpdated=? WHERE id=? AND churchId=?;";
+    const params = [message.userId, message.displayName, message.content, message.timeUpdated, message.id, message.churchId]
     await DB.query(sql, params)
     return message;
   }
