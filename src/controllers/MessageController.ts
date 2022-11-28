@@ -9,6 +9,30 @@ import { DeliveryHelper } from "../helpers/DeliveryHelper";
 @controller("/messages")
 export class MessageController extends MessagingBaseController {
 
+  @httpPost("/")
+  public async save(req: express.Request<{}, {}, Message[]>, res: express.Response): Promise<any> {
+    return this.actionWrapper(req, res, async (au) => {
+      const promises: Promise<Message>[] = [];
+      req.body.forEach((message: Message) => {
+        message.messageType = "message";
+        if (au?.id) {
+          message.userId = au.id;
+          message.displayName = au.firstName + " " + au.lastName;
+          message.personId = au.personId;
+          message.churchId = au.churchId;
+        }
+
+        promises.push(this.repositories.message.save(message).then(async (m: Message) => {
+          this.repositories.conversation.updateStats(m.conversationId);
+          await DeliveryHelper.sendMessages({ churchId: m.churchId, conversationId: m.conversationId, action: "message", data: m });
+          return m;
+        }));
+      });
+      return this.repositories.message.convertAllToModel(await Promise.all(promises));
+    });
+  }
+
+  // todo remove duplicate (used by streaming live.  Just post to /)
   @httpPost("/send")
   public async send(req: express.Request<{}, {}, Message[]>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
@@ -61,6 +85,13 @@ export class MessageController extends MessagingBaseController {
     });
   }
 
+  @httpGet("/conversation/:conversationId")
+  public async loadByConversation(@requestParam("conversationId") conversationId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+    return this.actionWrapper(req, res, async (au) => {
+      const messages: Message[] = await this.repositories.message.loadForConversation(au.churchId, conversationId);
+      return this.repositories.message.convertAllToModel(messages);
+    });
+  }
 
   @httpGet("/catchup/:churchId/:conversationId")
   public async catchup(@requestParam("churchId") churchId: string, @requestParam("conversationId") conversationId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {

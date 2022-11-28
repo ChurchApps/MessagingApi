@@ -37,7 +37,7 @@ export class MessageRepository {
   }
 
   public convertToModel(data: any) {
-    const result: Message = { id: data.id, churchId: data.churchId, conversationId: data.conversationId, userId: data.userId, displayName: data.displayName, timeSent: data.timeSent, messageType: data.messageType, content: data.content };
+    const result: Message = { id: data.id, churchId: data.churchId, conversationId: data.conversationId, userId: data.userId, displayName: data.displayName, timeSent: data.timeSent, messageType: data.messageType, content: data.content, personId: data.personId, timeUpdated: data.timeUpdated };
     return result;
   }
 

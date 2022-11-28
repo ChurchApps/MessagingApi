@@ -1,4 +1,4 @@
-import { controller, httpGet, requestParam } from "inversify-express-utils";
+import { controller, httpGet, httpPost, interfaces, requestParam } from "inversify-express-utils";
 import express from "express";
 import { MessagingBaseController } from "./MessagingBaseController"
 import { Conversation, Connection } from "../models";
@@ -6,6 +6,19 @@ import { DeliveryHelper } from "../helpers/DeliveryHelper";
 
 @controller("/conversations")
 export class ConversationController extends MessagingBaseController {
+
+  @httpPost("/")
+  public async save(req: express.Request<{}, {}, Conversation[]>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+    return this.actionWrapper(req, res, async (au) => {
+      const promises: Promise<Conversation>[] = [];
+      req.body.forEach(conv => {
+        conv.churchId = au.churchId;
+        promises.push(this.repositories.conversation.save(conv));
+      });
+      const result = await Promise.all(promises);
+      return result;
+    });
+  }
 
   @httpGet("/:videoChat/:connectionId/:room")
   public async videoChat(@requestParam("connectionId") connectionId: string, @requestParam("room") room: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
@@ -68,6 +81,13 @@ export class ConversationController extends MessagingBaseController {
     return this.actionWrapperAnon(req, res, async () => {
       return "";
 
+    });
+  }
+
+  @httpGet("/:id")
+  public async get(@requestParam("id") id: string, req: express.Request<{}, {}, null>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+    return this.actionWrapper(req, res, async (au) => {
+      return await this.repositories.conversation.loadById(au.churchId, id);
     });
   }
 
