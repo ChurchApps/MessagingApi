@@ -101,6 +101,12 @@ export class MessageController extends MessagingBaseController {
     });
   }
 
+  @httpGet("/:id")
+  public async get(@requestParam("id") id: string, req: express.Request<{}, {}, null>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+    return this.actionWrapper(req, res, async (au) => {
+      return await this.repositories.message.loadById(au.churchId, id);
+    });
+  }
 
   private async createPrayerConversation(connection: Connection) {
     return await this.repositories.conversation.save({
