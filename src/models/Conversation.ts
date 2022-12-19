@@ -1,3 +1,5 @@
+import { Message } from "./Message";
+
 export class Conversation {
   public id?: string;
   public churchId?: string;
@@ -12,4 +14,5 @@ export class Conversation {
   public postCount?: number;
   public allowAnonymousPosts?: boolean;
 
+  public messages?: Message[];
 }

@@ -13,7 +13,7 @@ export class ConversationRepository {
   }
 
   public loadForContent(churchId: string, contentType: string, contentId: string) {
-    return DB.query("SELECT * FROM conversations WHERE churchId=? AND contentType=? AND contentId=?", [churchId, contentType, contentId]);
+    return DB.query("SELECT * FROM conversations WHERE churchId=? AND contentType=? AND contentId=? ORDER BY dateCreated DESC", [churchId, contentType, contentId]);
   }
 
   public delete(churchId: string, id: string) {

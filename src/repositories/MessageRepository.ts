@@ -1,12 +1,15 @@
 import { DB } from "../apiBase/db";
 import { Message } from "../models";
 import { UniqueIdHelper } from "../helpers";
-import { ConversationRepository } from "./ConversationRepository";
 
 export class MessageRepository {
 
   public loadById(churchId: string, id: string) {
     return DB.queryOne("SELECT * FROM messages WHERE id=? AND churchId=?;", [id, churchId]);
+  }
+
+  public loadByIds(churchId: string, ids: string[]) {
+    return DB.query("SELECT * FROM messages WHERE id IN (?) AND churchId=?;", [ids, churchId]);
   }
 
   public loadForConversation(churchId: string, conversationId: string) {

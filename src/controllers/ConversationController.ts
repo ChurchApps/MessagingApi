@@ -3,6 +3,7 @@ import express from "express";
 import { MessagingBaseController } from "./MessagingBaseController"
 import { Conversation, Connection } from "../models";
 import { DeliveryHelper } from "../helpers/DeliveryHelper";
+import { ArrayHelper } from "../apiBase";
 
 @controller("/conversations")
 export class ConversationController extends MessagingBaseController {
@@ -37,6 +38,27 @@ export class ConversationController extends MessagingBaseController {
     });
   }
 
+  @httpGet("/:contentType/:contentId")
+  public async forContent(@requestParam("contentType") contentType: string, @requestParam("contentId") contentId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+    return this.actionWrapper(req, res, async (au) => {
+      const conversations: Conversation[] = await this.repositories.conversation.loadForContent(au.churchId, contentType, contentId);
+      const messageIds: string[] = [];
+      conversations.forEach(c => {
+        if (messageIds.indexOf(c.firstPostId) === -1) messageIds.push(c.firstPostId);
+        if (messageIds.indexOf(c.lastPostId) === -1) messageIds.push(c.lastPostId);
+      });
+      if (messageIds.length > 0) {
+        const allMessages = await this.repositories.message.loadByIds(au.churchId, messageIds);
+        conversations.forEach(c => {
+          c.messages = [ArrayHelper.getOne(allMessages, "id", c.firstPostId)];
+          if (c.lastPostId !== c.firstPostId) c.messages.push(ArrayHelper.getOne(allMessages, "id", c.lastPostId));
+        })
+      }
+      return conversations;
+    });
+  }
+
+  /*
   @httpGet("/:privateMessage/:connectionId")
   public async privateMessage(@requestParam("connectionId") connectionId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
@@ -55,7 +77,7 @@ export class ConversationController extends MessagingBaseController {
       // }
 
     });
-  }
+  }*/
 
   @httpGet("/requestPrayer/:churchId/:conversationId")
   public async requestPrayer(@requestParam("churchId") churchId: string, @requestParam("conversationId") conversationId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
