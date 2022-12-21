@@ -38,6 +38,14 @@ export class PrivateMessageController extends MessagingBaseController {
     });
   }
 
+  @httpGet("/existing/:personId")
+  public async getExisting(@requestParam("personId") personId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+    return this.actionWrapper(req, res, async (au) => {
+      const existing = await this.repositories.privateMessage.loadExisting(au.churchId, au.personId, personId);
+      return existing || {};
+    });
+  }
+
   @httpGet("/:id")
   public async get(@requestParam("id") id: string, req: express.Request<{}, {}, null>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapper(req, res, async (au) => {

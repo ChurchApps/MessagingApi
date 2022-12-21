@@ -5,7 +5,6 @@ import { UniqueIdHelper } from "../helpers";
 export class PrivateMessageRepository {
 
   public async loadForPerson(churchId: string, personId: string) {
-
     const sql = "SELECT c.*, pm.id as pmId, pm.fromPersonId, pm.toPersonId, pm.notifyPersonId"
       + " FROM privateMessages pm"
       + " INNER JOIN conversations c on c.id=pm.conversationId"
@@ -13,6 +12,16 @@ export class PrivateMessageRepository {
       + " ORDER by c.dateCreated desc";
     const data = await DB.query(sql, [churchId, personId, personId]);
     return this.convertAllToModel(data);
+  }
+
+  public async loadExisting(churchId: string, personId: string, otherPersonId: string) {
+    const sql = "SELECT c.*, pm.id as pmId, pm.fromPersonId, pm.toPersonId, pm.notifyPersonId"
+      + " FROM privateMessages pm"
+      + " INNER JOIN conversations c on c.id=pm.conversationId"
+      + " WHERE pm.churchId=? AND ((pm.fromPersonId=? and pm.toPersonId=?) OR (pm.fromPersonId=? AND pm.toPersonId=?))"
+      + " ORDER by c.dateCreated desc";
+    const data = await DB.queryOne(sql, [churchId, personId, otherPersonId, otherPersonId, personId]);
+    return (data) ? this.convertToModel(data) : null;
   }
 
   public loadById(churchId: string, id: string) {
