@@ -14,6 +14,7 @@ const init = async () => {
     { title: "Connections", file: "connections.mysql" },
     { title: "Conversations", file: "conversations.mysql" },
     { title: "Messages", file: "messages.mysql" },
+    { title: "Private Messages", file: "privateMessages.mysql" },
     { title: "Cleanup Procedure", file: "cleanup.mysql", customDelimeter: true },
     { title: "Update Conversation Stats", file: "updateConversationStats.mysql", customDelimeter: true }
   ];
