@@ -4,6 +4,18 @@ import { UniqueIdHelper } from "../helpers";
 
 export class ConversationRepository {
 
+  public async loadPosts(churchId: string, groupIds: string) {
+    const sql = "select 'message' as postType, c.id as postId, m.personId as posterId, '' as posterName, c.title as message, c.id as conversationId"
+      + " FROM conversations c"
+      + " INNER JOIN messages m on m.id=c.lastPostId"
+      + " WHERE c.churchId=? and c.groupId IN (?)"
+      + " AND m.timeSent>DATE_SUB(NOW(), INTERVAL 7 DAY)";
+    const params = [churchId, groupIds, churchId, churchId];
+    const result = await DB.query(sql, params);
+    console.log(sql, params, result)
+    return result;
+  }
+
   private cleanup() {
     return DB.query("CALL cleanup()", []);
   }

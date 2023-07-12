@@ -8,6 +8,13 @@ import { ArrayHelper } from "../apiBase";
 @controller("/conversations")
 export class ConversationController extends MessagingBaseController {
 
+  @httpGet("/posts")
+  public async getPosts(req: express.Request<{}, {}, null>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+    return this.actionWrapper(req, res, async (au) => {
+      return await this.repositories.conversation.loadPosts(au.churchId, au.personId);
+    });
+  }
+
   @httpPost("/")
   public async save(req: express.Request<{}, {}, Conversation[]>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapper(req, res, async (au) => {
