@@ -8,6 +8,40 @@ import { ArrayHelper } from "../apiBase";
 @controller("/conversations")
 export class ConversationController extends MessagingBaseController {
 
+  @httpGet("/social/ids")
+  public async getSocialByIds(req: express.Request<{}, {}, null>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+    return this.actionWrapper(req, res, async (au) => {
+      const ids = req.query.ids.toString().split(",");
+      const result =  await this.repositories.conversation.loadByIds(au.churchId, ids);
+      if (result.length > 0) {
+        const postIds: string[] = [];
+        result.forEach((c: Conversation) => {
+          if (c.firstPostId && postIds.indexOf(c.firstPostId) === -1) postIds.push(c.firstPostId);
+          if (c.lastPostId && postIds.indexOf(c.lastPostId) === -1) postIds.push(c.lastPostId);
+        });
+        if (postIds.length > 0)
+        {
+          const posts = await this.repositories.message.loadByIds(au.churchId, postIds);
+          result.forEach((c: any) => {
+            if (c.firstPostId) {
+              const post = ArrayHelper.getOne(posts, "id", c.firstPostId);
+              if (post) c.firstPost = { personId: post.personId, dislayName: post.dislayName, message: post.message, timeSent: post.timeSent }
+            }
+            if (c.lastPostId) {
+              const post = ArrayHelper.getOne(posts, "id", c.lastPostId);
+              if (post) c.lastPost = { personId: post.personId, dislayName: post.dislayName, message: post.message, timeSent: post.timeSent }
+            }
+          });
+        }
+        result.forEach((c: Conversation) => {
+          c.firstPostId = undefined;
+          c.lastPostId = undefined;
+        });
+      }
+      return result;
+    });
+  }
+
   @httpGet("/posts")
   public async getPosts(req: express.Request<{}, {}, null>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapper(req, res, async (au) => {

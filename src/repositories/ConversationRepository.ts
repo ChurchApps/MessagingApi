@@ -4,6 +4,16 @@ import { UniqueIdHelper } from "../helpers";
 
 export class ConversationRepository {
 
+  public async loadByIds(churchId: string, ids: string[]) {
+    const sql = "select firstPostId, lastPostId, postCount"
+      + " FROM conversations"
+      + " WHERE churchId=? and id IN (?)";
+    const params = [churchId, ids];
+    const result = await DB.query(sql, params);
+    console.log(sql, params, result)
+    return result;
+  }
+
   public async loadPosts(churchId: string, groupIds: string) {
     const sql = "select 'message' as postType, c.id as postId, m.personId as posterId, '' as posterName, c.title as message, c.id as conversationId"
       + " FROM conversations c"
@@ -12,7 +22,6 @@ export class ConversationRepository {
       + " AND m.timeSent>DATE_SUB(NOW(), INTERVAL 7 DAY)";
     const params = [churchId, groupIds, churchId, churchId];
     const result = await DB.query(sql, params);
-    console.log(sql, params, result)
     return result;
   }
 
