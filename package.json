@@ -23,6 +23,7 @@
   "keywords": [],
   "author": "Live Church Solutions",
   "dependencies": {
+    "@socket.io/admin-ui": "^0.5.1",
     "aws-serverless-express": "^3.4.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.1",
@@ -39,6 +40,7 @@
     "nodemailer": "^6.7.2",
     "nodemailer-direct-transport": "^3.3.2",
     "reflect-metadata": "^0.1.13",
+    "socket.io": "^4.7.1",
     "uuid": "^8.3.2",
     "winston": "^3.3.3",
     "winston-cloudwatch": "^3.1.1",
