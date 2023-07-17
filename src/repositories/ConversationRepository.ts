@@ -5,22 +5,22 @@ import { UniqueIdHelper } from "../helpers";
 export class ConversationRepository {
 
   public async loadByIds(churchId: string, ids: string[]) {
-    const sql = "select firstPostId, lastPostId, postCount"
+    const sql = "select id as conversationId, firstPostId, lastPostId, postCount"
       + " FROM conversations"
       + " WHERE churchId=? and id IN (?)";
     const params = [churchId, ids];
     const result = await DB.query(sql, params);
-    console.log(sql, params, result)
     return result;
   }
 
-  public async loadPosts(churchId: string, groupIds: string) {
-    const sql = "select 'message' as postType, c.id as postId, m.personId as posterId, '' as posterName, c.title as message, c.id as conversationId"
+  public async loadPosts(churchId: string, groupIds: string[]) {
+    const sql = "select 'message' as postType, c.id as postId, fp.personId as posterId, '' as posterName, fp.content as message, fp.timeSent as timeSent, c.id as conversationId"
       + " FROM conversations c"
-      + " INNER JOIN messages m on m.id=c.lastPostId"
+      + " INNER JOIN messages fp on fp.id=c.firstPostId"
+      + " INNER JOIN messages lp on lp.id=c.lastPostId"
       + " WHERE c.churchId=? and c.groupId IN (?)"
-      + " AND m.timeSent>DATE_SUB(NOW(), INTERVAL 7 DAY)";
-    const params = [churchId, groupIds, churchId, churchId];
+      + " AND lp.timeSent>DATE_SUB(NOW(), INTERVAL 180 DAY)";
+    const params = [churchId, groupIds];
     const result = await DB.query(sql, params);
     return result;
   }

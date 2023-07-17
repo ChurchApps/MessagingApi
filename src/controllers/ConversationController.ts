@@ -8,8 +8,8 @@ import { ArrayHelper } from "../apiBase";
 @controller("/conversations")
 export class ConversationController extends MessagingBaseController {
 
-  @httpGet("/social/ids")
-  public async getSocialByIds(req: express.Request<{}, {}, null>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+  @httpGet("/timeline/ids")
+  public async getTimelineByIds(req: express.Request<{}, {}, null>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapper(req, res, async (au) => {
       const ids = req.query.ids.toString().split(",");
       const result =  await this.repositories.conversation.loadByIds(au.churchId, ids);
@@ -25,11 +25,11 @@ export class ConversationController extends MessagingBaseController {
           result.forEach((c: any) => {
             if (c.firstPostId) {
               const post = ArrayHelper.getOne(posts, "id", c.firstPostId);
-              if (post) c.firstPost = { personId: post.personId, dislayName: post.dislayName, message: post.message, timeSent: post.timeSent }
+              if (post) c.firstPost = { personId: post.personId, displayName: post.displayName, message: post.content, timeSent: post.timeSent }
             }
             if (c.lastPostId) {
               const post = ArrayHelper.getOne(posts, "id", c.lastPostId);
-              if (post) c.lastPost = { personId: post.personId, dislayName: post.dislayName, message: post.message, timeSent: post.timeSent }
+              if (post) c.lastPost = { personId: post.personId, displayName: post.displayName, message: post.content, timeSent: post.timeSent }
             }
           });
         }
@@ -45,7 +45,7 @@ export class ConversationController extends MessagingBaseController {
   @httpGet("/posts")
   public async getPosts(req: express.Request<{}, {}, null>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapper(req, res, async (au) => {
-      return await this.repositories.conversation.loadPosts(au.churchId, au.personId);
+      return await this.repositories.conversation.loadPosts(au.churchId, au.groupIds);
     });
   }
 
