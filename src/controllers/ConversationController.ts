@@ -8,36 +8,42 @@ import { ArrayHelper } from "../apiBase";
 @controller("/conversations")
 export class ConversationController extends MessagingBaseController {
 
+  private async appendMessages(conversations: Conversation[], churchId:string) {
+    if (conversations.length > 0) {
+      const postIds: string[] = [];
+      conversations.forEach((c: Conversation) => {
+        if (c.firstPostId && postIds.indexOf(c.firstPostId) === -1) postIds.push(c.firstPostId);
+        if (c.lastPostId && postIds.indexOf(c.lastPostId) === -1) postIds.push(c.lastPostId);
+        c.messages = [];
+      });
+
+      if (postIds.length > 0)
+      {
+        const posts = await this.repositories.message.loadByIds(churchId, postIds);
+        conversations.forEach((c: any) => {
+          if (c.firstPostId) {
+            const message = ArrayHelper.getOne(posts, "id", c.firstPostId);
+            if (message) c.messages.push(message);
+          }
+          if (c.lastPostId && c.lastPostId !== c.firstPostId) {
+            const message = ArrayHelper.getOne(posts, "id", c.lastPostId);
+            if (message) c.messages.push(message);
+          }
+        });
+      }
+      conversations.forEach((c: Conversation) => {
+        c.firstPostId = undefined;
+        c.lastPostId = undefined;
+      });
+    }
+  }
+
   @httpGet("/timeline/ids")
   public async getTimelineByIds(req: express.Request<{}, {}, null>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapper(req, res, async (au) => {
       const ids = req.query.ids.toString().split(",");
       const result =  await this.repositories.conversation.loadByIds(au.churchId, ids);
-      if (result.length > 0) {
-        const postIds: string[] = [];
-        result.forEach((c: Conversation) => {
-          if (c.firstPostId && postIds.indexOf(c.firstPostId) === -1) postIds.push(c.firstPostId);
-          if (c.lastPostId && postIds.indexOf(c.lastPostId) === -1) postIds.push(c.lastPostId);
-        });
-        if (postIds.length > 0)
-        {
-          const posts = await this.repositories.message.loadByIds(au.churchId, postIds);
-          result.forEach((c: any) => {
-            if (c.firstPostId) {
-              const post = ArrayHelper.getOne(posts, "id", c.firstPostId);
-              if (post) c.firstPost = { personId: post.personId, displayName: post.displayName, message: post.content, timeSent: post.timeSent }
-            }
-            if (c.lastPostId) {
-              const post = ArrayHelper.getOne(posts, "id", c.lastPostId);
-              if (post) c.lastPost = { personId: post.personId, displayName: post.displayName, message: post.content, timeSent: post.timeSent }
-            }
-          });
-        }
-        result.forEach((c: Conversation) => {
-          c.firstPostId = undefined;
-          c.lastPostId = undefined;
-        });
-      }
+      await this.appendMessages(result, au.churchId);
       return result;
     });
   }
@@ -45,7 +51,9 @@ export class ConversationController extends MessagingBaseController {
   @httpGet("/posts")
   public async getPosts(req: express.Request<{}, {}, null>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapper(req, res, async (au) => {
-      return await this.repositories.conversation.loadPosts(au.churchId, au.groupIds);
+      const result = await this.repositories.conversation.loadPosts(au.churchId, au.groupIds);
+      await this.appendMessages(result, au.churchId);
+      return result;
     });
   }
 

@@ -14,7 +14,7 @@ export class ConversationRepository {
   }
 
   public async loadPosts(churchId: string, groupIds: string[]) {
-    const sql = "select 'message' as postType, c.id as postId, fp.personId as posterId, '' as posterName, fp.content as message, fp.timeSent as timeSent, c.id as conversationId"
+    const sql = "select c.contentType, c.contentId, c.id as conversationId, c.firstPostId, c.lastPostId, c.postCount"
       + " FROM conversations c"
       + " INNER JOIN messages fp on fp.id=c.firstPostId"
       + " INNER JOIN messages lp on lp.id=c.lastPostId"
