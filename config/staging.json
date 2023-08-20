@@ -7,5 +7,5 @@
   "s3Bucket": "staging-churchapps-content",
   "deliveryProvider": "aws",
   "socketPort": 0,
-  "socketUrl": "wss://socket.staging.churchapps.org/"
+  "socketUrl": "socket.staging.churchapps.org"
 }
