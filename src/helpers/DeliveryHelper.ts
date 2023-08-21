@@ -1,7 +1,7 @@
 import { PayloadInterface } from "../helpers/Interfaces";
 import WebSocket from "ws";
 import { Repositories } from "../repositories";
-import { Connection } from "../models";
+import { Connection, Conversation } from "../models";
 import { AttendanceInterface } from "../helpers/Interfaces";
 import { ApiGatewayManagementApi } from 'aws-sdk';
 import { SocketHelper } from "./SocketHelper";
@@ -10,22 +10,22 @@ import { Environment } from "../helpers"
 
 export class DeliveryHelper {
 
-    static sendMessages = async (payload: PayloadInterface) => {
+    static sendConversationMessages = async (payload: PayloadInterface) => {
         const repos = Repositories.getCurrent();
         const connections = repos.connection.convertAllToModel(await repos.connection.loadForConversation(payload.churchId, payload.conversationId));
-        const promises: Promise<boolean>[] = [];
+        const deliveryCount = await this.sendMessages(connections, payload);
+        if (deliveryCount !== connections.length) DeliveryHelper.sendAttendance(payload.churchId, payload.conversationId)
+    }
 
-        // console.log("Connection count: " + connections.length);
-
-        // console.log("SENDING " + payload.action + ' to ' + connections.length + ' recipients');
-        connections.forEach(connection => {
-            promises.push(DeliveryHelper.sendMessage(connection, payload));
-        });
-        const results = await Promise.all(promises);
-        let allSuccess = true;
-        results.forEach(r => { if (!r) allSuccess = false; })
-        // console.log("All success: " + allSuccess.toString())
-        if (!allSuccess) DeliveryHelper.sendAttendance(payload.churchId, payload.conversationId)
+    static sendMessages = async (connections: Connection[], payload: PayloadInterface) => {
+      const promises: Promise<boolean>[] = [];
+      connections.forEach(connection => {
+        promises.push(DeliveryHelper.sendMessage(connection, payload));
+      });
+      const results = await Promise.all(promises);
+      let deliveryCount = 0;
+      results.forEach(r => { if (r) deliveryCount++; })
+      return deliveryCount;
     }
 
     static sendMessage = async (connection: Connection, payload: PayloadInterface) => {
@@ -40,7 +40,7 @@ export class DeliveryHelper {
         const viewers = await Repositories.getCurrent().connection.loadAttendance(churchId, conversationId);
         const totalViewers = viewers.length;
         const data: AttendanceInterface = { conversationId, viewers, totalViewers };
-        await DeliveryHelper.sendMessages({ churchId, conversationId, action: "attendance", data });
+        await DeliveryHelper.sendConversationMessages({ churchId, conversationId, action: "attendance", data });
     }
 
     private static sendAws = async (connection: Connection, payload: PayloadInterface) => {

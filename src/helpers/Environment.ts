@@ -25,7 +25,6 @@ export class Environment extends EnvironmentBase {
     this.deliveryProvider = data.deliveryProvider;
     this.socketPort = data.socketPort;
     this.socketUrl = data.socketUrl;
-
   }
 
 }

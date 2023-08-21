@@ -17,6 +17,15 @@ export class ConnectionController extends MessagingBaseController {
         });
     }
 
+    @httpPost("/tmpSendAlert")
+    public async sendAlert(req: express.Request<{}, {}, any>, res: express.Response): Promise<any> {
+        return this.actionWrapperAnon(req, res, async () => {
+          const connections = await this.repositories.connection.loadForNotification(req.body.churchId, req.body.userId);
+          const deliveryCount = await DeliveryHelper.sendMessages(connections, { churchId: req.body.churchId, conversationId: "alert", action: "notification", data: {} });
+          return { deliveryCount }
+        });
+    }
+
     @httpPost("/")
     public async save(req: express.Request<{}, {}, Connection[]>, res: express.Response): Promise<any> {
         return this.actionWrapperAnon(req, res, async () => {

@@ -24,7 +24,7 @@ export class MessageController extends MessagingBaseController {
 
         promises.push(this.repositories.message.save(message).then(async (m: Message) => {
           this.repositories.conversation.updateStats(m.conversationId);
-          await DeliveryHelper.sendMessages({ churchId: m.churchId, conversationId: m.conversationId, action: "message", data: m });
+          await DeliveryHelper.sendConversationMessages({ churchId: m.churchId, conversationId: m.conversationId, action: "message", data: m });
           return m;
         }));
       });
@@ -47,7 +47,7 @@ export class MessageController extends MessagingBaseController {
 
         promises.push(this.repositories.message.save(message).then(async (m: Message) => {
           this.repositories.conversation.updateStats(m.conversationId);
-          await DeliveryHelper.sendMessages({ churchId: m.churchId, conversationId: m.conversationId, action: "message", data: m });
+          await DeliveryHelper.sendConversationMessages({ churchId: m.churchId, conversationId: m.conversationId, action: "message", data: m });
           return m;
         }));
       });
@@ -62,7 +62,7 @@ export class MessageController extends MessagingBaseController {
       // else {
       req.body.messageType = "callout";
       const m = this.repositories.message.convertToModel(await this.repositories.message.save(req.body));
-      await DeliveryHelper.sendMessages({ churchId: m.churchId, conversationId: m.conversationId, action: "callout", data: m });
+      await DeliveryHelper.sendConversationMessages({ churchId: m.churchId, conversationId: m.conversationId, action: "callout", data: m });
       return m;
       // }
     });
@@ -77,7 +77,7 @@ export class MessageController extends MessagingBaseController {
       if (m !== null) {
         await this.repositories.message.delete(au.churchId, id);
         this.repositories.conversation.updateStats(m.conversationId);
-        await DeliveryHelper.sendMessages({ churchId: au.churchId, conversationId: m.conversationId, action: "deleteMessage", data: m.id });
+        await DeliveryHelper.sendConversationMessages({ churchId: au.churchId, conversationId: m.conversationId, action: "deleteMessage", data: m.id });
         return m;
       }
 

@@ -21,6 +21,10 @@ export class ConnectionRepository {
     return DB.query("SELECT * FROM connections WHERE churchId=? AND conversationId=?", [churchId, conversationId]);
   }
 
+  public loadForNotification(churchId: string, userId: string) {
+    return DB.query("SELECT * FROM connections WHERE churchId=? AND userId=? and conversationId='alerts'", [churchId, userId]);
+  }
+
   public loadBySocketId(socketId: string) {
     return DB.query("SELECT * FROM connections WHERE socketId=?", [socketId]);
   }

@@ -134,7 +134,7 @@ export class ConversationController extends MessagingBaseController {
       const conversation = await this.repositories.conversation.loadById(churchId, conversationId);
       const hostConversation = await this.getOrCreate(churchId, "streamingLiveHost", conversation.contentId, "hidden", true);
       const prayerConversation = await this.repositories.conversation.save({ contentId: conversation.contentId, contentType: "prayer", dateCreated: new Date(), title: "Prayer request", churchId });
-      await DeliveryHelper.sendMessages({ churchId: hostConversation.churchId, conversationId: hostConversation.id, action: "prayerRequest", data: prayerConversation });
+      await DeliveryHelper.sendConversationMessages({ churchId: hostConversation.churchId, conversationId: hostConversation.id, action: "prayerRequest", data: prayerConversation });
       return prayerConversation;
     });
   }
