@@ -14,7 +14,6 @@ export class Environment extends EnvironmentBase {
     if (environment === "staging") file = "staging.json";
     if (environment === "prod") file = "prod.json";
 
-
     const relativePath = "../../config/" + file;
     const physicalPath = path.resolve(__dirname, relativePath);
 
