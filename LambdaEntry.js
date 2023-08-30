@@ -1,7 +1,7 @@
 const { createServer, proxy } = require('aws-serverless-express');
 const { init } = require('./dist/App');
 const { Environment } = require('./dist/helpers/Environment');
-const { Pool } = require('./dist/apiBase/pool');
+const { Pool } = require('@churchapps/apihelper');
 const AWS = require('aws-sdk');
 const { Logger } = require('./dist/helpers/Logger');
 const { SocketHelper } = require('./dist/helpers/SocketHelper');

@@ -1,5 +1,5 @@
 import { Repositories } from "../repositories";
-import { CustomBaseController } from "../apiBase/controllers"
+import { CustomBaseController } from "@churchapps/apihelper";
 
 export class MessagingBaseController extends CustomBaseController {
 

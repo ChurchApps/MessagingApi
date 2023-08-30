@@ -1,4 +1,4 @@
-import { UniqueIdHelper } from "../apiBase";
+import { UniqueIdHelper } from "@churchapps/apihelper";
 import WebSocket from "ws";
 import { PayloadInterface, SocketConnectionInterface } from "./Interfaces";
 import { Repositories } from "../repositories";

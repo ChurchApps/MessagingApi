@@ -1,5 +1,4 @@
 export * from './Permissions'
-export * from '../apiBase/helpers/Interfaces'
 
-export { UniqueIdHelper } from "../apiBase/helpers";
+export { UniqueIdHelper } from "@churchapps/apihelper";
 export { Environment } from "./Environment";
