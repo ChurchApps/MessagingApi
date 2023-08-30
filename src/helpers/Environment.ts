@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-import { EnvironmentBase } from "../apiBase";
+import { EnvironmentBase } from "@churchapps/apihelper";
 
 export class Environment extends EnvironmentBase {
 
@@ -20,7 +20,7 @@ export class Environment extends EnvironmentBase {
 
     const json = fs.readFileSync(physicalPath, "utf8");
     const data = JSON.parse(json);
-    this.populateBase(data);
+    this.populateBase(data, "messagingApi", environment);
 
     this.deliveryProvider = data.deliveryProvider;
     this.socketPort = data.socketPort;

@@ -1,8 +1,8 @@
 import "reflect-metadata";
 import dotenv from "dotenv";
 import { Environment } from "../src/helpers/Environment";
-import { Pool } from "../src/apiBase/pool";
-import { DBCreator } from "../src/apiBase/tools/DBCreator"
+import { Pool } from "@churchapps/apihelper";
+import { DBCreator } from "@churchapps/apihelper";
 
 const init = async () => {
   dotenv.config();

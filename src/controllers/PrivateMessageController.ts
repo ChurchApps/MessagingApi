@@ -2,7 +2,7 @@ import { controller, httpGet, httpPost, interfaces, requestParam } from "inversi
 import express from "express";
 import { MessagingBaseController } from "./MessagingBaseController"
 import { PrivateMessage } from "../models";
-import { ArrayHelper } from "../apiBase";
+import { ArrayHelper } from "@churchapps/apihelper";
 
 @controller("/privateMessages")
 export class PrivateMessageController extends MessagingBaseController {

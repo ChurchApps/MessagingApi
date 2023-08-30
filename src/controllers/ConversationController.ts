@@ -3,7 +3,7 @@ import express from "express";
 import { MessagingBaseController } from "./MessagingBaseController"
 import { Conversation, Connection } from "../models";
 import { DeliveryHelper } from "../helpers/DeliveryHelper";
-import { ArrayHelper } from "../apiBase";
+import { ArrayHelper } from "@churchapps/apihelper";
 
 @controller("/conversations")
 export class ConversationController extends MessagingBaseController {
