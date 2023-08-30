@@ -9,7 +9,7 @@ export class Environment extends EnvironmentBase {
   static socketPort: number;
   static socketUrl: string;
 
-  static init(environment: string) {
+  static async init(environment: string) {
     let file = "dev.json";
     if (environment === "staging") file = "staging.json";
     if (environment === "prod") file = "prod.json";

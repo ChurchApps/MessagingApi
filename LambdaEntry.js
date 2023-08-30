@@ -8,8 +8,9 @@ const { SocketHelper } = require('./dist/helpers/SocketHelper');
 const { ApiGatewayManagementApi } = require('aws-sdk');
 
 
-Environment.init(process.env.APP_ENV);
-Pool.initPool();
+Environment.init(process.env.APP_ENV).then(() => {
+  Pool.initPool();
+});
 
 const gwManagement = new ApiGatewayManagementApi({ apiVersion: '2020-04-16', endpoint: Environment.socketUrl });
 

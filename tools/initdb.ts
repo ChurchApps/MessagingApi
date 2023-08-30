@@ -6,9 +6,11 @@ import { DBCreator } from "@churchapps/apihelper";
 
 const init = async () => {
   dotenv.config();
-  Environment.init(process.env.APP_ENV);
-  console.log("Connecting");
-  Pool.initPool();
+  Environment.init(process.env.APP_ENV).then(() => { 
+    console.log("Connecting");
+    Pool.initPool();
+  }));
+  
 
   const tablesAndProcedure: { title: string, file: string, customDelimeter?: boolean }[] = [
     { title: "Connections", file: "connections.mysql" },
