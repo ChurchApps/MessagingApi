@@ -21,11 +21,29 @@ async function logMessage(message) {
   await wl.flush();
 }
 
+const checkPool = async () => {
+  if (!Environment.connectionString) {
+    await Environment.init(process.env.APP_ENV)
+    Pool.initPool();
+  }
+}
+
+module.exports.universal = function universal(event, context) {
+  checkPool().then(() => {
+    init().then(app => {
+      const server = createServer(app);
+      return proxy(server, event, context);
+    });
+  });
+}
+
 module.exports.handleWeb = function handleWeb(event, context) {
   AWS.config.update({ region: 'us-east-2' });
-  init().then(app => {
-    const server = createServer(app);
-    return proxy(server, event, context);
+  checkPool().then(() => {
+    init().then(app => {
+      const server = createServer(app);
+      return proxy(server, event, context);
+    });
   });
 
 }
@@ -34,6 +52,8 @@ module.exports.handleSocket = async function handleSocket(event) {
   const rc = event.requestContext;
   const eventType = rc.eventType;
   const connectionId = rc.connectionId;
+
+  await checkPool();
   //console.log(eventType);
   if (eventType == "DISCONNECT") await SocketHelper.handleDisconnect(connectionId) //; Repositories.getCurrent().connection.deleteForSocket(connectionId);
   else if (eventType == "MESSAGE") {
