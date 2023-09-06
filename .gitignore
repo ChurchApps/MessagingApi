@@ -1,5 +1,6 @@
 *.bat
 /content
+firebase-service-account.json
 
 # Logs
 logs
