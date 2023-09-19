@@ -9,10 +9,10 @@ import { FirebaseHelper } from "../helpers/FirebaseHelper";
 export class DeviceController extends MessagingBaseController {
 
   @httpPost("/register")
-  public async register(req: express.Request<{}, {}, { fcmToken:string }>, res: express.Response): Promise<any> {
+  public async register(req: express.Request<{}, {}, Device>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
-      const device: Device = { userId:au.id, fcmToken: req.body.fcmToken };
-      console.log("REGISTERING DEVICE");
+      const device: Device = req.body;
+      device.userId = au.id;
       await this.repositories.device.save(device);
     });
   }

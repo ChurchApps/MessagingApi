@@ -29,7 +29,7 @@ export class DeviceRepository {
     if (device.id) result = this.update(device);
     else {
       const existing = await this.loadByFcmToken(device.fcmToken)
-      if (existing) {
+      if (existing?.id) {
         existing.lastActiveDate = new Date();
         result = this.update(existing);
       }
@@ -41,7 +41,7 @@ export class DeviceRepository {
   private async create(device: Device) {
     device.id = UniqueIdHelper.shortId();
     const sql = "INSERT INTO devices (id, userId, fcmToken, label, registrationDate, lastActiveDate, deviceInfo) VALUES (?, ?, ?, ?, NOW(), NOW(), ?);";
-    const params = [device.id, device.userId, device.fcmToken, device.label, device.registrationDate, device.lastActiveDate, device.deviceInfo];
+    const params = [device.id, device.userId, device.fcmToken, device.label, device.deviceInfo];
     await DB.query(sql, params);
     return device;
   }
