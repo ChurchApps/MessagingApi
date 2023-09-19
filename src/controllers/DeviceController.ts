@@ -30,9 +30,20 @@ export class DeviceController extends MessagingBaseController {
     });
   }
 
+  @httpPost("/tempMessageUser")
+  public async sendUser(req: express.Request<{}, {}, any>, res: express.Response): Promise<any> {
+    return this.actionWrapperAnon(req, res, async () => {
+      const devices:Device[] = await this.repositories.device.loadForUser(req.body.userId);
+      const promises: Promise<any>[] = [];
+      devices.forEach(device => {
+        promises.push(FirebaseHelper.sendMessage(device.fcmToken, req.body.title.toString(), req.body.body.toString()));
+      });
+      await Promise.all(promises);
+    });
+  }
 
   @httpPost("/tempSendManual")
-  public async send(req: express.Request<{}, {}, any>, res: express.Response): Promise<any> {
+  public async sendManual(req: express.Request<{}, {}, any>, res: express.Response): Promise<any> {
     return this.actionWrapperAnon(req, res, async () => {
       await FirebaseHelper.sendMessage(req.body.fcmToken, req.body.title.toString(), req.body.body.toString());
     });
