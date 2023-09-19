@@ -1,13 +1,15 @@
 import fs from "fs";
 import path from "path";
 
-import { EnvironmentBase } from "@churchapps/apihelper";
+import { AwsHelper, EnvironmentBase } from "@churchapps/apihelper";
 
 export class Environment extends EnvironmentBase {
 
   static deliveryProvider: string;
   static socketPort: number;
   static socketUrl: string;
+  static firebaseClientEmail: string;
+  static firebasePrivateKey: string;
 
   static async init(environment: string) {
     let file = "dev.json";
@@ -24,6 +26,9 @@ export class Environment extends EnvironmentBase {
     this.deliveryProvider = data.deliveryProvider;
     this.socketPort = data.socketPort;
     this.socketUrl = data.socketUrl;
+
+    this.firebaseClientEmail = process.env.FIREBASE_CLIENT_EMAIL || await AwsHelper.readParameter(`/${environment}/firebase/clientEmail`);
+    this.firebasePrivateKey = process.env.FIREBASE_PRIVATE_KEY || await AwsHelper.readParameter(`/${environment}/firebase/privateKey`);
   }
 
 }

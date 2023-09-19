@@ -16,12 +16,26 @@ export class DeviceRepository {
     return DB.query("SELECT * FROM devices WHERE userId=?", [userId]);
   }
 
+  public loadByFcmToken(fcmToken: string) {
+    return DB.query("SELECT * FROM devices WHERE fcmToken=?", [fcmToken]);
+  }
+
   public delete(id: string) {
     return DB.query("DELETE FROM devices WHERE userId=?;", [id]);
   }
 
-  public save(device: Device) {
-    return device.id ? this.update(device) : this.create(device);
+  public async save(device: Device) {
+    let result = null;
+    if (device.id) result = this.update(device);
+    else {
+      const existing = await this.loadByFcmToken(device.fcmToken)
+      if (existing) {
+        existing.lastActiveDate = new Date();
+        result = this.update(existing);
+      }
+      else result = this.create(device);
+    }
+    return result;
   }
 
   private async create(device: Device) {

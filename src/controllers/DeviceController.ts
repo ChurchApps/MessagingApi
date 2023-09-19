@@ -1,12 +1,21 @@
 import { controller, httpPost, requestParam, httpDelete, interfaces } from "inversify-express-utils";
 import express from "express";
 import { MessagingBaseController } from "./MessagingBaseController"
-import { Device } from "../models";
+import { Device, Message } from "../models";
 import { FirebaseHelper } from "../helpers/FirebaseHelper";
 
 
 @controller("/devices")
-export class MessageController extends MessagingBaseController {
+export class DeviceController extends MessagingBaseController {
+
+  @httpPost("/register")
+  public async register(req: express.Request<{}, {}, { fcmToken:string }>, res: express.Response): Promise<any> {
+    return this.actionWrapper(req, res, async (au) => {
+      const device: Device = { userId:au.id, fcmToken: req.body.fcmToken };
+      console.log("REGISTERING DEVICE");
+      await this.repositories.device.save(device);
+    });
+  }
 
   @httpPost("/")
   public async save(req: express.Request<{}, {}, Device[]>, res: express.Response): Promise<any> {
@@ -25,7 +34,7 @@ export class MessageController extends MessagingBaseController {
   @httpPost("/tempSendManual")
   public async send(req: express.Request<{}, {}, any>, res: express.Response): Promise<any> {
     return this.actionWrapperAnon(req, res, async () => {
-      await FirebaseHelper.sendMessage(req.body.fcmToken, req.body.message);
+      await FirebaseHelper.sendMessage(req.body.fcmToken, req.body.title.toString(), req.body.body.toString());
     });
   }
 
