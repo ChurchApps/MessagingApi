@@ -29,6 +29,7 @@ export class Environment extends EnvironmentBase {
 
     this.firebaseClientEmail = process.env.FIREBASE_CLIENT_EMAIL || await AwsHelper.readParameter(`/${environment}/firebase/clientEmail`);
     this.firebasePrivateKey = process.env.FIREBASE_PRIVATE_KEY || await AwsHelper.readParameter(`/${environment}/firebase/privateKey`);
+    this.firebasePrivateKey = this.firebasePrivateKey.replace(/\\n/g, "\n");
   }
 
 }
