@@ -13,7 +13,7 @@ export class DeviceController extends MessagingBaseController {
     return this.actionWrapper(req, res, async (au) => {
       const device: Device = req.body;
       device.userId = au.id;
-      await this.repositories.device.save(device);
+      if (device.userId) await this.repositories.device.save(device);
     });
   }
 
@@ -33,12 +33,16 @@ export class DeviceController extends MessagingBaseController {
   @httpPost("/tempMessageUser")
   public async sendUser(req: express.Request<{}, {}, any>, res: express.Response): Promise<any> {
     return this.actionWrapperAnon(req, res, async () => {
+      const result:string[] = [];
       const devices:Device[] = await this.repositories.device.loadForUser(req.body.userId);
       const promises: Promise<any>[] = [];
       devices.forEach(device => {
+        result.push(device.fcmToken);
+        console.log("FCM", device.fcmToken);
         promises.push(FirebaseHelper.sendMessage(device.fcmToken, req.body.title.toString(), req.body.body.toString()));
       });
       await Promise.all(promises);
+      return {devices: result};
     });
   }
 
