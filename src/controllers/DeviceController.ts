@@ -4,7 +4,6 @@ import { MessagingBaseController } from "./MessagingBaseController"
 import { Device, Message } from "../models";
 import { FirebaseHelper } from "../helpers/FirebaseHelper";
 
-
 @controller("/devices")
 export class DeviceController extends MessagingBaseController {
 
@@ -38,7 +37,6 @@ export class DeviceController extends MessagingBaseController {
       const promises: Promise<any>[] = [];
       devices.forEach(device => {
         result.push(device.fcmToken);
-        console.log("FCM", device.fcmToken);
         promises.push(FirebaseHelper.sendMessage(device.fcmToken, req.body.title.toString(), req.body.body.toString()));
       });
       await Promise.all(promises);
