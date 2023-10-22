@@ -12,8 +12,8 @@ export class DeviceRepository {
     return DB.query("SELECT * FROM devices WHERE id IN (?);", [ids]);
   }
 
-  public loadForUser(userId: string) {
-    return DB.query("SELECT * FROM devices WHERE userId=?", [userId]);
+  public loadForPerson(personId: string) {
+    return DB.query("SELECT * FROM devices WHERE personId=?", [personId]);
   }
 
   public loadByFcmToken(fcmToken: string) {
@@ -21,7 +21,7 @@ export class DeviceRepository {
   }
 
   public delete(id: string) {
-    return DB.query("DELETE FROM devices WHERE userId=?;", [id]);
+    return DB.query("DELETE FROM devices WHERE personId=?;", [id]);
   }
 
   public async save(device: Device) {
@@ -40,15 +40,15 @@ export class DeviceRepository {
 
   private async create(device: Device) {
     device.id = UniqueIdHelper.shortId();
-    const sql = "INSERT INTO devices (id, userId, fcmToken, label, registrationDate, lastActiveDate, deviceInfo) VALUES (?, ?, ?, ?, NOW(), NOW(), ?);";
-    const params = [device.id, device.userId, device.fcmToken, device.label, device.deviceInfo];
+    const sql = "INSERT INTO devices (id, churchId, personId, fcmToken, label, registrationDate, lastActiveDate, deviceInfo) VALUES (?, ?, ?, ?, ?, NOW(), NOW(), ?);";
+    const params = [device.id, device.churchId, device.personId, device.fcmToken, device.label, device.deviceInfo];
     await DB.query(sql, params);
     return device;
   }
 
   private async update(device: Device) {
-    const sql = "UPDATE devices SET userId=?, fcmToken=?, label=?, registrationDate=?, lastActiveDate=?, deviceInfo=? WHERE id=?;";
-    const params = [device.userId, device.fcmToken, device.label, device.registrationDate, device.lastActiveDate, device.deviceInfo, device.id]
+    const sql = "UPDATE devices SET personId=?, fcmToken=?, label=?, registrationDate=?, lastActiveDate=?, deviceInfo=? WHERE id=? and churchId=?;";
+    const params = [device.personId, device.fcmToken, device.label, device.registrationDate, device.lastActiveDate, device.deviceInfo, device.id, device.churchId]
     await DB.query(sql, params)
     return device;
   }

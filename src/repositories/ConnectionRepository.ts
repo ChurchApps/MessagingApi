@@ -21,8 +21,8 @@ export class ConnectionRepository {
     return DB.query("SELECT * FROM connections WHERE churchId=? AND conversationId=?", [churchId, conversationId]);
   }
 
-  public loadForNotification(churchId: string, userId: string) {
-    return DB.query("SELECT * FROM connections WHERE churchId=? AND userId=? and conversationId='alerts'", [churchId, userId]);
+  public loadForNotification(churchId: string, personId: string) {
+    return DB.query("SELECT * FROM connections WHERE churchId=? AND personId=? and conversationId='alerts'", [churchId, personId]);
   }
 
   public loadBySocketId(socketId: string) {
@@ -50,21 +50,21 @@ export class ConnectionRepository {
   private async create(connection: Connection): Promise<Connection> {
     connection.id = UniqueIdHelper.shortId();
     await this.deleteExisting(connection.churchId, connection.conversationId, connection.socketId, connection.id);
-    const sql = "INSERT INTO connections (id, churchId, conversationId, userId, displayName, timeJoined, socketId) VALUES (?, ?, ?, ?, ?, NOW(), ?);";
-    const params = [connection.id, connection.churchId, connection.conversationId, connection.userId, connection.displayName, connection.socketId];
+    const sql = "INSERT INTO connections (id, churchId, conversationId, personId, displayName, timeJoined, socketId) VALUES (?, ?, ?, ?, ?, NOW(), ?);";
+    const params = [connection.id, connection.churchId, connection.conversationId, connection.personId, connection.displayName, connection.socketId];
     await DB.query(sql, params);
     return connection;
   }
 
   private async update(connection: Connection) {
-    const sql = "UPDATE connections SET userId=?, displayName=? WHERE id=? AND churchId=?;";
-    const params = [connection.userId, connection.displayName, connection.id, connection.churchId];
+    const sql = "UPDATE connections SET personId=?, displayName=? WHERE id=? AND churchId=?;";
+    const params = [connection.personId, connection.displayName, connection.id, connection.churchId];
     await DB.query(sql, params);
     return connection;
   }
 
   public convertToModel(data: any) {
-    const result: Connection = { id: data.id, churchId: data.churchId, conversationId: data.conversationId, userId: data.userId, displayName: data.displayName, timeJoined: data.timeJoined, socketId: data.socketId };
+    const result: Connection = { id: data.id, churchId: data.churchId, conversationId: data.conversationId, personId: data.personId, displayName: data.displayName, timeJoined: data.timeJoined, socketId: data.socketId };
     return result;
   }
 

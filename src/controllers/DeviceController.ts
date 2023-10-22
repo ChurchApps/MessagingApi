@@ -11,8 +11,8 @@ export class DeviceController extends MessagingBaseController {
   public async register(req: express.Request<{}, {}, Device>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
       const device: Device = req.body;
-      device.userId = au.id;
-      if (device.userId) await this.repositories.device.save(device);
+      device.personId = au.personId;
+      if (device.personId) await this.repositories.device.save(device);
     });
   }
 
@@ -21,7 +21,7 @@ export class DeviceController extends MessagingBaseController {
     return this.actionWrapper(req, res, async (au) => {
       const promises: Promise<Device>[] = [];
       req.body.forEach(device => {
-        device.userId = au.id;
+        device.personId = au.personId;
         promises.push(this.repositories.device.save(device));
       });
       const result = await Promise.all(promises);
@@ -33,7 +33,7 @@ export class DeviceController extends MessagingBaseController {
   public async sendUser(req: express.Request<{}, {}, any>, res: express.Response): Promise<any> {
     return this.actionWrapperAnon(req, res, async () => {
       const result:string[] = [];
-      const devices:Device[] = await this.repositories.device.loadForUser(req.body.userId);
+      const devices:Device[] = await this.repositories.device.loadForPerson(req.body.personId);
       const promises: Promise<any>[] = [];
       devices.forEach(device => {
         result.push(device.fcmToken);

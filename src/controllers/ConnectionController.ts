@@ -20,7 +20,7 @@ export class ConnectionController extends MessagingBaseController {
     @httpPost("/tmpSendAlert")
     public async sendAlert(req: express.Request<{}, {}, any>, res: express.Response): Promise<any> {
         return this.actionWrapperAnon(req, res, async () => {
-          const connections = await this.repositories.connection.loadForNotification(req.body.churchId, req.body.userId);
+          const connections = await this.repositories.connection.loadForNotification(req.body.churchId, req.body.personId);
           const deliveryCount = await DeliveryHelper.sendMessages(connections, { churchId: req.body.churchId, conversationId: "alert", action: "notification", data: {} });
           return { deliveryCount }
         });
@@ -31,7 +31,7 @@ export class ConnectionController extends MessagingBaseController {
         return this.actionWrapperAnon(req, res, async () => {
             const promises: Promise<Connection>[] = [];
             req.body.forEach((connection: Connection) => {
-                if (connection.userId === undefined) connection.userId = null;
+                if (connection.personId === undefined) connection.personId = null;
                 promises.push(this.repositories.connection.save(connection).then(async c => {
                     await DeliveryHelper.sendAttendance(c.churchId, c.conversationId);
                     return c;

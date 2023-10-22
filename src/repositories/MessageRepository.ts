@@ -26,21 +26,21 @@ export class MessageRepository {
 
   private async create(message: Message) {
     message.id = UniqueIdHelper.shortId();
-    const sql = "INSERT INTO messages (id, churchId, conversationId, userId, personId, displayName, timeSent, messageType, content) VALUES (?, ?, ?, ?, ?, ?, NOW(), ?, ?);";
-    const params = [message.id, message.churchId, message.conversationId, message.userId, message.personId, message.displayName, message.messageType, message.content];
+    const sql = "INSERT INTO messages (id, churchId, conversationId, personId, displayName, timeSent, messageType, content) VALUES (?, ?, ?, ?, ?, NOW(), ?, ?);";
+    const params = [message.id, message.churchId, message.conversationId, message.personId, message.displayName, message.messageType, message.content];
     await DB.query(sql, params);
     return message;
   }
 
   private async update(message: Message) {
-    const sql = "UPDATE messages SET userId=?, displayName=?, content=?, timeUpdated=? WHERE id=? AND churchId=?;";
-    const params = [message.userId, message.displayName, message.content, message.timeUpdated, message.id, message.churchId]
+    const sql = "UPDATE messages SET personId=?, displayName=?, content=?, timeUpdated=? WHERE id=? AND churchId=?;";
+    const params = [message.personId, message.displayName, message.content, message.timeUpdated, message.id, message.churchId]
     await DB.query(sql, params)
     return message;
   }
 
   public convertToModel(data: any) {
-    const result: Message = { id: data.id, churchId: data.churchId, conversationId: data.conversationId, userId: data.userId, displayName: data.displayName, timeSent: data.timeSent, messageType: data.messageType, content: data.content, personId: data.personId, timeUpdated: data.timeUpdated };
+    const result: Message = { id: data.id, churchId: data.churchId, conversationId: data.conversationId, displayName: data.displayName, timeSent: data.timeSent, messageType: data.messageType, content: data.content, personId: data.personId, timeUpdated: data.timeUpdated };
     return result;
   }
 

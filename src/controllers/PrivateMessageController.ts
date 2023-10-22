@@ -3,6 +3,7 @@ import express from "express";
 import { MessagingBaseController } from "./MessagingBaseController"
 import { PrivateMessage } from "../models";
 import { ArrayHelper } from "@churchapps/apihelper";
+import { NotificationHelper } from "../helpers/NotificationHelper";
 
 @controller("/privateMessages")
 export class PrivateMessageController extends MessagingBaseController {
@@ -13,7 +14,12 @@ export class PrivateMessageController extends MessagingBaseController {
       const promises: Promise<PrivateMessage>[] = [];
       req.body.forEach(conv => {
         conv.churchId = au.churchId;
-        promises.push(this.repositories.privateMessage.save(conv));
+        const promise = this.repositories.privateMessage.save(conv).then(c => {
+          // console.log("NOTIFYING")
+          // NotificationHelper.notifyUser(au.churchId, c.toPersonId);
+          return c;
+        });
+        promises.push(promise);
       });
       const result = await Promise.all(promises);
       return result;

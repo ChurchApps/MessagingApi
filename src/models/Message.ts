@@ -2,7 +2,6 @@ export class Message {
   public id?: string;
   public churchId?: string;
   public conversationId?: string;
-  public userId?: string;
   public personId?: string;
   public displayName?: string;
   public timeSent?: Date;
