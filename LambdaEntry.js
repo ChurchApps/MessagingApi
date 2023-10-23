@@ -8,11 +8,12 @@ const { SocketHelper } = require('./dist/helpers/SocketHelper');
 const { ApiGatewayManagementApi } = require('aws-sdk');
 
 
+let gwManagement = new ApiGatewayManagementApi({ apiVersion: '2020-04-16', endpoint: Environment.socketUrl });
+
 Environment.init(process.env.APP_ENV).then(() => {
   Pool.initPool();
+  gwManagement = new ApiGatewayManagementApi({ apiVersion: '2020-04-16', endpoint: Environment.socketUrl });
 });
-
-const gwManagement = new ApiGatewayManagementApi({ apiVersion: '2020-04-16', endpoint: Environment.socketUrl });
 
 
 async function logMessage(message) {
@@ -54,7 +55,6 @@ module.exports.handleSocket = async function handleSocket(event) {
   const connectionId = rc.connectionId;
 
   await checkPool();
-  //console.log(eventType);
   if (eventType == "DISCONNECT") await SocketHelper.handleDisconnect(connectionId) //; Repositories.getCurrent().connection.deleteForSocket(connectionId);
   else if (eventType == "MESSAGE") {
     const payload = { churchId: "", conversationId: "", action: "socketId", data: rc.connectionId }
