@@ -28,6 +28,10 @@ export class PrivateMessageRepository {
     return DB.queryOne("SELECT * FROM privateMessages WHERE id=? AND churchId=?;", [id, churchId]);
   }
 
+  public loadByConversationId(churchId: string, converstationId: string) {
+    return DB.queryOne("SELECT * FROM privateMessages WHERE churchId=? AND conversationId=?;", [churchId, converstationId]);
+  }
+
   public save(pm: PrivateMessage) {
     return pm.id ? this.update(pm) : this.create(pm);
   }

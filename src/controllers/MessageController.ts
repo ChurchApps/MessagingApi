@@ -26,6 +26,8 @@ export class MessageController extends MessagingBaseController {
         promises.push(this.repositories.message.save(message).then(async (m: Message) => {
           this.repositories.conversation.updateStats(m.conversationId);
           await DeliveryHelper.sendConversationMessages({ churchId: m.churchId, conversationId: m.conversationId, action: "message", data: m });
+          const conv = await this.repositories.conversation.loadById(m.churchId, m.conversationId);
+          await NotificationHelper.checkShouldNotify(conv, m, au.personId);
           return m;
         }));
       });
@@ -49,8 +51,8 @@ export class MessageController extends MessagingBaseController {
         promises.push(this.repositories.message.save(message).then(async (m: Message) => {
           this.repositories.conversation.updateStats(m.conversationId);
           await DeliveryHelper.sendConversationMessages({ churchId: m.churchId, conversationId: m.conversationId, action: "message", data: m });
-          // const conv = await this.repositories.conversation.loadById(m.churchId, m.conversationId);
-          // await NotificationHelper.checkShouldNotify({ conversation: conv, message: m })
+          const conv = await this.repositories.conversation.loadById(m.churchId, m.conversationId);
+          await NotificationHelper.checkShouldNotify(conv, m, au.personId);
           return m;
         }));
       });
