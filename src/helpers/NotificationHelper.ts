@@ -9,8 +9,9 @@ export class NotificationHelper {
       case "privateMessage":
         console.log("Conversation", conversation);
         const pm:PrivateMessage = await Repositories.getCurrent().privateMessage.loadByConversationId(conversation.churchId, conversation.id);
-        const personId = (pm.fromPersonId === senderPersonId) ? pm.toPersonId : pm.fromPersonId;
-        await this.notifyUser(message.churchId, personId);
+        pm.notifyPersonId = (pm.fromPersonId === senderPersonId) ? pm.toPersonId : pm.fromPersonId;
+        await Repositories.getCurrent().privateMessage.save(pm);
+        await this.notifyUser(message.churchId, pm.notifyPersonId);
         break;
     }
   }

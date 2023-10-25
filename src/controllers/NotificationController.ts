@@ -24,9 +24,17 @@ export class NotificationController extends MessagingBaseController {
   public async loadMy(req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
       const existing = await this.repositories.notification.loadForPerson(au.churchId, au.personId);
+      await this.repositories.notification.markALlRead(au.churchId, au.personId);
       return existing || {};
     });
   }
 
+  @httpGet("/unreadCount")
+  public async loadMyUnread(req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+    return this.actionWrapper(req, res, async (au) => {
+      const existing = await this.repositories.notification.loadNewCounts(au.churchId, au.personId);
+      return existing || {};
+    });
+  }
 
 }

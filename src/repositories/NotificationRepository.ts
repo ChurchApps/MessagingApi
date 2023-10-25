@@ -4,8 +4,22 @@ import { UniqueIdHelper } from "../helpers";
 
 export class NotificationRepository {
 
+  public async loadNewCounts(churchId: string, personId: string) {
+    const sql = "SELECT ("
+    + "  SELECT COUNT(*) FROM notifications where churchId=? and personId=? and isNew=1"
+    + ") AS notificationCount, ("
+    + "  SELECT COUNT(*) FROM privateMessages where churchId=? and notifyPersonId=?"
+    + ") AS pmCount";
+    return DB.queryOne(sql, [churchId, personId, churchId, personId]);
+  }
+
   public async loadForPerson(churchId: string, personId: string) {
     const sql = "SELECT * FROM notifications WHERE churchId=? AND personId=? ORDER BY timeSent DESC;";
+    return DB.query(sql, [churchId, personId]);
+  }
+
+  public async markALlRead(churchId: string, personId: string) {
+    const sql = "UPDATE notifications set isNew=0 WHERE churchId=? AND personId=?;";
     return DB.query(sql, [churchId, personId]);
   }
 

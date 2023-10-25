@@ -45,7 +45,7 @@ export class PrivateMessageRepository {
   }
 
   private async update(pm: PrivateMessage) {
-    const sql = "UPDATE messages SET notifyPersonId=? WHERE id=? AND churchId=?;";
+    const sql = "UPDATE privateMessages SET notifyPersonId=? WHERE id=? AND churchId=?;";
     const params = [pm.notifyPersonId, pm.id, pm.churchId]
     await DB.query(sql, params)
     return pm;
