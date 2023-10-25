@@ -4,7 +4,7 @@ export class Notification {
   public personId?: string;
   public contentType?: string;
   public contentId?: string;
-  public timeSent?: string;
-  public read?: boolean;
+  public timeSent?: Date;
+  public isNew?: boolean;
   public message?: string;
 }

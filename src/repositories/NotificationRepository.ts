@@ -18,6 +18,11 @@ export class NotificationRepository {
     return DB.query(sql, [churchId, personId]);
   }
 
+  public async loadExistingUnread(churchId: string, contentType:string, contentId:string) {
+    const sql = "SELECT * FROM notifications WHERE churchId=? AND contentType=? AND contentId=? AND isNew=1;";
+    return DB.query(sql, [churchId, contentType, contentId]);
+  }
+
   public async markALlRead(churchId: string, personId: string) {
     const sql = "UPDATE notifications set isNew=0 WHERE churchId=? AND personId=?;";
     return DB.query(sql, [churchId, personId]);
@@ -29,15 +34,15 @@ export class NotificationRepository {
 
   private async create(notification: Notification) {
     notification.id = UniqueIdHelper.shortId();
-    const sql = "INSERT INTO notifications (id, churchId, contentType, contentId, timeSent, read, message) VALUES (?, ?, ?, ?, ?, ?, ?);";
-    const params = [notification.id, notification.churchId, notification.contentType, notification.contentId, notification.timeSent, notification.read, notification.message];
+    const sql = "INSERT INTO notifications (id, churchId, personId, contentType, contentId, timeSent, isNew, message) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+    const params = [notification.id, notification.churchId, notification.personId, notification.contentType, notification.contentId, notification.timeSent, notification.isNew, notification.message];
     await DB.query(sql, params);
     return notification;
   }
 
   private async update(notification: Notification) {
-    const sql = "UPDATE notifications SET personId=?, contentType=?, contentId=?, timeSent=?, read=?, message=? WHERE id=? AND churchId=?;";
-    const params = [notification.personId, notification.contentType, notification.contentId, notification.timeSent, notification.read, notification.message, notification.id, notification.churchId]
+    const sql = "UPDATE notifications SET personId=?, contentType=?, contentId=?, timeSent=?, isNew=?, message=? WHERE id=? AND churchId=?;";
+    const params = [notification.personId, notification.contentType, notification.contentId, notification.timeSent, notification.isNew, notification.message, notification.id, notification.churchId]
     await DB.query(sql, params)
     return notification;
   }
