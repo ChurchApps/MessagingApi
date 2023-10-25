@@ -52,7 +52,7 @@ export class PrivateMessageRepository {
   }
 
   public async markAllRead(churchId: string, personId: string) {
-    const sql = "UPDATE privateMessages set notifyPersonId=NULL WHERE churchId=? AND personId=?;";
+    const sql = "UPDATE privateMessages set notifyPersonId=NULL WHERE churchId=? AND notifyPersonId=?;";
     return DB.query(sql, [churchId, personId]);
   }
 

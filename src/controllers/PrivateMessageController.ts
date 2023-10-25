@@ -41,7 +41,7 @@ export class PrivateMessageController extends MessagingBaseController {
         })
       }
 
-      this.repositories.privateMessage.markAllRead(au.churchId, au.personId);
+      await this.repositories.privateMessage.markAllRead(au.churchId, au.personId);
 
       return privateMessages;
     });
