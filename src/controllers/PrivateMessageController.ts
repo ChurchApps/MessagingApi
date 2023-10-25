@@ -40,6 +40,9 @@ export class PrivateMessageController extends MessagingBaseController {
           pm.conversation.messages = [ArrayHelper.getOne(allMessages, "id", pm.conversation.lastPostId)];
         })
       }
+
+      this.repositories.privateMessage.markAllRead(au.churchId, au.personId);
+
       return privateMessages;
     });
   }

@@ -51,6 +51,11 @@ export class PrivateMessageRepository {
     return pm;
   }
 
+  public async markAllRead(churchId: string, personId: string) {
+    const sql = "UPDATE privateMessages set notifyPersonId=NULL WHERE churchId=? AND personId=?;";
+    return DB.query(sql, [churchId, personId]);
+  }
+
   public convertToModel(data: any) {
     const result: PrivateMessage = {
       id: data.pmId,
