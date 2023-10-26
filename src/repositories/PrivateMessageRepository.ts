@@ -28,6 +28,10 @@ export class PrivateMessageRepository {
     return DB.queryOne("SELECT * FROM privateMessages WHERE id=? AND churchId=?;", [id, churchId]);
   }
 
+  public loadByConversationId(churchId: string, converstationId: string) {
+    return DB.queryOne("SELECT * FROM privateMessages WHERE churchId=? AND conversationId=?;", [churchId, converstationId]);
+  }
+
   public save(pm: PrivateMessage) {
     return pm.id ? this.update(pm) : this.create(pm);
   }
@@ -41,10 +45,15 @@ export class PrivateMessageRepository {
   }
 
   private async update(pm: PrivateMessage) {
-    const sql = "UPDATE messages SET notifyPersonId=? WHERE id=? AND churchId=?;";
+    const sql = "UPDATE privateMessages SET notifyPersonId=? WHERE id=? AND churchId=?;";
     const params = [pm.notifyPersonId, pm.id, pm.churchId]
     await DB.query(sql, params)
     return pm;
+  }
+
+  public async markAllRead(churchId: string, personId: string) {
+    const sql = "UPDATE privateMessages set notifyPersonId=NULL WHERE churchId=? AND notifyPersonId=?;";
+    return DB.query(sql, [churchId, personId]);
   }
 
   public convertToModel(data: any) {

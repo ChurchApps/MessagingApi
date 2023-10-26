@@ -1,20 +1,17 @@
-import { Conversation, Message } from "../models";
+import { Conversation, Message, PrivateMessage } from "../models";
 import { Repositories } from "../repositories";
 import { DeliveryHelper } from "./DeliveryHelper";
 
 export class NotificationHelper {
 
-  static checkShouldNotify = async (conversation: Conversation, message: Message) => {
-
+  static checkShouldNotify = async (conversation: Conversation, message: Message, senderPersonId:string) => {
     switch (conversation.contentType) {
       case "privateMessage":
-        const pm = await Repositories.getCurrent().privateMessage.loadById(conversation.churchId, conversation.contentId);
-        // get the personId
-
-        // switch everything to memberId and don't use personId?
-
-        // let personId =
-        // await this.notifyUser(message.churchId, message.);
+        console.log("Conversation", conversation);
+        const pm:PrivateMessage = await Repositories.getCurrent().privateMessage.loadByConversationId(conversation.churchId, conversation.id);
+        pm.notifyPersonId = (pm.fromPersonId === senderPersonId) ? pm.toPersonId : pm.fromPersonId;
+        await Repositories.getCurrent().privateMessage.save(pm);
+        await this.notifyUser(message.churchId, pm.notifyPersonId);
         break;
     }
   }
