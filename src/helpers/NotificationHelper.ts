@@ -1,6 +1,7 @@
-import { Conversation, Message, PrivateMessage } from "../models";
+import { Conversation, Device, Message, PrivateMessage } from "../models";
 import { Repositories } from "../repositories";
 import { DeliveryHelper } from "./DeliveryHelper";
+import { FirebaseHelper } from "./FirebaseHelper";
 
 export class NotificationHelper {
 
@@ -30,8 +31,15 @@ export class NotificationHelper {
         const deliveryCount = await DeliveryHelper.sendMessages(connections, { churchId, conversationId: "alert", action: "notification", data: {} });
         console.log("DELIVERY COUNT", deliveryCount);
         return deliveryCount;
+      } else {
+        const devices:Device[] = await Repositories.getCurrent().device.loadForPerson(personId);
+        const promises: Promise<any>[] = [];
+        devices.forEach(device => {
+          promises.push(FirebaseHelper.sendMessage(device.fcmToken, "New Notification", "New Notification"));
+        });
+        await Promise.all(promises);
+        return devices.length;
       }
-      else return 0;
   }
 
 
