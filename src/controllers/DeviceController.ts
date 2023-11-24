@@ -12,6 +12,7 @@ export class DeviceController extends MessagingBaseController {
     return this.actionWrapper(req, res, async (au) => {
       const device: Device = req.body;
       device.personId = au.personId;
+      device.churchId = au.churchId;
       if (device.personId) await this.repositories.device.save(device);
     });
   }
