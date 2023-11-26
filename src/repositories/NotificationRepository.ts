@@ -4,6 +4,10 @@ import { UniqueIdHelper } from "../helpers";
 
 export class NotificationRepository {
 
+  public async loadUndelivered() {
+    return DB.query("SELECT * FROM notifications WHERE deliveryMethod IS NULL or deliveryMethod='';", []);
+  }
+
   public async loadNewCounts(churchId: string, personId: string) {
     const sql = "SELECT ("
     + "  SELECT COUNT(*) FROM notifications where churchId=? and personId=? and isNew=1"

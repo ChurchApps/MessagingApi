@@ -1,8 +1,9 @@
-import { ArrayHelper } from "@churchapps/apihelper";
-import { Conversation, Device, Message, PrivateMessage, Notification } from "../models";
+import { ArrayHelper, EmailHelper } from "@churchapps/apihelper";
+import { Conversation, Device, Message, PrivateMessage, Notification, NotificationPreference } from "../models";
 import { Repositories } from "../repositories";
 import { DeliveryHelper } from "./DeliveryHelper";
 import { FirebaseHelper } from "./FirebaseHelper";
+import axios from "axios";
 
 export class NotificationHelper {
 
@@ -94,6 +95,62 @@ export class NotificationHelper {
       if (devices.length > 0) method = "push";
     }
     return method;
+  }
+
+  static sendEmailNotifications = async (frequency:string) => {
+    const promises: Promise<any>[] = [];
+    const allNotifications:Notification[] = await Repositories.getCurrent().notification.loadUndelivered();
+    const peopleIds = ArrayHelper.getIds(allNotifications, "personId");
+
+    const notificationPrefs = await Repositories.getCurrent().notificationPreference.loadByPersonIds(peopleIds);
+    const todoPrefs:NotificationPreference[] = [];
+    peopleIds.forEach(personId => {
+      const notifications:Notification[] = ArrayHelper.getAll(allNotifications, "personId", personId);
+      let pref = ArrayHelper.getOne(notificationPrefs, "personId", personId);
+      if (!pref) pref = this.createNotificationPref(notifications[0].churchId, personId);
+      if (!pref.allowEmail) {
+        notifications.forEach(notification => {
+          notification.deliveryMethod = "none";
+          promises.push(Repositories.getCurrent().notification.save(notification));
+        });
+      } else if (pref.emailFrequency === frequency) todoPrefs.push(pref)
+    });
+
+    if (todoPrefs.length > 0) {
+      const allEmailData = await this.getEmailData(todoPrefs);
+      todoPrefs.forEach(pref => {
+        const notifications:Notification[] = ArrayHelper.getAll(allNotifications, "personId", pref.personId);
+        const emailData = ArrayHelper.getOne(allEmailData, "personId", pref.personId);
+        if (emailData) promises.push(this.sendEmailNotification(emailData.email, notifications));
+      });
+
+    }
+    await Promise.all(promises);
+  }
+
+  static createNotificationPref = (churchId:string, personId:string) => {
+    const pref:NotificationPreference = { churchId, personId, allowPush: true, emailFrequency: "daily" };
+    Repositories.getCurrent().notificationPreference.save(pref);
+    return pref;
+  }
+
+  static getEmailData = async (notificationPrefs:NotificationPreference[]) => {
+    console.log(notificationPrefs);
+    return [] as any[];
+    // const email = axios.post("https://membershipapi.churchapps.org/people/getEmailsApi", { churchId: pref.churchId, personIds: [pref.personId] });
+  }
+
+  static sendEmailNotification = async (email:string, notifications:Notification[]) => {
+    let title = notifications.length + " New Notifications";
+    if (notifications.length === 1) title = "New Notification: " + notifications[0].message;
+
+    const promises: Promise<any>[] = [];
+    EmailHelper.sendTemplatedEmail("support@churchapps.org", email, "Chums", "https://chums.org", title, title, "ChurchEmailTemplate.html");
+    notifications.forEach(notification => {
+      notification.deliveryMethod = "email";
+      promises.push(Repositories.getCurrent().notification.save(notification));
+    });
+    await Promise.all(promises);
   }
 
 
