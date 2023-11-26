@@ -7,4 +7,5 @@ export class Notification {
   public timeSent?: Date;
   public isNew?: boolean;
   public message?: string;
+  public deliveryMethod?: string;
 }
