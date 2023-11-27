@@ -10,6 +10,7 @@ export class Environment extends EnvironmentBase {
   static socketUrl: string;
   static firebaseClientEmail: string;
   static firebasePrivateKey: string;
+  static membershipApi: string;
 
   static async init(environment: string) {
     let file = "dev.json";
@@ -26,6 +27,7 @@ export class Environment extends EnvironmentBase {
     this.deliveryProvider = data.deliveryProvider;
     this.socketPort = data.socketPort;
     this.socketUrl = data.socketUrl;
+    this.membershipApi = data.membershipApi;
 
     this.firebaseClientEmail = process.env.FIREBASE_CLIENT_EMAIL || await AwsHelper.readParameter(`/${environment}/firebase/clientEmail`);
     this.firebasePrivateKey = process.env.FIREBASE_PRIVATE_KEY || await AwsHelper.readParameter(`/${environment}/firebase/privateKey`);

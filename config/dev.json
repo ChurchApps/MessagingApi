@@ -7,5 +7,6 @@
   "s3Bucket": "",
   "deliveryProvider": "local",
   "socketPort": 8087,
-  "socketUrl": ""
+  "socketUrl": "",
+  "membershipApi": "https://membershipapi.staging.churchapps.org"
 }

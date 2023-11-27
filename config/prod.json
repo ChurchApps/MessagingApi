@@ -7,5 +7,6 @@
   "s3Bucket": "churchapps-content",
   "deliveryProvider": "aws",
   "socketPort": 0,
-  "socketUrl": "socket.churchapps.org"
+  "socketUrl": "socket.churchapps.org",
+  "membershipApi": "https://membershipapi.churchapps.org"
 }

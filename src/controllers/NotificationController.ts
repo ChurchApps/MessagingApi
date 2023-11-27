@@ -24,7 +24,7 @@ export class NotificationController extends MessagingBaseController {
   @httpPost("/ping")
   public async ping(req: express.Request<{}, {}, any>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapperAnon(req, res, async () => {
-      return await NotificationHelper.createNotifications(req.body.churchId, req.body.personId, req.body.contentType, req.body.contentId, req.body.message);
+      return await NotificationHelper.createNotifications([req.body.personId], req.body.churchId, req.body.contentType, req.body.contentId, req.body.message);
     });
   }
 

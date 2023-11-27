@@ -4,6 +4,7 @@ import { Repositories } from "../repositories";
 import { DeliveryHelper } from "./DeliveryHelper";
 import { FirebaseHelper } from "./FirebaseHelper";
 import axios from "axios";
+import { Environment } from "./Environment";
 
 export class NotificationHelper {
 
@@ -136,8 +137,13 @@ export class NotificationHelper {
 
   static getEmailData = async (notificationPrefs:NotificationPreference[]) => {
     console.log(notificationPrefs);
-    return [] as any[];
-    // const email = axios.post("https://membershipapi.churchapps.org/people/getEmailsApi", { churchId: pref.churchId, personIds: [pref.personId] });
+    const peopleIds = ArrayHelper.getIds(notificationPrefs, "personId");
+    const data = {
+      peopleIds,
+      jwtSecret: Environment.jwtSecret
+    }
+    const result = await axios.post(Environment.membershipApi + "/people/apiEmails", data);
+    return result.data;
   }
 
   static sendEmailNotification = async (email:string, notifications:Notification[]) => {
