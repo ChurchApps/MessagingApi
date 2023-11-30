@@ -28,6 +28,14 @@ export class NotificationController extends MessagingBaseController {
     });
   }
 
+
+  @httpGet("/tmpEmail")
+  public async tmpEmail(req: express.Request<{}, {}, any>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+    return this.actionWrapperAnon(req, res, async () => {
+      return await NotificationHelper.sendEmailNotifications("daily");
+    });
+  }
+
   @httpGet("/my")
   public async loadMy(req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {

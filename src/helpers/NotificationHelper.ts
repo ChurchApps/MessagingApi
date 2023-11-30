@@ -11,7 +11,6 @@ export class NotificationHelper {
   static checkShouldNotify = async (conversation: Conversation, message: Message, senderPersonId:string) => {
     switch (conversation.contentType) {
       case "privateMessage":
-        console.log("Conversation", conversation);
         const pm:PrivateMessage = await Repositories.getCurrent().privateMessage.loadByConversationId(conversation.churchId, conversation.id);
         pm.notifyPersonId = (pm.fromPersonId === senderPersonId) ? pm.toPersonId : pm.fromPersonId;
         await Repositories.getCurrent().privateMessage.save(pm);
@@ -50,7 +49,6 @@ export class NotificationHelper {
           isNew: true,
           message
         };
-        console.log(notification);
         notifications.push(notification);
       });
 
@@ -81,11 +79,9 @@ export class NotificationHelper {
     const repos = Repositories.getCurrent();
     // await repos.connection.loadForNotification(payload.churchId, payload.conversationId);
     const connections = await repos.connection.loadForNotification(churchId, personId);
-    console.log("CONNECTIONS", connections.length);
     if (connections.length > 0) {
       method = "socket";
       const deliveryCount = await DeliveryHelper.sendMessages(connections, { churchId, conversationId: "alert", action: "notification", data: {} });
-      console.log("DELIVERY COUNT", deliveryCount);
     } else {
       const devices:Device[] = await Repositories.getCurrent().device.loadForPerson(personId);
       const promises: Promise<any>[] = [];
@@ -109,7 +105,7 @@ export class NotificationHelper {
       const notifications:Notification[] = ArrayHelper.getAll(allNotifications, "personId", personId);
       let pref = ArrayHelper.getOne(notificationPrefs, "personId", personId);
       if (!pref) pref = this.createNotificationPref(notifications[0].churchId, personId);
-      if (!pref.allowEmail) {
+      if (pref.emailFrequency==="never") {
         notifications.forEach(notification => {
           notification.deliveryMethod = "none";
           promises.push(Repositories.getCurrent().notification.save(notification));
@@ -121,7 +117,7 @@ export class NotificationHelper {
       const allEmailData = await this.getEmailData(todoPrefs);
       todoPrefs.forEach(pref => {
         const notifications:Notification[] = ArrayHelper.getAll(allNotifications, "personId", pref.personId);
-        const emailData = ArrayHelper.getOne(allEmailData, "personId", pref.personId);
+        const emailData = ArrayHelper.getOne(allEmailData, "id", pref.personId);
         if (emailData) promises.push(this.sendEmailNotification(emailData.email, notifications));
       });
 
@@ -136,7 +132,6 @@ export class NotificationHelper {
   }
 
   static getEmailData = async (notificationPrefs:NotificationPreference[]) => {
-    console.log(notificationPrefs);
     const peopleIds = ArrayHelper.getIds(notificationPrefs, "personId");
     const data = {
       peopleIds,
@@ -151,7 +146,7 @@ export class NotificationHelper {
     if (notifications.length === 1) title = "New Notification: " + notifications[0].message;
 
     const promises: Promise<any>[] = [];
-    EmailHelper.sendTemplatedEmail("support@churchapps.org", email, "Chums", "https://chums.org", title, title, "ChurchEmailTemplate.html");
+    await EmailHelper.sendTemplatedEmail("support@churchapps.org", email, "Chums", "https://chums.org", title, title, "ChurchEmailTemplate.html");
     notifications.forEach(notification => {
       notification.deliveryMethod = "email";
       promises.push(Repositories.getCurrent().notification.save(notification));
