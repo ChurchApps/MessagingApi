@@ -4,6 +4,10 @@ import { UniqueIdHelper } from "../helpers";
 
 export class PrivateMessageRepository {
 
+  public async loadUndelivered() {
+    return DB.query("SELECT * FROM privateMessages WHERE notifyPersonId IS NOT NULL AND deliveryMethod IS NULL or deliveryMethod='';", []);
+  }
+
   public async loadForPerson(churchId: string, personId: string) {
     const sql = "SELECT c.*, pm.id as pmId, pm.fromPersonId, pm.toPersonId, pm.notifyPersonId"
       + " FROM privateMessages pm"
@@ -52,7 +56,7 @@ export class PrivateMessageRepository {
   }
 
   public async markAllRead(churchId: string, personId: string) {
-    const sql = "UPDATE privateMessages set notifyPersonId=NULL WHERE churchId=? AND notifyPersonId=?;";
+    const sql = "UPDATE privateMessages set notifyPersonId=NULL, deliveryMethod=NULL WHERE churchId=? AND notifyPersonId=?;";
     return DB.query(sql, [churchId, personId]);
   }
 

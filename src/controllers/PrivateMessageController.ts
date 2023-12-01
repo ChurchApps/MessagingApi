@@ -16,7 +16,12 @@ export class PrivateMessageController extends MessagingBaseController {
         conv.churchId = au.churchId;
         const promise = this.repositories.privateMessage.save(conv).then(c => {
           // console.log("NOTIFYING")
-          NotificationHelper.notifyUser(au.churchId, c.toPersonId);
+          NotificationHelper.notifyUser(au.churchId, c.toPersonId).then(method => {
+            if (method) {
+              c.deliveryMethod = method;
+              this.repositories.privateMessage.save(c);
+            }
+          });
           return c;
         });
         promises.push(promise);

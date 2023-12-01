@@ -29,6 +29,14 @@ const checkPool = async () => {
   }
 }
 
+module.exports.timer15Min = async (event, context) => {
+  return await NotificationHelper.sendEmailNotifications("individual");
+}
+
+module.exports.timerMidnight = async (event, context) => {
+  return await NotificationHelper.sendEmailNotifications("daily");
+}
+
 module.exports.universal = function universal(event, context) {
   checkPool().then(() => {
     init().then(app => {

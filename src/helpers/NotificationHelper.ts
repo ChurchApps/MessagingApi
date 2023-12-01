@@ -96,34 +96,48 @@ export class NotificationHelper {
   }
 
   static sendEmailNotifications = async (frequency:string) => {
-    const promises: Promise<any>[] = [];
+    let promises: Promise<any>[] = [];
     const allNotifications:Notification[] = await Repositories.getCurrent().notification.loadUndelivered();
-    const peopleIds = ArrayHelper.getIds(allNotifications, "personId");
+    const allPMs:PrivateMessage[] = await Repositories.getCurrent().privateMessage.loadUndelivered();
+    if (allNotifications.length === 0 && allPMs.length === 0) return;
+
+    const peopleIds = ArrayHelper.getIds(allNotifications, "personId").concat(ArrayHelper.getIds(allPMs, "notifyPersonId"));
 
     const notificationPrefs = await Repositories.getCurrent().notificationPreference.loadByPersonIds(peopleIds);
     const todoPrefs:NotificationPreference[] = [];
     peopleIds.forEach(personId => {
       const notifications:Notification[] = ArrayHelper.getAll(allNotifications, "personId", personId);
+      const pms:PrivateMessage[] = ArrayHelper.getAll(allPMs, "notifyPersonId", personId);
       let pref = ArrayHelper.getOne(notificationPrefs, "personId", personId);
-      if (!pref) pref = this.createNotificationPref(notifications[0].churchId, personId);
-      if (pref.emailFrequency==="never") {
-        notifications.forEach(notification => {
-          notification.deliveryMethod = "none";
-          promises.push(Repositories.getCurrent().notification.save(notification));
-        });
-      } else if (pref.emailFrequency === frequency) todoPrefs.push(pref)
+      if (!pref) pref = this.createNotificationPref(notifications[0]?.churchId || pms[0]?.churchId, personId);
+      if (pref.emailFrequency==="never") promises = promises.concat(this.markMethod(notifications, pms, "none"));
+      else if (pref.emailFrequency === frequency) todoPrefs.push(pref)
     });
 
     if (todoPrefs.length > 0) {
       const allEmailData = await this.getEmailData(todoPrefs);
       todoPrefs.forEach(pref => {
         const notifications:Notification[] = ArrayHelper.getAll(allNotifications, "personId", pref.personId);
+        const pms:PrivateMessage[] = ArrayHelper.getAll(allPMs, "notifyPersonId", pref.personId);
         const emailData = ArrayHelper.getOne(allEmailData, "id", pref.personId);
-        if (emailData) promises.push(this.sendEmailNotification(emailData.email, notifications));
+        if (emailData) promises.push(this.sendEmailNotification(emailData.email, notifications, pms));
       });
 
     }
     await Promise.all(promises);
+  }
+
+  static markMethod = (notifications:Notification[], privateMessages:PrivateMessage[], method:string) => {
+    const promises: Promise<any>[] = [];
+    notifications.forEach(notification => {
+      notification.deliveryMethod = "none";
+      promises.push(Repositories.getCurrent().notification.save(notification));
+    });
+    privateMessages.forEach(pm => {
+      pm.deliveryMethod = "none";
+      promises.push(Repositories.getCurrent().privateMessage.save(pm));
+    });
+    return promises;
   }
 
   static createNotificationPref = (churchId:string, personId:string) => {
@@ -142,16 +156,14 @@ export class NotificationHelper {
     return result.data;
   }
 
-  static sendEmailNotification = async (email:string, notifications:Notification[]) => {
+  static sendEmailNotification = async (email:string, notifications:Notification[], privateMessages:PrivateMessage[]) => {
     let title = notifications.length + " New Notifications";
-    if (notifications.length === 1) title = "New Notification: " + notifications[0].message;
+    if (notifications.length === 1 && privateMessages.length===0) title = "New Notification: " + notifications[0].message;
+    else if (notifications.length === 0 && privateMessages.length===1) title = "New Private Message";
 
-    const promises: Promise<any>[] = [];
+
     await EmailHelper.sendTemplatedEmail("support@churchapps.org", email, "Chums", "https://chums.org", title, title, "ChurchEmailTemplate.html");
-    notifications.forEach(notification => {
-      notification.deliveryMethod = "email";
-      promises.push(Repositories.getCurrent().notification.save(notification));
-    });
+    const promises: Promise<any>[] = this.markMethod(notifications, privateMessages, "email");
     await Promise.all(promises);
   }
 
