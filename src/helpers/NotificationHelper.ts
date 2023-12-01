@@ -105,11 +105,11 @@ export class NotificationHelper {
 
     const notificationPrefs = await Repositories.getCurrent().notificationPreference.loadByPersonIds(peopleIds);
     const todoPrefs:NotificationPreference[] = [];
-    peopleIds.forEach(personId => {
+    peopleIds.forEach(async personId => {
       const notifications:Notification[] = ArrayHelper.getAll(allNotifications, "personId", personId);
       const pms:PrivateMessage[] = ArrayHelper.getAll(allPMs, "notifyPersonId", personId);
       let pref = ArrayHelper.getOne(notificationPrefs, "personId", personId);
-      if (!pref) pref = this.createNotificationPref(notifications[0]?.churchId || pms[0]?.churchId, personId);
+      if (!pref) pref = await this.createNotificationPref(notifications[0]?.churchId || pms[0]?.churchId, personId);
       if (pref.emailFrequency==="never") promises = promises.concat(this.markMethod(notifications, pms, "none"));
       else if (pref.emailFrequency === frequency) todoPrefs.push(pref)
     });
@@ -140,10 +140,10 @@ export class NotificationHelper {
     return promises;
   }
 
-  static createNotificationPref = (churchId:string, personId:string) => {
+  static createNotificationPref = async (churchId:string, personId:string) => {
     const pref:NotificationPreference = { churchId, personId, allowPush: true, emailFrequency: "daily" };
-    Repositories.getCurrent().notificationPreference.save(pref);
-    return pref;
+    const result = await Repositories.getCurrent().notificationPreference.save(pref);
+    return result;
   }
 
   static getEmailData = async (notificationPrefs:NotificationPreference[]) => {
