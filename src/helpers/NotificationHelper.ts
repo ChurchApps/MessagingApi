@@ -8,13 +8,13 @@ import { Environment } from "./Environment";
 
 export class NotificationHelper {
 
-  static checkShouldNotify = async (conversation: Conversation, message: Message, senderPersonId:string) => {
+  static checkShouldNotify = async (conversation: Conversation, message: Message, senderPersonId:string, title?:string) => {
     switch (conversation.contentType) {
       case "privateMessage":
         const pm:PrivateMessage = await Repositories.getCurrent().privateMessage.loadByConversationId(conversation.churchId, conversation.id);
         pm.notifyPersonId = (pm.fromPersonId === senderPersonId) ? pm.toPersonId : pm.fromPersonId;
         await Repositories.getCurrent().privateMessage.save(pm);
-        const method = await this.notifyUser(message.churchId, pm.notifyPersonId);
+        const method = await this.notifyUser(message.churchId, pm.notifyPersonId, title);
         if (method) {
           pm.deliveryMethod = method;
           await Repositories.getCurrent().privateMessage.save(pm);
@@ -74,19 +74,20 @@ export class NotificationHelper {
   }
 
 
-  static notifyUser = async (churchId:string, personId:string) => {
+  static notifyUser = async (churchId:string, personId:string, title:string = "New Notification") => {
     let method = "";
     const repos = Repositories.getCurrent();
-    // await repos.connection.loadForNotification(payload.churchId, payload.conversationId);
+    let deliveryCount = 0;
     const connections = await repos.connection.loadForNotification(churchId, personId);
     if (connections.length > 0) {
       method = "socket";
-      const deliveryCount = await DeliveryHelper.sendMessages(connections, { churchId, conversationId: "alert", action: "notification", data: {} });
-    } else {
+      deliveryCount = await DeliveryHelper.sendMessages(connections, { churchId, conversationId: "alert", action: "notification", data: {} });
+    }
+    if (deliveryCount===0) {
       const devices:Device[] = await Repositories.getCurrent().device.loadForPerson(personId);
       const promises: Promise<any>[] = [];
       devices.forEach(device => {
-        promises.push(FirebaseHelper.sendMessage(device.fcmToken, "New Notification", "New Notification"));
+        promises.push(FirebaseHelper.sendMessage(device.fcmToken, title, title));
       });
       await Promise.all(promises);
       if (devices.length > 0) method = "push";

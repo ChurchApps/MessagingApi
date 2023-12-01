@@ -19,7 +19,6 @@ export class FirebaseHelper {
         token: fcmToken
       }
 
-      console.log("sending fcm message", message);
       if (fcmToken) {
         await this.initialize();
         await admin.messaging().send(message)

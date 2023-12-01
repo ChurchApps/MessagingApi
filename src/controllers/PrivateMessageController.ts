@@ -58,7 +58,12 @@ export class PrivateMessageController extends MessagingBaseController {
   @httpGet("/:id")
   public async get(@requestParam("id") id: string, req: express.Request<{}, {}, null>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapper(req, res, async (au) => {
-      return await this.repositories.privateMessage.loadById(au.churchId, id);
+      const result = await this.repositories.privateMessage.loadById(au.churchId, id);
+      if (result.notifyPersonId===au.personId) {
+        result.notifyPersonId = null;
+        await this.repositories.privateMessage.save(result);
+      }
+      return result;
     });
   }
 
