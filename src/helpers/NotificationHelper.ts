@@ -10,6 +10,9 @@ export class NotificationHelper {
 
   static checkShouldNotify = async (conversation: Conversation, message: Message, senderPersonId:string, title?:string) => {
     switch (conversation.contentType) {
+      case "streamingLive":
+        // don't send notifications for live stream chat room.
+        break;
       case "privateMessage":
         const pm:PrivateMessage = await Repositories.getCurrent().privateMessage.loadByConversationId(conversation.churchId, conversation.id);
         pm.notifyPersonId = (pm.fromPersonId === senderPersonId) ? pm.toPersonId : pm.fromPersonId;
