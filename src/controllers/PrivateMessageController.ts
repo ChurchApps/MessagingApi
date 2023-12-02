@@ -16,7 +16,12 @@ export class PrivateMessageController extends MessagingBaseController {
         conv.churchId = au.churchId;
         const promise = this.repositories.privateMessage.save(conv).then(c => {
           // console.log("NOTIFYING")
-          NotificationHelper.notifyUser(au.churchId, c.toPersonId);
+          NotificationHelper.notifyUser(au.churchId, c.toPersonId).then(method => {
+            if (method) {
+              c.deliveryMethod = method;
+              this.repositories.privateMessage.save(c);
+            }
+          });
           return c;
         });
         promises.push(promise);
@@ -58,7 +63,12 @@ export class PrivateMessageController extends MessagingBaseController {
   @httpGet("/:id")
   public async get(@requestParam("id") id: string, req: express.Request<{}, {}, null>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapper(req, res, async (au) => {
-      return await this.repositories.privateMessage.loadById(au.churchId, id);
+      const result = await this.repositories.privateMessage.loadById(au.churchId, id);
+      if (result.notifyPersonId===au.personId) {
+        result.notifyPersonId = null;
+        await this.repositories.privateMessage.save(result);
+      }
+      return result;
     });
   }
 

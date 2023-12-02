@@ -4,6 +4,10 @@ import { UniqueIdHelper } from "../helpers";
 
 export class NotificationRepository {
 
+  public async loadUndelivered() {
+    return DB.query("SELECT * FROM notifications WHERE deliveryMethod IS NULL or deliveryMethod='';", []);
+  }
+
   public async loadNewCounts(churchId: string, personId: string) {
     const sql = "SELECT ("
     + "  SELECT COUNT(*) FROM notifications where churchId=? and personId=? and isNew=1"
@@ -34,15 +38,15 @@ export class NotificationRepository {
 
   private async create(notification: Notification) {
     notification.id = UniqueIdHelper.shortId();
-    const sql = "INSERT INTO notifications (id, churchId, personId, contentType, contentId, timeSent, isNew, message) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
-    const params = [notification.id, notification.churchId, notification.personId, notification.contentType, notification.contentId, notification.timeSent, notification.isNew, notification.message];
+    const sql = "INSERT INTO notifications (id, churchId, personId, contentType, contentId, timeSent, isNew, message, deliveryMethod) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    const params = [notification.id, notification.churchId, notification.personId, notification.contentType, notification.contentId, notification.timeSent, notification.isNew, notification.message, notification.deliveryMethod];
     await DB.query(sql, params);
     return notification;
   }
 
   private async update(notification: Notification) {
-    const sql = "UPDATE notifications SET personId=?, contentType=?, contentId=?, timeSent=?, isNew=?, message=? WHERE id=? AND churchId=?;";
-    const params = [notification.personId, notification.contentType, notification.contentId, notification.timeSent, notification.isNew, notification.message, notification.id, notification.churchId]
+    const sql = "UPDATE notifications SET personId=?, contentType=?, contentId=?, timeSent=?, isNew=?, message=?, deliveryMethod=? WHERE id=? AND churchId=?;";
+    const params = [notification.personId, notification.contentType, notification.contentId, notification.timeSent, notification.isNew, notification.message, notification.deliveryMethod, notification.id, notification.churchId]
     await DB.query(sql, params)
     return notification;
   }
