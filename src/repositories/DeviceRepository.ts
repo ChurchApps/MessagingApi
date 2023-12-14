@@ -26,14 +26,15 @@ export class DeviceRepository {
 
   public async save(device: Device) {
     let result = null;
-    if (device.id) result = this.update(device);
+    if (device.id) result = await this.update(device);
     else {
-      const existing = await this.loadByFcmToken(device.fcmToken)
-      if (existing?.id) {
+      const allExisting = await this.loadByFcmToken(device.fcmToken)
+      if (allExisting.length > 0) {
+        const existing = allExisting[0];
         existing.lastActiveDate = new Date();
-        result = this.update(existing);
+        result = await this.update(existing);
       }
-      else result = this.create(device);
+      else result = await this.create(device);
     }
     return result;
   }

@@ -10,10 +10,10 @@ export class DeviceController extends MessagingBaseController {
   @httpPost("/register")
   public async register(req: express.Request<{}, {}, Device>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
-      const device: Device = req.body;
+      let device: Device = req.body;
       device.personId = au.personId;
       device.churchId = au.churchId;
-      if (device.personId) await this.repositories.device.save(device);
+      if (device.personId) device = await this.repositories.device.save(device);
       return {"id": device.id};
     });
   }
