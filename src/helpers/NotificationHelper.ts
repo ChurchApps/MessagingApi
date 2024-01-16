@@ -78,16 +78,19 @@ export class NotificationHelper {
 
 
   static notifyUser = async (churchId:string, personId:string, title:string = "New Notification") => {
+    console.log("notifyUser", churchId, personId, title)
     let method = "";
     const repos = Repositories.getCurrent();
     let deliveryCount = 0;
     const connections = await repos.connection.loadForNotification(churchId, personId);
+    console.log("connections", connections.length)
     if (connections.length > 0) {
       method = "socket";
       deliveryCount = await DeliveryHelper.sendMessages(connections, { churchId, conversationId: "alert", action: "notification", data: {} });
     }
     if (deliveryCount===0) {
       const devices:Device[] = await Repositories.getCurrent().device.loadForPerson(personId);
+      console.log("devices", devices.length)
       const promises: Promise<any>[] = [];
       devices.forEach(device => {
         promises.push(FirebaseHelper.sendMessage(device.fcmToken, title, title));
