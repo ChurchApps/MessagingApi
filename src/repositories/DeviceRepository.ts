@@ -21,7 +21,7 @@ export class DeviceRepository {
   }
 
   public loadByAppDevice(appName: string, deviceId:string) {
-    return DB.query("SELECT * FROM devices WHERE appName=?, deviceId=?", [appName, deviceId]);
+    return DB.query("SELECT * FROM devices WHERE appName=? AND deviceId=?", [appName, deviceId]);
   }
 
   public delete(id: string) {
