@@ -52,8 +52,8 @@ export class DeviceRepository {
   }
 
   private async update(device: Device) {
-    const sql = "UPDATE devices SET appName=?, deviceId=?, personId=?, fcmToken=?, label=?, registrationDate=?, lastActiveDate=?, deviceInfo=? WHERE id=? and churchId=?;";
-    const params = [device.appName, device.deviceId, device.personId, device.fcmToken, device.label, device.registrationDate, device.lastActiveDate, device.deviceInfo, device.id, device.churchId]
+    const sql = "UPDATE devices SET appName=?, deviceId=?, churchId=?, personId=?, fcmToken=?, label=?, registrationDate=?, lastActiveDate=?, deviceInfo=? WHERE id=?;";
+    const params = [device.appName, device.deviceId, device.churchId, device.personId, device.fcmToken, device.label, device.registrationDate, device.lastActiveDate, device.deviceInfo, device.id]
     await DB.query(sql, params)
     return device;
   }
