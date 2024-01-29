@@ -20,6 +20,10 @@ export class DeviceRepository {
     return DB.query("SELECT * FROM devices WHERE fcmToken=?", [fcmToken]);
   }
 
+  public loadByAppDevice(appName: string, deviceId:string) {
+    return DB.query("SELECT * FROM devices WHERE appName=?, deviceId=?", [appName, deviceId]);
+  }
+
   public delete(id: string) {
     return DB.query("DELETE FROM devices WHERE personId=?;", [id]);
   }
@@ -28,7 +32,7 @@ export class DeviceRepository {
     let result = null;
     if (device.id) result = await this.update(device);
     else {
-      const allExisting = await this.loadByFcmToken(device.fcmToken)
+      const allExisting = (device.deviceId) ? await this.loadByAppDevice(device.appName, device.deviceId) : this.loadByFcmToken(device.fcmToken);
       if (allExisting.length > 0) {
         const existing = allExisting[0];
         existing.lastActiveDate = new Date();
