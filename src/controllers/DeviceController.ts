@@ -1,7 +1,7 @@
 import { controller, httpPost, requestParam, httpDelete, interfaces } from "inversify-express-utils";
 import express from "express";
 import { MessagingBaseController } from "./MessagingBaseController"
-import { Device, Message } from "../models";
+import { Device } from "../models";
 import { FirebaseHelper } from "../helpers/FirebaseHelper";
 
 @controller("/devices")
@@ -11,9 +11,11 @@ export class DeviceController extends MessagingBaseController {
   public async register(req: express.Request<{}, {}, Device>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
       let device: Device = req.body;
-      device.personId = au.personId;
-      device.churchId = au.churchId;
-      if (device.personId) device = await this.repositories.device.save(device);
+      if (au) {
+        device.personId = au.personId;
+        device.churchId = au.churchId;
+      }
+      device = await this.repositories.device.save(device);
       return {"id": device.id};
     });
   }
