@@ -36,6 +36,9 @@ export class DeviceRepository {
       if (allExisting.length > 0) {
         const existing = allExisting[0];
         existing.lastActiveDate = new Date();
+        existing.personId = device.personId;
+        existing.churchId = device.churchId;
+        existing.fcmToken = device.fcmToken;
         result = await this.update(existing);
       }
       else result = await this.create(device);
