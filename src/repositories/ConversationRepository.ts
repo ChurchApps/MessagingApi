@@ -19,7 +19,7 @@ export class ConversationRepository {
       + " INNER JOIN messages fp on fp.id=c.firstPostId"
       + " INNER JOIN messages lp on lp.id=c.lastPostId"
       + " WHERE c.churchId=? and c.groupId IN (?)"
-      + " AND lp.timeSent>DATE_SUB(NOW(), INTERVAL 180 DAY)";
+      + " AND lp.timeSent>DATE_SUB(NOW(), INTERVAL 365 DAY)";
     const params = [churchId, groupIds];
     const result = await DB.query(sql, params);
     return result;

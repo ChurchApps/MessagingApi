@@ -57,6 +57,15 @@ export class ConversationController extends MessagingBaseController {
     });
   }
 
+  @httpGet("/posts/group/:groupId")
+  public async getPostsForGroup(@requestParam("groupId") groupId: string, req: express.Request<{}, {}, null>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+    return this.actionWrapper(req, res, async (au) => {
+      const result = await this.repositories.conversation.loadPosts(au.churchId, [groupId]);
+      await this.appendMessages(result, au.churchId);
+      return result;
+    });
+  }
+
   @httpPost("/")
   public async save(req: express.Request<{}, {}, Conversation[]>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapper(req, res, async (au) => {
