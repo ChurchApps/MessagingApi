@@ -9,6 +9,7 @@ import { Environment } from "./Environment";
 export class NotificationHelper {
 
   static checkShouldNotify = async (conversation: Conversation, message: Message, senderPersonId:string, title?:string) => {
+    // console.log("check should notify", conversation, message, senderPersonId, title)
     switch (conversation.contentType) {
       case "streamingLive":
         // don't send notifications for live stream chat room.
@@ -24,18 +25,16 @@ export class NotificationHelper {
         }
         break;
       default:
-        if (conversation.messages.length>0)
+        const allMessages:Message[] = await Repositories.getCurrent().message.loadForConversation(conversation.churchId, conversation.id);
+        const peopleIds = ArrayHelper.getIds(allMessages, "personId");
+        if (peopleIds.length>1)
         {
-          const allMessages:Message[] = await Repositories.getCurrent().message.loadForConversation(conversation.churchId, conversation.id);
-          const peopleIds = ArrayHelper.getIds(allMessages, "personId");
-          if (peopleIds.length>1)
-          {
-            for (let i=peopleIds.length-1; i>=0; i--) {
-              if (peopleIds[i] === senderPersonId) peopleIds.splice(i, 1);
-            }
-            await this.createNotifications(peopleIds, conversation.churchId, conversation.contentType, conversation.contentId, "New message: " + conversation.title);
+          for (let i=peopleIds.length-1; i>=0; i--) {
+            if (peopleIds[i] === senderPersonId) peopleIds.splice(i, 1);
           }
+          await this.createNotifications(peopleIds, conversation.churchId, conversation.contentType, conversation.contentId, "New message: " + conversation.title);
         }
+
         break;
     }
   }
