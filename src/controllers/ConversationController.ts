@@ -1,7 +1,7 @@
 import { controller, httpGet, httpPost, interfaces, requestParam } from "inversify-express-utils";
 import express from "express";
 import { MessagingBaseController } from "./MessagingBaseController"
-import { Conversation, Connection } from "../models";
+import { Conversation, Connection, Message } from "../models";
 import { DeliveryHelper } from "../helpers/DeliveryHelper";
 import { ArrayHelper } from "@churchapps/apihelper";
 
@@ -66,6 +66,24 @@ export class ConversationController extends MessagingBaseController {
     });
   }
 
+  @httpPost("/start")
+  public async start(req: express.Request<{}, {}, {groupId:string, contentType:string, contentId:string, title:string, comment:string}>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+    return this.actionWrapper(req, res, async (au) => {
+
+      const c:Conversation = { churchId: au.churchId, contentType: req.body.contentType, contentId: req.body.contentId, title: req.body.title, dateCreated: new Date(), visibility: "public", allowAnonymousPosts: true };
+      const conversation = await this.repositories.conversation.save(c);
+
+      const m:Message = { churchId: au.churchId, conversationId: conversation.id, personId: au.personId, displayName:au.firstName + " " + au.lastName, timeSent: new Date(), content: req.body.comment, messageType: "comment" };
+      const message = await this.repositories.message.save(m);
+
+      conversation.firstPostId = message.id;
+      conversation.lastPostId = message.id;
+      conversation.postCount = 1;
+      await this.repositories.conversation.save(conversation);
+
+      return conversation;
+    });
+  }
 
   @httpPost("/")
   public async save(req: express.Request<{}, {}, Conversation[]>, res: express.Response): Promise<interfaces.IHttpActionResult> {
