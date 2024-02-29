@@ -9,7 +9,7 @@ import { ArrayHelper } from "@churchapps/apihelper";
 export class ConversationController extends MessagingBaseController {
 
   private async appendMessages(conversations: Conversation[], churchId:string) {
-    if (conversations.length > 0) {
+    if (conversations?.length > 0) {
       const postIds: string[] = [];
       conversations.forEach((c: Conversation) => {
         if (c.firstPostId && postIds.indexOf(c.firstPostId) === -1) postIds.push(c.firstPostId);
