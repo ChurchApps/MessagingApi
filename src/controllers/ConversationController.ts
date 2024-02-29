@@ -70,16 +70,13 @@ export class ConversationController extends MessagingBaseController {
   public async start(req: express.Request<{}, {}, {groupId:string, contentType:string, contentId:string, title:string, comment:string}>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapper(req, res, async (au) => {
 
-      const c:Conversation = { churchId: au.churchId, contentType: req.body.contentType, contentId: req.body.contentId, title: req.body.title, dateCreated: new Date(), visibility: "public", allowAnonymousPosts: true };
+      const c:Conversation = { churchId: au.churchId, contentType: req.body.contentType, contentId: req.body.contentId, title: req.body.title, dateCreated: new Date(), visibility: "public", allowAnonymousPosts: false, groupId:req.body.groupId  };
       const conversation = await this.repositories.conversation.save(c);
 
       const m:Message = { churchId: au.churchId, conversationId: conversation.id, personId: au.personId, displayName:au.firstName + " " + au.lastName, timeSent: new Date(), content: req.body.comment, messageType: "comment" };
-      const message = await this.repositories.message.save(m);
+      await this.repositories.message.save(m);
 
-      conversation.firstPostId = message.id;
-      conversation.lastPostId = message.id;
-      conversation.postCount = 1;
-      await this.repositories.conversation.save(conversation);
+      this.repositories.conversation.updateStats(conversation.id);
 
       return conversation;
     });
