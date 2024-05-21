@@ -1,13 +1,11 @@
 import admin from "firebase-admin";
-import { FcmMessage } from "../models";
-import { DataMessagePayload, Message } from "firebase-admin/lib/messaging/messaging-api";
+import { Message } from "firebase-admin/lib/messaging/messaging-api";
 import { Environment } from "./Environment";
+import { Repositories } from "../repositories";
 
 export class FirebaseHelper {
 
   static app: admin.app.App = null;
-
-
 
   static async sendMessage(fcmToken:string, title:string, body:string) {
     if (Environment.firebasePrivateKey) {
@@ -23,7 +21,15 @@ export class FirebaseHelper {
 
       if (fcmToken) {
         await this.initialize();
-        await admin.messaging().send(message)
+        try {
+        const result = await admin.messaging().send(message)
+        console.log("Message sent", result);
+        } catch (e) {
+            if (e.toString().indexOf("entity was not found") > -1) {
+                console.log("Removing invalid token", fcmToken);
+                await Repositories.getCurrent().device.deleteByToken(fcmToken);
+            }
+        }
       }
     }
   }

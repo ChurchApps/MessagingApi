@@ -28,6 +28,10 @@ export class DeviceRepository {
     return DB.query("DELETE FROM devices WHERE personId=?;", [id]);
   }
 
+  public deleteByToken(token: string) {
+    return DB.query("DELETE FROM devices WHERE fcmToken=?;", [token]);
+  }
+
   public async save(device: Device) {
     let result = null;
     if (device.id) result = await this.update(device);
