@@ -87,16 +87,17 @@ export class NotificationHelper {
       method = "socket";
       deliveryCount = await DeliveryHelper.sendMessages(connections, { churchId, conversationId: "alert", action: "notification", data: {} });
     }
-    if (deliveryCount===0) {
-      const devices:Device[] = await Repositories.getCurrent().device.loadForPerson(personId);
-      console.log("devices", devices.length)
-      const promises: Promise<any>[] = [];
-      devices.forEach(device => {
-        promises.push(FirebaseHelper.sendMessage(device.fcmToken, title, title));
-      });
-      await Promise.all(promises);
-      if (devices.length > 0) method = "push";
-    }
+
+    // Still push to phone even if delivered to web browser
+    const devices:Device[] = await Repositories.getCurrent().device.loadForPerson(personId);
+    console.log("devices", devices.length)
+    const promises: Promise<any>[] = [];
+    devices.forEach(device => {
+      promises.push(FirebaseHelper.sendMessage(device.fcmToken, title, title));
+    });
+    await Promise.all(promises);
+    if (devices.length > 0) method = "push";
+
     return method;
   }
 

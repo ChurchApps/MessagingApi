@@ -5,7 +5,7 @@ import { UniqueIdHelper } from "../helpers";
 export class NotificationRepository {
 
   public async loadUndelivered() {
-    return DB.query("SELECT * FROM notifications WHERE deliveryMethod IS NULL or deliveryMethod='';", []);
+    return DB.query("SELECT * FROM notifications WHERE isNew=1 and deliverMethod<>'email';", []);
   }
 
   public async loadNewCounts(churchId: string, personId: string) {

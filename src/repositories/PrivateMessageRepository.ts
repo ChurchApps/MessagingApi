@@ -5,7 +5,7 @@ import { UniqueIdHelper } from "../helpers";
 export class PrivateMessageRepository {
 
   public async loadUndelivered() {
-    return DB.query("SELECT * FROM privateMessages WHERE notifyPersonId IS NOT NULL AND deliveryMethod IS NULL or deliveryMethod='';", []);
+    return DB.query("SELECT * FROM privateMessages WHERE notifyPersonId IS NOT NULL AND deliveryMethod<>'email';", []);
   }
 
   public async loadForPerson(churchId: string, personId: string) {
