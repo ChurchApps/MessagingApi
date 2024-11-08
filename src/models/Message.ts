@@ -7,5 +7,6 @@ export class Message {
   public timeSent?: Date;
   public timeUpdated?: Date;
   public messageType?: string;
+  public ipAddress?: string;
   public content?: string;
 }

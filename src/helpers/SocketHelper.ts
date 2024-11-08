@@ -9,6 +9,8 @@ import { Environment } from ".";
 export class SocketHelper {
   private static wss: WebSocket.Server = null;
   private static connections: SocketConnectionInterface[] = [];
+  private static blockedIps: Map<string, Set<string>> = new Map();
+
 
   static init = () => {
     const port = Environment.socketPort;
@@ -20,6 +22,20 @@ export class SocketHelper {
         SocketHelper.connections.push(sc);
         const payload: PayloadInterface = { churchId: "", conversationId: "", action: "socketId", data: sc.id };
         sc.socket.send(JSON.stringify(payload));
+
+        // Send current blocked IPs to new connections
+        SocketHelper.sendBlockedIpsToNewConnection(sc.socket);
+
+        sc.socket.on("message", (rawData) => {
+          try {
+            const data = JSON.parse(rawData.toString());
+            if (data.action === "updatedBlockedIps") {
+              this.updateBlockedIps(data.data.serviceId, Array.from(data.data.blockedIps));
+            }
+          } catch (e) {
+            console.log("Error processing the socket message: ", e);
+          }
+        })
         sc.socket.on("close", async () => {
           // console.log("DELETING " + sc.id);
           await SocketHelper.handleDisconnect(sc.id);
@@ -52,4 +68,52 @@ export class SocketHelper {
       if (sc.id === id) SocketHelper.connections.splice(i, 1);
     }
   };
+
+  static updateBlockedIps(serviceId: string, ips: string[]) {
+    this.blockedIps.set(serviceId, new Set(ips));
+    const payload: PayloadInterface = {
+      churchId: "",
+      conversationId: "",
+      action: "updatedBlockedIps",
+      data: { serviceId, blockedIps: Array.from(this.blockedIps.get(serviceId)) }
+    };
+
+    this.connections.forEach(connection => {
+      try {
+        if (connection.socket.readyState === WebSocket.OPEN) {
+          connection.socket.send(JSON.stringify(payload));
+        }
+      } catch (e) {
+        console.log("Error sending blocked IPs update: ", e);
+      }
+    })
+  }
+
+  static sendBlockedIpsToNewConnection(socket: WebSocket) {
+    // Send all services' blocked IPs
+
+    const allBlockedIps = Array.from(this.blockedIps.entries()).map(([serviceId, ips]) => ({
+      serviceId,
+      blockedIps: Array.from(ips)
+    }))
+
+    const payload: PayloadInterface = {
+      churchId: "",
+      conversationId: "",
+      action: "updatedBlockedIps",
+      data: allBlockedIps
+    }
+
+    try {
+      socket.send(JSON.stringify(payload));
+    } catch (e) {
+      console.log("Error sending initial blocked IPs: ", e);
+    }
+  }
+
+  static clearBlockedIps(serviceId: string) {
+    if (this.blockedIps.has(serviceId)) {
+      this.blockedIps.delete(serviceId);
+    }
+  }
 }

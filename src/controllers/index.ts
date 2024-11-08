@@ -5,3 +5,4 @@ export { MessageController } from "./MessageController";
 export { NotificationController } from "./NotificationController";
 export { NotificationPreferenceController } from "./NotificationPreferenceController";
 export { PrivateMessageController } from "./PrivateMessageController";
+export { BlockedIpsController } from "./BlockedIps"
