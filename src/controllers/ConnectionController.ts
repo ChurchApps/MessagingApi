@@ -30,13 +30,31 @@ export class ConnectionController extends MessagingBaseController {
     public async save(req: express.Request<{}, {}, Connection[]>, res: express.Response): Promise<any> {
         return this.actionWrapperAnon(req, res, async () => {
             const promises: Promise<Connection>[] = [];
-            req.body.forEach((connection: Connection) => {
+            for (const connection of req.body) {
                 if (connection.personId === undefined) connection.personId = null;
+                if (connection.displayName === "Anonymous ") {
+                    const connections: Connection[] = await this.repositories.connection.loadForConversation(connection.churchId, connection.conversationId);
+                    const anonConnections = connections.filter(c => c.displayName.includes("Anonymous"));
+                    if (anonConnections.length > 0) {
+                        const filteredConn = anonConnections.filter((c) => c.displayName.includes("Anonymous"));
+                        const displayNames = filteredConn.map(c => c.displayName);
+                        const numbers: number[] = [];
+                        displayNames.forEach(name => {
+                            const splitName = name.split('_');
+                            numbers.push(Number(splitName[1]))
+                        });
+                        const maxNumber = Math.max(...numbers);
+                        connection.displayName = `Anonymous_${maxNumber + 1}`
+                    } else {
+                        connection.displayName = "Anonymous_1";
+                    }
+                }
                 promises.push(this.repositories.connection.save(connection).then(async c => {
                     await DeliveryHelper.sendAttendance(c.churchId, c.conversationId);
+                    await DeliveryHelper.sendBlockedIps(c.churchId, c.conversationId);
                     return c;
                 }));
-            });
+            };
             return this.repositories.connection.convertAllToModel(await Promise.all(promises));
         });
     }

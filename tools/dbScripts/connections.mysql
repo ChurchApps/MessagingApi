@@ -8,6 +8,7 @@ CREATE TABLE `connections` (
   `displayName` varchar(45) DEFAULT NULL,
   `timeJoined` datetime DEFAULT NULL,
   `socketId` varchar(45) DEFAULT NULL,
+  `ipAddress` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `ix_churchId` (`churchId`,`conversationId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

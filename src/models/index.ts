@@ -6,3 +6,4 @@ export { Message } from "./Message";
 export { Notification } from "./Notification";
 export { NotificationPreference } from "./NotificationPreference";
 export { PrivateMessage } from "./PrivateMessage";
+export { BlockedIp } from "./BlockedIp";

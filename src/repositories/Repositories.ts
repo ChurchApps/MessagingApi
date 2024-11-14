@@ -1,4 +1,4 @@
-import { ConnectionRepository, ConversationRepository, DeviceRepository, MessageRepository, NotificationRepository, NotificationPreferenceRepository, PrivateMessageRepository } from ".";
+import { ConnectionRepository, ConversationRepository, DeviceRepository, MessageRepository, NotificationRepository, NotificationPreferenceRepository, PrivateMessageRepository, BlockedIpRepository } from ".";
 
 export class Repositories {
   public connection: ConnectionRepository;
@@ -8,6 +8,7 @@ export class Repositories {
   public notification: NotificationRepository;
   public notificationPreference: NotificationPreferenceRepository;
   public privateMessage: PrivateMessageRepository;
+  public blockedIp: BlockedIpRepository
 
   private static _current: Repositories = null;
   public static getCurrent = () => {
@@ -23,5 +24,6 @@ export class Repositories {
     this.notification = new NotificationRepository();
     this.notificationPreference = new NotificationPreferenceRepository();
     this.privateMessage = new PrivateMessageRepository();
+    this.blockedIp = new BlockedIpRepository();
   }
 }
