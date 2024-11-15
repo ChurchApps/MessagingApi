@@ -43,6 +43,12 @@ export class DeliveryHelper {
         await DeliveryHelper.sendConversationMessages({ churchId, conversationId, action: "attendance", data });
     }
 
+    static sendBlockedIps = async (churchId: string, conversationId: string) => {
+        const blockedIps = await Repositories.getCurrent().blockedIp.loadByConversationId(churchId, conversationId);
+        const data = { conversationId, ipAddresses: blockedIps }
+        await DeliveryHelper.sendConversationMessages({ churchId, conversationId, action: "blockedIp", data })
+    }
+
     private static sendAws = async (connection: Connection, payload: PayloadInterface) => {
         const apigwManagementApi = new ApiGatewayManagementApi({ apiVersion: '2020-04-16', endpoint: Environment.socketUrl });
         let success = true;

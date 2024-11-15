@@ -6,4 +6,5 @@ export class Connection {
     public displayName?: string;
     public timeJoined?: Date;
     public socketId?: string;
+    public ipAddress?: string;
 }

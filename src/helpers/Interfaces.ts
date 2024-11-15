@@ -1,7 +1,7 @@
 import WebSocket from "ws";
 
 export type PayloadAction = "message" | "deleteMessage" | "callout" | "attendance" | "prayerRequest" | "socketId" | "privateMessage" | "privateRoomAdded" | "videoChatInvite"
-  | "notification"
+  | "notification" | "blockedIp"
 
 export interface PayloadInterface { churchId: string, conversationId: string, action: PayloadAction, data: any }
 export interface AttendanceInterface { viewers?: ViewerInterface[], totalViewers?: number, conversationId: string }

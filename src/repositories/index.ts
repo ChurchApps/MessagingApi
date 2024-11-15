@@ -5,4 +5,5 @@ export { MessageRepository } from "./MessageRepository";
 export { NotificationRepository } from "./NotificationRepository";
 export { NotificationPreferenceRepository } from "./NotificationPreferenceRepository";
 export { PrivateMessageRepository } from "./PrivateMessageRepository";
+export { BlockedIpRepository } from "./BlockedIpRepository";
 export { Repositories } from "./Repositories";
