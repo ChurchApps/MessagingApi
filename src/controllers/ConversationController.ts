@@ -95,6 +95,25 @@ export class ConversationController extends MessagingBaseController {
     });
   }
 
+  @httpGet("/requestPrayer/:churchId/:conversationId")
+  public async requestPrayer(@requestParam("churchId") churchId: string, @requestParam("conversationId") conversationId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+    return this.actionWrapperAnon(req, res, async () => {
+      const conversation = await this.repositories.conversation.loadById(churchId, conversationId);
+      const hostConversation = await this.getOrCreate(churchId, "streamingLiveHost", conversation.contentId, "hidden", true);
+      const prayerConversation = await this.repositories.conversation.save({ contentId: conversation.contentId, contentType: "prayer", dateCreated: new Date(), title: "Prayer request", churchId });
+      await DeliveryHelper.sendConversationMessages({ churchId: hostConversation.churchId, conversationId: hostConversation.id, action: "prayerRequest", data: prayerConversation });
+      return prayerConversation;
+    });
+  }
+
+
+  @httpGet("/current/:churchId/:contentType/:contentId")
+  public async current(@requestParam("churchId") churchId: string, @requestParam("contentType") contentType: string, @requestParam("contentId") contentId: string, req: express.Request<{}, {}, {}>, res: express.Response): Promise<any> {
+    return this.actionWrapperAnon(req, res, async () => {
+      return await this.getOrCreate(churchId, contentType, contentId, "public", true);
+    });
+  }
+
   @httpGet("/:videoChat/:connectionId/:room")
   public async videoChat(@requestParam("connectionId") connectionId: string, @requestParam("room") room: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
@@ -152,25 +171,6 @@ export class ConversationController extends MessagingBaseController {
 
     });
   }*/
-
-  @httpGet("/requestPrayer/:churchId/:conversationId")
-  public async requestPrayer(@requestParam("churchId") churchId: string, @requestParam("conversationId") conversationId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
-    return this.actionWrapperAnon(req, res, async () => {
-      const conversation = await this.repositories.conversation.loadById(churchId, conversationId);
-      const hostConversation = await this.getOrCreate(churchId, "streamingLiveHost", conversation.contentId, "hidden", true);
-      const prayerConversation = await this.repositories.conversation.save({ contentId: conversation.contentId, contentType: "prayer", dateCreated: new Date(), title: "Prayer request", churchId });
-      await DeliveryHelper.sendConversationMessages({ churchId: hostConversation.churchId, conversationId: hostConversation.id, action: "prayerRequest", data: prayerConversation });
-      return prayerConversation;
-    });
-  }
-
-
-  @httpGet("/current/:churchId/:contentType/:contentId")
-  public async current(@requestParam("churchId") churchId: string, @requestParam("contentType") contentType: string, @requestParam("contentId") contentId: string, req: express.Request<{}, {}, {}>, res: express.Response): Promise<any> {
-    return this.actionWrapperAnon(req, res, async () => {
-      return await this.getOrCreate(churchId, contentType, contentId, "public", true);
-    });
-  }
 
   @httpGet("/cleanup")
   public async cleanup(req: express.Request<{}, {}, {}>, res: express.Response): Promise<any> {
