@@ -152,8 +152,14 @@ export class ConversationController extends MessagingBaseController {
           }
         })
       }
+
+      for (let i=conversations.length-1; i>=0; i--) {
+        if (conversations[i].messages.length === 0) conversations.splice(i, 1);
+      }
+
       return conversations;
     });
+
   }
 
   /*
