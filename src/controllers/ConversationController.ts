@@ -143,8 +143,13 @@ export class ConversationController extends MessagingBaseController {
       if (messageIds.length > 0) {
         const allMessages = await this.repositories.message.loadByIds(au.churchId, messageIds);
         conversations.forEach(c => {
-          c.messages = [ArrayHelper.getOne(allMessages, "id", c.firstPostId)];
-          if (c.lastPostId !== c.firstPostId) c.messages.push(ArrayHelper.getOne(allMessages, "id", c.lastPostId));
+          c.messages = [];
+          let msg = ArrayHelper.getOne(allMessages, "id", c.firstPostId)
+          if (msg) c.messages.push(msg);
+          if (c.lastPostId !== c.firstPostId) {
+            msg = ArrayHelper.getOne(allMessages, "id", c.lastPostId);
+            if (msg) c.messages.push(msg);
+          }
         })
       }
       return conversations;
