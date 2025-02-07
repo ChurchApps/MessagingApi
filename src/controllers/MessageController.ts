@@ -16,6 +16,10 @@ export class MessageController extends MessagingBaseController {
       const promises: Promise<Message>[] = [];
       req.body.forEach((message: Message) => {
         message.messageType = "message";
+        if (message?.id && message.personId !== au.personId) {
+          res.status(403).send("You can not edit the message sent by others.");
+          return;
+        }
         if (au?.id) {
           message.personId = au.personId;
           message.displayName = au.firstName + " " + au.lastName;
