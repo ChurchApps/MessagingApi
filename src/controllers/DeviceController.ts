@@ -7,16 +7,15 @@ import { FirebaseHelper } from "../helpers/FirebaseHelper";
 @controller("/devices")
 export class DeviceController extends MessagingBaseController {
 
-  @httpGet("/instructions/:deviceId")
+  @httpGet("/player/:deviceId")
   public async load(@requestParam("deviceId") deviceId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
     return this.actionWrapperAnon(req, res, async () => {
-      //const data = await this.repositories.connection.loadForConversation(churchId, conversationId);
-      //const connections = this.repositories.connection.convertAllToModel(data);
+
       const device = await this.repositories.device.loadById(deviceId);
       if (!device) return { error: "Device not found" };
       const result = {
-        manualPlaylistsApiUrl: "https://api.lessons.church/player/" + deviceId,
-        libraryApiUrl: "https://contentapi.churchapps.org/sermons/tvWrapper/" + device.churchId
+        manualPlaylistsApiUrl: "https://api.lessons.church/classroom/player/" + deviceId,
+        libraryApiUrl: "https://contentapi.churchapps.org/sermons/public/tvWrapper/" + device.churchId
       }
       return result;
     });
