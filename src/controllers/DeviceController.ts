@@ -1,4 +1,4 @@
-import { controller, httpPost, requestParam, httpDelete, interfaces } from "inversify-express-utils";
+import { controller, httpPost, requestParam, httpDelete, interfaces, httpGet } from "inversify-express-utils";
 import express from "express";
 import { MessagingBaseController } from "./MessagingBaseController"
 import { Device } from "../models";
@@ -6,6 +6,21 @@ import { FirebaseHelper } from "../helpers/FirebaseHelper";
 
 @controller("/devices")
 export class DeviceController extends MessagingBaseController {
+
+  @httpGet("/instructions/:deviceId")
+  public async load(@requestParam("deviceId") deviceId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+    return this.actionWrapperAnon(req, res, async () => {
+      //const data = await this.repositories.connection.loadForConversation(churchId, conversationId);
+      //const connections = this.repositories.connection.convertAllToModel(data);
+      const device = await this.repositories.device.loadById(deviceId);
+      if (!device) return { error: "Device not found" };
+      const result = {
+        manualPlaylistsApiUrl: "https://api.lessons.church/player/" + deviceId,
+        libraryApiUrl: "https://contentapi.churchapps.org/sermons/tvWrapper/" + device.churchId
+      }
+      return result;
+    });
+  }
 
   @httpPost("/register")
   public async register(req: express.Request<{}, {}, Device>, res: express.Response): Promise<any> {
@@ -16,7 +31,7 @@ export class DeviceController extends MessagingBaseController {
         device.churchId = au.churchId;
       }
       device = await this.repositories.device.save(device);
-      return {"id": device.id};
+      return { "id": device.id };
     });
   }
 
@@ -36,15 +51,15 @@ export class DeviceController extends MessagingBaseController {
   @httpPost("/tempMessageUser")
   public async sendUser(req: express.Request<{}, {}, any>, res: express.Response): Promise<any> {
     return this.actionWrapperAnon(req, res, async () => {
-      const result:string[] = [];
-      const devices:Device[] = await this.repositories.device.loadForPerson(req.body.personId);
+      const result: string[] = [];
+      const devices: Device[] = await this.repositories.device.loadForPerson(req.body.personId);
       const promises: Promise<any>[] = [];
       devices.forEach(device => {
         result.push(device.fcmToken);
         promises.push(FirebaseHelper.sendMessage(device.fcmToken, req.body.title.toString(), req.body.body.toString()));
       });
       await Promise.all(promises);
-      return {devices: result};
+      return { devices: result };
     });
   }
 
