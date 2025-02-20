@@ -14,7 +14,7 @@ export class DeviceController extends MessagingBaseController {
       const device = await this.repositories.device.loadById(deviceId);
       if (!device) return { error: "Device not found" };
       const result = {
-        manualPlaylistsApiUrl: "https://api.lessons.church/classroom/player/" + deviceId,
+        manualPlaylistsApiUrl: "https://api.lessons.church/classrooms/player/" + deviceId,
         libraryApiUrl: "https://contentapi.churchapps.org/sermons/public/tvWrapper/" + device.churchId
       }
       return result;
