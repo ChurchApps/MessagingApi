@@ -7,6 +7,13 @@ import { FirebaseHelper } from "../helpers/FirebaseHelper";
 @controller("/devices")
 export class DeviceController extends MessagingBaseController {
 
+  @httpGet("/my")
+  public async loadMy(req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+    return this.actionWrapper(req, res, async (au) => {
+      return this.repositories.device.loadForPerson(au.personId);
+    });
+  }
+
   @httpGet("/player/:deviceId")
   public async load(@requestParam("deviceId") deviceId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
     return this.actionWrapperAnon(req, res, async () => {
