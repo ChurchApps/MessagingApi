@@ -10,7 +10,7 @@ export class DeviceController extends MessagingBaseController {
   @httpGet("/my")
   public async loadMy(req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
-      return this.repositories.device.loadForPerson(au.personId);
+      return this.repositories.device.loadActiveForPerson(au.personId);
     });
   }
 

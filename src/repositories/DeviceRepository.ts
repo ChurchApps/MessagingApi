@@ -13,14 +13,18 @@ export class DeviceRepository {
   }
 
   public loadForPerson(personId: string) {
-    return DB.query("SELECT * FROM devices WHERE personId=?", [personId]);
+    return DB.query("SELECT * FROM devices WHERE personId=? order by lastActiveDate desc", [personId]);
+  }
+
+  public loadActiveForPerson(personId: string) {
+    return DB.query("SELECT * FROM devices WHERE personId=? and lastActiveDate>DATE_SUB(NOW(), INTERVAL 1 YEAR) order by lastActiveDate desc", [personId]);
   }
 
   public loadByFcmToken(fcmToken: string) {
     return DB.query("SELECT * FROM devices WHERE fcmToken=?", [fcmToken]);
   }
 
-  public loadByAppDevice(appName: string, deviceId:string) {
+  public loadByAppDevice(appName: string, deviceId: string) {
     return DB.query("SELECT * FROM devices WHERE appName=? AND deviceId=?", [appName, deviceId]);
   }
 
