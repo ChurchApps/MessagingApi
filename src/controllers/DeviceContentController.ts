@@ -3,7 +3,7 @@ import express from "express";
 import { MessagingBaseController } from "./MessagingBaseController"
 import { DeviceContent } from "../models";
 
-@controller("/deviceContent")
+@controller("/deviceContents")
 export class DeviceContentController extends MessagingBaseController {
 
   @httpGet("/deviceId/:deviceId")
@@ -13,7 +13,6 @@ export class DeviceContentController extends MessagingBaseController {
       return deviceContent;
     })
   }
-
 
   @httpPost("/")
   public async save(req: express.Request<{}, {}, DeviceContent[]>, res: express.Response): Promise<any> {
