@@ -4,6 +4,10 @@ import { UniqueIdHelper } from "../helpers";
 
 export class DeviceRepository {
 
+  public loadByDeviceId(deviceId: string) {
+    return DB.queryOne("SELECT * FROM devices WHERE deviceId=?;", [deviceId]);
+  }
+
   public loadById(id: string) {
     return DB.queryOne("SELECT * FROM devices WHERE id=?;", [id]);
   }
@@ -56,15 +60,15 @@ export class DeviceRepository {
 
   private async create(device: Device) {
     device.id = UniqueIdHelper.shortId();
-    const sql = "INSERT INTO devices (id, appName, deviceId, churchId, personId, fcmToken, label, registrationDate, lastActiveDate, deviceInfo) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?);";
-    const params = [device.id, device.appName, device.deviceId, device.churchId, device.personId, device.fcmToken, device.label, device.deviceInfo];
+    const sql = "INSERT INTO devices (id, appName, deviceId, churchId, personId, fcmToken, label, registrationDate, lastActiveDate, deviceInfo, admId, pairingCode, ipAddress) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?, ?, ?);";
+    const params = [device.id, device.appName, device.deviceId, device.churchId, device.personId, device.fcmToken, device.label, device.deviceInfo, device.admId, device.pairingCode, device.ipAddress];
     await DB.query(sql, params);
     return device;
   }
 
   private async update(device: Device) {
-    const sql = "UPDATE devices SET appName=?, deviceId=?, churchId=?, personId=?, fcmToken=?, label=?, registrationDate=?, lastActiveDate=?, deviceInfo=? WHERE id=?;";
-    const params = [device.appName, device.deviceId, device.churchId, device.personId, device.fcmToken, device.label, device.registrationDate, device.lastActiveDate, device.deviceInfo, device.id]
+    const sql = "UPDATE devices SET appName=?, deviceId=?, churchId=?, personId=?, fcmToken=?, label=?, registrationDate=?, lastActiveDate=?, deviceInfo=?, admId=?, pairingCode=?, ipAddress=? WHERE id=?;";
+    const params = [device.appName, device.deviceId, device.churchId, device.personId, device.fcmToken, device.label, device.registrationDate, device.lastActiveDate, device.deviceInfo, device.admId, device.pairingCode, device.ipAddress, device.id]
     await DB.query(sql, params)
     return device;
   }

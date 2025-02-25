@@ -14,6 +14,15 @@ export class DeviceController extends MessagingBaseController {
     });
   }
 
+
+  @httpGet("/deviceId/:deviceId")
+  public async getUnique(@requestParam("uniqueId") uniqueId: string, req: express.Request<{}, {}, {}>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+    return this.actionWrapperAnon(req, res, async () => {
+      const device = await this.repositories.device.loadByDeviceId(uniqueId);
+      return device || {};
+    })
+  }
+
   @httpGet("/player/:deviceId")
   public async load(@requestParam("deviceId") deviceId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
     return this.actionWrapperAnon(req, res, async () => {

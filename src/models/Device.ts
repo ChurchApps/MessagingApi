@@ -9,4 +9,7 @@ export class Device {
   public registrationDate?: Date;
   public lastActiveDate?: Date;
   public deviceInfo?: string;
+  public admId?: string;
+  public pairingCode?: string;
+  public ipAddress?: string;
 }
