@@ -63,6 +63,22 @@ export class DeviceController extends MessagingBaseController {
     });
   }
 
+  @httpGet("/pair/:pairingCode")
+  public async pair(@requestParam("pairingCode") pairingCode: string, req: express.Request<{}, {}, {}>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+    return this.actionWrapper(req, res, async (au) => {
+      let success = false;
+      const existing = await this.repositories.device.loadByPairingCode(pairingCode);
+      if (existing) {
+        existing.personId = au.personId;
+        existing.churchId = au.churchId;
+        existing.pairingCode = ""
+        await this.repositories.device.save(existing);
+        success = true;
+      }
+      return { success };
+    });
+  }
+
   @httpPost("/enroll")
   public async enroll(req: express.Request<{}, {}, Device>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {

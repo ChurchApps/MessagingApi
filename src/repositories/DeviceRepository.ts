@@ -4,6 +4,10 @@ import { UniqueIdHelper } from "../helpers";
 
 export class DeviceRepository {
 
+  public loadByPairingCode(pairingCode: string) {
+    return DB.queryOne("SELECT * FROM devices WHERE pairingCode=?;", [pairingCode]);
+  }
+
   public loadByDeviceId(deviceId: string) {
     return DB.queryOne("SELECT * FROM devices WHERE deviceId=?;", [deviceId]);
   }
