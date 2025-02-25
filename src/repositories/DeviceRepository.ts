@@ -37,7 +37,7 @@ export class DeviceRepository {
   }
 
   public delete(id: string) {
-    return DB.query("DELETE FROM devices WHERE personId=?;", [id]);
+    return DB.query("DELETE FROM devices WHERE id=?;", [id]);
   }
 
   public deleteByToken(token: string) {

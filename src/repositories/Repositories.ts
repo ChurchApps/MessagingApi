@@ -1,9 +1,10 @@
-import { ConnectionRepository, ConversationRepository, DeviceRepository, MessageRepository, NotificationRepository, NotificationPreferenceRepository, PrivateMessageRepository, BlockedIpRepository } from ".";
+import { ConnectionRepository, ConversationRepository, DeviceRepository, MessageRepository, NotificationRepository, NotificationPreferenceRepository, PrivateMessageRepository, BlockedIpRepository, DeviceContentRepository } from ".";
 
 export class Repositories {
   public connection: ConnectionRepository;
   public conversation: ConversationRepository;
   public device: DeviceRepository;
+  public deviceContent: DeviceContentRepository;
   public message: MessageRepository;
   public notification: NotificationRepository;
   public notificationPreference: NotificationPreferenceRepository;
@@ -20,6 +21,7 @@ export class Repositories {
     this.connection = new ConnectionRepository();
     this.conversation = new ConversationRepository();
     this.device = new DeviceRepository();
+    this.deviceContent = new DeviceContentRepository();
     this.message = new MessageRepository();
     this.notification = new NotificationRepository();
     this.notificationPreference = new NotificationPreferenceRepository();
