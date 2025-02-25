@@ -16,9 +16,9 @@ export class DeviceController extends MessagingBaseController {
 
 
   @httpGet("/deviceId/:deviceId")
-  public async getUnique(@requestParam("uniqueId") uniqueId: string, req: express.Request<{}, {}, {}>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+  public async getUnique(@requestParam("deviceId") deviceId: string, req: express.Request<{}, {}, {}>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapperAnon(req, res, async () => {
-      const device = await this.repositories.device.loadByDeviceId(uniqueId);
+      const device = await this.repositories.device.loadByDeviceId(deviceId);
       return device || {};
     })
   }
@@ -59,6 +59,19 @@ export class DeviceController extends MessagingBaseController {
         promises.push(this.repositories.device.save(device));
       });
       const result = await Promise.all(promises);
+      return result;
+    });
+  }
+
+  @httpPost("/enroll")
+  public async enroll(req: express.Request<{}, {}, Device>, res: express.Response): Promise<any> {
+    return this.actionWrapper(req, res, async (au) => {
+      let result = await this.repositories.device.loadByDeviceId(req.body.deviceId);
+      if (result) {
+        result.pairingCode = req.body.pairingCode;
+        await result.save();
+      }
+      else result = await this.repositories.device.save(req.body)
       return result;
     });
   }
