@@ -2,9 +2,8 @@ import { controller, httpPost, requestParam, httpDelete, interfaces, httpGet } f
 import express from "express";
 import { MessagingBaseController } from "./MessagingBaseController"
 import { DeviceContent } from "../models";
-import { FirebaseHelper } from "../helpers/FirebaseHelper";
 
-@controller("/deviceContentContents")
+@controller("/deviceContent")
 export class DeviceContentController extends MessagingBaseController {
 
   @httpGet("/deviceId/:deviceId")

@@ -1,7 +1,7 @@
 import { controller, httpPost, requestParam, httpDelete, interfaces, httpGet } from "inversify-express-utils";
 import express from "express";
 import { MessagingBaseController } from "./MessagingBaseController"
-import { Device } from "../models";
+import { Device, DeviceContent } from "../models";
 import { FirebaseHelper } from "../helpers/FirebaseHelper";
 
 @controller("/devices")
@@ -29,8 +29,13 @@ export class DeviceController extends MessagingBaseController {
 
       const device = await this.repositories.device.loadById(deviceId);
       if (!device) return { error: "Device not found" };
+      const deviceContents = await this.repositories.deviceContent.loadByDeviceId(deviceId);
+      const classRoomIds: string[] = [];
+      deviceContents.forEach((dc: DeviceContent) => {
+        if (dc.contentType === "classroom") classRoomIds.push(dc.contentId);
+      });
       const result = {
-        manualPlaylistsApiUrl: "https://api.lessons.church/classrooms/player/" + deviceId,
+        manualPlaylistsApiUrl: "https://api.lessons.church/classrooms/player/" + device.churchId + "?classRooms=" + classRoomIds.join(","),
         libraryApiUrl: "https://contentapi.churchapps.org/sermons/public/tvWrapper/" + device.churchId
       }
       return result;
