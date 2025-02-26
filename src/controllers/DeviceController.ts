@@ -35,7 +35,7 @@ export class DeviceController extends MessagingBaseController {
         if (dc.contentType === "classroom") classRoomIds.push(dc.contentId);
       });
       const result = {
-        manualPlaylistsApiUrl: "https://api.lessons.church/classrooms/player/" + device.churchId + "?classRooms=" + classRoomIds.join(","),
+        manualPlaylistsApiUrl: "https://api.lessons.church/classrooms/player/" + device.churchId + "?classrooms=" + classRoomIds.join(","),
         libraryApiUrl: "https://contentapi.churchapps.org/sermons/public/tvWrapper/" + device.churchId
       }
       return result;
@@ -90,7 +90,8 @@ export class DeviceController extends MessagingBaseController {
       let result = await this.repositories.device.loadByDeviceId(req.body.deviceId);
       if (result) {
         result.pairingCode = req.body.pairingCode;
-        await result.save();
+        result.personId = null;
+        await this.repositories.device.save(result)
       }
       else result = await this.repositories.device.save(req.body)
       return result;
