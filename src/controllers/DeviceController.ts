@@ -19,6 +19,7 @@ export class DeviceController extends MessagingBaseController {
   public async getUnique(@requestParam("deviceId") deviceId: string, req: express.Request<{}, {}, {}>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapperAnon(req, res, async () => {
       const device = await this.repositories.device.loadByDeviceId(deviceId);
+      device.paired = device.personId !== null;
       return device || {};
     })
   }
