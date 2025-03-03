@@ -6,6 +6,7 @@ const AWS = require('aws-sdk');
 const { Logger } = require('./dist/helpers/Logger');
 const { SocketHelper } = require('./dist/helpers/SocketHelper');
 const { ApiGatewayManagementApi } = require('aws-sdk');
+const { NotificationHelper } = require('./dist/helpers/NotificationHelper');
 
 
 let gwManagement = new ApiGatewayManagementApi({ apiVersion: '2020-04-16', endpoint: Environment.socketUrl });
