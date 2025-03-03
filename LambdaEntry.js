@@ -11,10 +11,14 @@ const { NotificationHelper } = require('./dist/helpers/NotificationHelper');
 
 let gwManagement = new ApiGatewayManagementApi({ apiVersion: '2020-04-16', endpoint: Environment.socketUrl });
 
-Environment.init(process.env.APP_ENV).then(() => {
-  Pool.initPool();
-  gwManagement = new ApiGatewayManagementApi({ apiVersion: '2020-04-16', endpoint: Environment.socketUrl });
-});
+const init = async () => {
+  return Environment.init(process.env.APP_ENV).then(() => {
+    Pool.initPool();
+    gwManagement = new ApiGatewayManagementApi({ apiVersion: '2020-04-16', endpoint: Environment.socketUrl });
+  });
+}
+
+init();
 
 
 async function logMessage(message) {
@@ -31,10 +35,12 @@ const checkPool = async () => {
 }
 
 module.exports.timer15Min = async (event, context) => {
+  await init();
   return await NotificationHelper.sendEmailNotifications("individual");
 }
 
 module.exports.timerMidnight = async (event, context) => {
+  await init();
   return await NotificationHelper.sendEmailNotifications("daily");
 }
 
