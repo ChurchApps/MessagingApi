@@ -37,6 +37,16 @@ functions:
       - websocket: $default
       - websocket: $disconnect
     vpc: ${self:custom.vpcSettings.current}
+  timer15Min:
+    handler: LambdaEntry.timer15Min
+    events:
+      - schedule: rate(15 minutes)
+    vpc: ${self:custom.vpcSettings.current}
+  timerMidnight:
+    handler: LambdaEntry.timerMidnight
+    events:
+      - schedule: cron(0 5 * * ? *)
+    vpc: ${self:custom.vpcSettings.current}
 
 plugins:
   - serverless-layers
