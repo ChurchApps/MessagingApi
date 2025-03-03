@@ -5,15 +5,15 @@ import { UniqueIdHelper } from "../helpers";
 export class NotificationRepository {
 
   public async loadUndelivered() {
-    return DB.query("SELECT * FROM notifications WHERE isNew=1 and deliverMethod<>'email';", []);
+    return DB.query("SELECT * FROM notifications WHERE isNew=1 and deliveryMethod<>'email';", []);
   }
 
   public async loadNewCounts(churchId: string, personId: string) {
     const sql = "SELECT ("
-    + "  SELECT COUNT(*) FROM notifications where churchId=? and personId=? and isNew=1"
-    + ") AS notificationCount, ("
-    + "  SELECT COUNT(*) FROM privateMessages where churchId=? and notifyPersonId=?"
-    + ") AS pmCount";
+      + "  SELECT COUNT(*) FROM notifications where churchId=? and personId=? and isNew=1"
+      + ") AS notificationCount, ("
+      + "  SELECT COUNT(*) FROM privateMessages where churchId=? and notifyPersonId=?"
+      + ") AS pmCount";
     return DB.queryOne(sql, [churchId, personId, churchId, personId]);
   }
 
@@ -22,7 +22,7 @@ export class NotificationRepository {
     return DB.query(sql, [churchId, personId]);
   }
 
-  public async loadExistingUnread(churchId: string, contentType:string, contentId:string) {
+  public async loadExistingUnread(churchId: string, contentType: string, contentId: string) {
     const sql = "SELECT * FROM notifications WHERE churchId=? AND contentType=? AND contentId=? AND isNew=1;";
     return DB.query(sql, [churchId, contentType, contentId]);
   }
