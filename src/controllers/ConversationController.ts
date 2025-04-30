@@ -3,7 +3,7 @@ import express from "express";
 import { MessagingBaseController } from "./MessagingBaseController"
 import { Conversation, Connection, Message } from "../models";
 import { DeliveryHelper } from "../helpers/DeliveryHelper";
-import { ArrayHelper } from "@churchapps/apihelper";
+import { ArrayHelper, EncryptionHelper } from "@churchapps/apihelper";
 
 @controller("/conversations")
 export class ConversationController extends MessagingBaseController {
@@ -201,7 +201,8 @@ export class ConversationController extends MessagingBaseController {
   private async getOrCreate(churchId: string, contentType: string, contentId: string, visibility: string, allowAnonymousPosts: boolean) {
     let result: Conversation = await this.repositories.conversation.loadCurrent(churchId, contentType, contentId);
     if (result === null) {
-      result = { contentId, contentType, dateCreated: new Date(), title: contentType + " #" + contentId, churchId, visibility, allowAnonymousPosts }
+      const CONTENT_ID = (contentId.length > 11) ? EncryptionHelper.decrypt(contentId) : contentId;
+      result = { contentId: CONTENT_ID, contentType, dateCreated: new Date(), title: contentType + " #" + CONTENT_ID, churchId, visibility, allowAnonymousPosts }
       result = await this.repositories.conversation.save(result);
     }
     return result;
