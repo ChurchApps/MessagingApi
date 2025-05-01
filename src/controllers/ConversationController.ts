@@ -199,9 +199,9 @@ export class ConversationController extends MessagingBaseController {
   }
 
   private async getOrCreate(churchId: string, contentType: string, contentId: string, visibility: string, allowAnonymousPosts: boolean) {
-    let result: Conversation = await this.repositories.conversation.loadCurrent(churchId, contentType, contentId);
+    const CONTENT_ID = (contentId.length > 11) ? EncryptionHelper.decrypt(contentId) : contentId;
+    let result: Conversation = await this.repositories.conversation.loadCurrent(churchId, contentType, CONTENT_ID);
     if (result === null) {
-      const CONTENT_ID = (contentId.length > 11) ? EncryptionHelper.decrypt(contentId) : contentId;
       result = { contentId: CONTENT_ID, contentType, dateCreated: new Date(), title: contentType + " #" + CONTENT_ID, churchId, visibility, allowAnonymousPosts }
       result = await this.repositories.conversation.save(result);
     }
