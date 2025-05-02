@@ -18,6 +18,8 @@ const init = async () => {
     { title: "Devices", file: "devices.mysql" },
     { title: "Device Contents", file: "deviceContents.mysql" },
     { title: "Messages", file: "messages.mysql" },
+    { title: "Notifications", file: "notifications.mysql" },
+    { title: "Notification Preferences", file: "notificationPreferences.mysql" },
     { title: "Private Messages", file: "privateMessages.mysql" },
     { title: "Blocked Ips", file: "blockedIps.mysql" },
     { title: "Cleanup Procedure", file: "cleanup.mysql", customDelimeter: true },

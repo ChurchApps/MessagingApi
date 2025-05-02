@@ -13,5 +13,8 @@ CREATE TABLE `devices` (
   `pairingCode` varchar(45) DEFAULT NULL,
   `ipAddress` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `appName_deviceId` (`appName`,`deviceId`)
+  KEY `appName_deviceId` (`appName`,`deviceId`),
+  KEY `personId_lastActiveDate` (`personId`, `lastActiveDate`),
+  KEY `fcmToken` (`fcmToken`),
+  KEY `pairingCode` (`pairingCode`)
 ) ENGINE=InnoDB;
