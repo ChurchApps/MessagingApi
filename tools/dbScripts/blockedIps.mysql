@@ -7,4 +7,4 @@ CREATE TABLE `blockedIps` (
   `serviceId` char(11) DEFAULT NULL,
   `ipAddress` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB;
