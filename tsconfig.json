@@ -19,6 +19,7 @@
     "baseUrl": ".",
     "strict": false,
     "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
     "paths": {
       "*": [
         "node_modules/*"
