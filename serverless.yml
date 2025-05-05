@@ -1,5 +1,10 @@
 service: messaging-api
 
+package:
+  individually: true
+  exclude:
+    - node_modules/**
+
 custom:
   serverless-layers:
     dependenciesPath: ./package.json
