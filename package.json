@@ -35,7 +35,6 @@
     "inversify": "^6.0.1",
     "inversify-express-utils": "^6.4.3",
     "mysql": "^2.18.1",
-    "reflect-metadata": "^0.1.13",
     "winston": "^3.3.3",
     "winston-cloudwatch": "^3.1.1",
     "ws": "^8.4.0"
