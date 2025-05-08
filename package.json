@@ -52,6 +52,7 @@
     "prettier": "^3.1.0",
     "rimraf": "^3.0.2",
     "serverless": "3.39.0",
+    "serverless-layers": "^2.8.5",
     "serverless-plugin-utils": "^0.2.0",
     "tslint": "^6.1.2",
     "tslint-config-prettier": "^1.18.0",
