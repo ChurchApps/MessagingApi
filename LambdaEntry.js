@@ -5,7 +5,7 @@ const { Pool } = require("@churchapps/apihelper");
 const {
   ApiGatewayManagementApiClient,
   PostToConnectionCommand
-} = require("@aws-sdk/client-api-gateway-management-api");
+} = require("@aws-sdk/client-apigatewaymanagementapi");
 const { Logger } = require("./dist/helpers/Logger");
 const { SocketHelper } = require("./dist/helpers/SocketHelper");
 const { NotificationHelper } = require("./dist/helpers/NotificationHelper");
