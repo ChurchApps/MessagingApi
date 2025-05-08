@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import winston from "winston";
 import WinstonCloudWatch from "winston-cloudwatch";
-import { CloudWatchLogsClient } from "@aws-sdk/client-cloudwatch-logs";
+import { CloudWatchLogs } from "@aws-sdk/client-cloudwatch-logs";
 import { fromEnv } from "@aws-sdk/credential-providers";
 import { Environment } from "./Environment";
 
@@ -24,7 +24,7 @@ export class Logger {
 
   private init() {
     this.pendingMessages = false;
-    const cloudWatchClient = new CloudWatchLogsClient({
+    const cloudWatchClient = new CloudWatchLogs({
       region: "us-east-2",
       credentials: fromEnv()
     });
