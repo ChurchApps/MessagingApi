@@ -1,7 +1,8 @@
 import "reflect-metadata";
 import winston from "winston";
 import WinstonCloudWatch from "winston-cloudwatch";
-import AWS from "aws-sdk";
+import { CloudWatchLogsClient } from "@aws-sdk/client-cloudwatch-logs";
+import { fromEnv } from "@aws-sdk/credential-providers";
 import { Environment } from "./Environment";
 
 export class Logger {
@@ -23,23 +24,19 @@ export class Logger {
 
   private init() {
     this.pendingMessages = false;
-    AWS.config.update({ region: "us-east-2" });
+    const cloudWatchClient = new CloudWatchLogsClient({
+      region: "us-east-2",
+      credentials: fromEnv()
+    });
+
     if (Environment.appEnv === "dev") {
       this._logger = winston.createLogger({
         transports: [new winston.transports.Console()],
         format: winston.format.json()
       });
-      // this.wc = new WinstonCloudWatch({ logGroupName: 'StreamingLiveDev', logStreamName: 'ChatApi' });
-      // this._logger = winston.createLogger({ transports: [this.wc], format: winston.format.json() });
-    } else if (Environment.appEnv === "staging") {
+    } else if (Environment.appEnv === "staging" || Environment.appEnv === "prod") {
       this.wc = new WinstonCloudWatch({
-        logGroupName: "CoreApis",
-        logStreamName: "MessagingApi",
-        name: "CoreApis_MessagingApi"
-      });
-      this._logger = winston.createLogger({ transports: [this.wc], format: winston.format.json() });
-    } else if (Environment.appEnv === "prod") {
-      this.wc = new WinstonCloudWatch({
+        cloudWatchLogs: cloudWatchClient,
         logGroupName: "CoreApis",
         logStreamName: "MessagingApi",
         name: "CoreApis_MessagingApi"
