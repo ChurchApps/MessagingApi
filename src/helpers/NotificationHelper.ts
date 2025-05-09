@@ -165,11 +165,30 @@ export class NotificationHelper {
 
   static sendEmailNotification = async (email: string, notifications: Notification[], privateMessages: PrivateMessage[]) => {
     let title = notifications.length + " New Notifications";
-    if (notifications.length === 1 && privateMessages.length === 0) title = "New Notification: " + notifications[0].message;
+    let content = "";
+    if (notifications.length === 1 && privateMessages.length === 0) {
+      if (notifications[0].message.includes("Volunteer Requests:")) {
+        const match = notifications[0].message.match(/Volunteer Requests:(.*).Please log in and confirm/);
+        title = "New Notification: Volunteer Request"
+        content = `
+          <h3>New Notification</h3>
+          <h4>Volunteer Request</h4>
+          <h4>${match[1]}</h4>
+          ${notifications[0].link
+            ? "<a href='" + notifications[0].link + "' target='_blank'><button style='background-color: #0288d1; border:2px solid #0288d1; border-radius: 5px; color:white; cursor: pointer; padding: 5px'>View Details</button></a>"
+            : ''
+          }
+          <p>Please log in and confirm</p>
+        `;
+      } else {
+        title = "New Notification: " + notifications[0].message;
+        content = "New Notification: " + notifications[0].message;
+      }
+    }
     else if (notifications.length === 0 && privateMessages.length === 1) title = "New Private Message";
 
 
-    await EmailHelper.sendTemplatedEmail("support@churchapps.org", email, "Chums", "https://chums.org", title, title, "ChurchEmailTemplate.html");
+    await EmailHelper.sendTemplatedEmail("support@churchapps.org", email, "CHUMS", "https://chums.org", title, content, "ChurchEmailTemplate.html");
     const promises: Promise<any>[] = this.markMethod(notifications, privateMessages, "email");
     await Promise.all(promises);
   }
