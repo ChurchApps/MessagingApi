@@ -24,7 +24,7 @@ export class NotificationController extends MessagingBaseController {
   @httpPost("/create")
   public async create(req: express.Request<{}, {}, any>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapper(req, res, async (au) => {
-      return await NotificationHelper.createNotifications(req.body.peopleIds, au.churchId, req.body.contentType, req.body.contentId, req.body.message);
+      return await NotificationHelper.createNotifications(req.body.peopleIds, au.churchId, req.body.contentType, req.body.contentId, req.body.message, req.body?.link);
     });
   }
 

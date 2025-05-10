@@ -38,7 +38,7 @@ export class NotificationHelper {
     }
   }
 
-  static createNotifications = async (peopleIds: string[], churchId: string, contentType: string, contentId: string, message: string,) => {
+  static createNotifications = async (peopleIds: string[], churchId: string, contentType: string, contentId: string, message: string, link?: string) => {
     const notifications: Notification[] = [];
     peopleIds.forEach((personId: string) => {
       const notification: Notification = {
@@ -48,7 +48,8 @@ export class NotificationHelper {
         contentId,
         timeSent: new Date(),
         isNew: true,
-        message
+        message,
+        link
       };
       notifications.push(notification);
     });
