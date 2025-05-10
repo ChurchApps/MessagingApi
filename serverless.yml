@@ -1,5 +1,10 @@
 service: messaging-api
 
+package:
+  individually: true
+  exclude:
+    - node_modules/**
+
 custom:
   serverless-layers:
     dependenciesPath: ./package.json
@@ -16,8 +21,8 @@ custom:
 provider:
   name: aws
   runtime: nodejs18.x
-  memorySize: 2048
-  timeout: 60
+  memorySize: 1024
+  timeout: 10
   region: us-east-2
   iam:
     role: arn:aws:iam::428019619026:role/ChurchAppsRole
