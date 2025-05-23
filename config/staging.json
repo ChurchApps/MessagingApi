@@ -7,6 +7,6 @@
   "s3Bucket": "staging-churchapps-content",
   "deliveryProvider": "aws",
   "socketPort": 0,
-  "socketUrl": "socket.staging.churchapps.org/staging",
+  "socketUrl": "socket.staging.churchapps.org",
   "membershipApi": "https://membershipapi.staging.churchapps.org"
 }
