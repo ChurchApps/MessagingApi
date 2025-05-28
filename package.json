@@ -28,6 +28,7 @@
     "@aws-sdk/credential-providers": "^3.806.0",
     "@churchapps/apihelper": "0.0.23",
     "aws-serverless-express": "^3.4.0",
+    "axios": "^1.9.0",
     "body-parser": "^1.19.1",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
