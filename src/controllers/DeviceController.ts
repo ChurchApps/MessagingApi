@@ -160,4 +160,24 @@ export class DeviceController extends MessagingBaseController {
       return this.json({});
     });
   }
+
+  @httpGet("/testNotification/:deviceId")
+  public async testNotification(
+    @requestParam("deviceId") deviceId: string,
+    req: express.Request<{}, {}, {}>,
+    res: express.Response
+  ): Promise<interfaces.IHttpActionResult> {
+    return this.actionWrapperAnon(req, res, async () => {
+      const device = await this.repositories.device.loadById(deviceId);
+      if (!device || !device.fcmToken) return { error: "Device not found or has no FCM token" };
+
+      await ExpoPushHelper.sendMessage(
+        device.fcmToken,
+        "Test Notification",
+        "This is a test notification from the API"
+      );
+
+      return { success: true, message: "Test notification sent" };
+    });
+  }
 }
