@@ -3,7 +3,6 @@ import { Device } from "../models";
 import { UniqueIdHelper } from "../helpers";
 
 export class DeviceRepository {
-
   public loadByPairingCode(pairingCode: string) {
     return DB.queryOne("SELECT * FROM devices WHERE pairingCode=?;", [pairingCode]);
   }
@@ -48,7 +47,14 @@ export class DeviceRepository {
     let result = null;
     if (device.id) result = await this.update(device);
     else {
-      const allExisting = (device.deviceId) ? await this.loadByAppDevice(device.appName, device.deviceId) : this.loadByFcmToken(device.fcmToken);
+      // If we have an FCM token, delete any other devices that have the same token
+      if (device.fcmToken) {
+        const existingDevices = await this.loadByFcmToken(device.fcmToken);
+        for (const existingDevice of existingDevices) {
+          await this.delete(existingDevice.id);
+        }
+      }
+      const allExisting = device.deviceId ? await this.loadByAppDevice(device.appName, device.deviceId) : this.loadByFcmToken(device.fcmToken);
       if (allExisting.length > 0) {
         const existing = allExisting[0];
         existing.lastActiveDate = new Date();
@@ -56,8 +62,7 @@ export class DeviceRepository {
         existing.churchId = device.churchId;
         existing.fcmToken = device.fcmToken;
         result = await this.update(existing);
-      }
-      else result = await this.create(device);
+      } else result = await this.create(device);
     }
     return result;
   }
@@ -72,9 +77,8 @@ export class DeviceRepository {
 
   private async update(device: Device) {
     const sql = "UPDATE devices SET appName=?, deviceId=?, churchId=?, personId=?, fcmToken=?, label=?, registrationDate=?, lastActiveDate=?, deviceInfo=?, admId=?, pairingCode=?, ipAddress=? WHERE id=?;";
-    const params = [device.appName, device.deviceId, device.churchId, device.personId, device.fcmToken, device.label, device.registrationDate, device.lastActiveDate, device.deviceInfo, device.admId, device.pairingCode, device.ipAddress, device.id]
-    await DB.query(sql, params)
+    const params = [device.appName, device.deviceId, device.churchId, device.personId, device.fcmToken, device.label, device.registrationDate, device.lastActiveDate, device.deviceInfo, device.admId, device.pairingCode, device.ipAddress, device.id];
+    await DB.query(sql, params);
     return device;
   }
-
 }

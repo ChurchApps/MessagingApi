@@ -1,5 +1,5 @@
 {
-  "printWidth": 100,
+  "printWidth": 999,
   "tabWidth": 2,
   "useTabs": false,
   "semi": true,
@@ -8,4 +8,4 @@
   "bracketSpacing": true,
   "arrowParens": "avoid",
   "endOfLine": "auto"
-} 
+}
