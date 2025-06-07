@@ -6,6 +6,8 @@
   "scripts": {
     "clean": "rimraf dist/*",
     "copy-assets": "ts-node tools/copyAssets",
+    "exec-deploy-demo": "serverless deploy --stage Demo",
+    "deploy-demo": "npm-run-all build exec-deploy-demo",
     "exec-deploy-staging": "serverless deploy --stage Staging",
     "deploy-staging": "npm-run-all build exec-deploy-staging",
     "exec-deploy-prod": "serverless deploy --stage Prod",
