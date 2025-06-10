@@ -1,25 +1,30 @@
-on:
-  schedule:
-    - cron: "0 2 * * *" # Runs at 2 AM UTC every day
-  workflow_dispatch: # Allows manual triggering
-
 name: Deploy Demo
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Allows manual triggering
 
 env:
   SERVERLESS_ACCESS_KEY: ${{ secrets.STAGING_AWS_ACCESS_KEY_ID }}
 
 jobs:
   deploy:
-    name: Deploy Staging
+    name: Deploy Demo
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           submodules: "true"
 
-      - uses: actions/cache@v3
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "18"
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -34,10 +39,31 @@ jobs:
           aws-region: us-east-2
 
       - name: Setup Serverless
-        run: |
-          export SERVERLESS_ACCESS_KEY="$SERVERLESS_ACCESS_KEY"
+        run: export SERVERLESS_ACCESS_KEY="$SERVERLESS_ACCESS_KEY"
 
       - name: Deploy API
         run: |
           npm install
           npm run deploy-demo
+
+      - name: Serverless package contents
+        run: |
+          npx serverless package --stage Demo
+          ls -R .serverless
+
+  cleanup:
+    name: Trigger Database Cleanup
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Cleanup Demo Workflow
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'cleanup-demo.yml',
+              ref: 'main'
+            })
