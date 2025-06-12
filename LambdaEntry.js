@@ -50,41 +50,33 @@ module.exports.timerMidnight = async (event, context) => {
   return await NotificationHelper.sendEmailNotifications("daily");
 };
 
-module.exports.universal = async function universal(event, context) {
+let handler;
+
+const universal = async function universal(event, context) {
   await checkPool();
-  const app = await init();
-  return serverlessExpress({ 
-    app,
-    binarySettings: {
-      contentTypes: [
-        'application/octet-stream',
-        'font/*', 
-        'image/*',
-        'application/pdf'
-      ]
-    },
-    stripBasePath: false,
-    resolutionMode: 'PROMISE'
-  })(event, context);
+  
+  if (!handler) {
+    const app = await init();
+    handler = serverlessExpress({ 
+      app,
+      binarySettings: {
+        contentTypes: [
+          'application/octet-stream',
+          'font/*', 
+          'image/*',
+          'application/pdf'
+        ]
+      },
+      stripBasePath: false,
+      resolutionMode: 'PROMISE'
+    });
+  }
+  
+  return handler(event, context);
 };
 
-module.exports.handleWeb = async function handleWeb(event, context) {
-  await checkPool();
-  const app = await init();
-  return serverlessExpress({ 
-    app,
-    binarySettings: {
-      contentTypes: [
-        'application/octet-stream',
-        'font/*', 
-        'image/*',
-        'application/pdf'
-      ]
-    },
-    stripBasePath: false,
-    resolutionMode: 'PROMISE'
-  })(event, context);
-};
+module.exports.universal = universal;
+module.exports.handleWeb = universal;
 
 module.exports.handleSocket = async function handleSocket(event) {
   const rc = event.requestContext;

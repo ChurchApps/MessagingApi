@@ -23,8 +23,12 @@ export const init = async () => {
       origin: true,
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+      exposedHeaders: ['Content-Length', 'X-Kuma-Revision']
     }));
+
+    // Explicit OPTIONS handler
+    expApp.options('*', cors());
 
     // Handle body parsing from @codegenie/serverless-express
     expApp.use((req, res, next) => {
@@ -72,9 +76,8 @@ export const init = async () => {
       next();
     });
 
-    // Standard body parsers
-    expApp.use(bodyParser.urlencoded({ extended: true }));
-    expApp.use(bodyParser.json({ limit: '10mb' }));
+    // Note: No standard body-parser middleware needed
+    // Custom buffer handling above replaces the need for body-parser
   };
 
   const server = app.setConfig(configFunction).build();

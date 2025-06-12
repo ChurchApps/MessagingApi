@@ -30,6 +30,9 @@ provider:
     role: arn:aws:iam::428019619026:role/ChurchAppsRole
   environment:
     APP_ENV: ${self:custom.env}
+  httpApi:
+    binaryMediaTypes:
+      - "*/*"
 
 layers:
   dependencies:
@@ -46,8 +49,14 @@ functions:
     layers:
       - { Ref: DependenciesLambdaLayer }
     events:
-      - http: ANY {proxy+}
-      - http: ANY /
+      - http:
+          path: /{proxy+}
+          method: ANY
+          cors: true
+      - http:
+          path: /
+          method: ANY
+          cors: true
     vpc: ${self:custom.vpcSettings.current}
   socket:
     handler: LambdaEntry.handleSocket
