@@ -8,6 +8,7 @@ import {
   NotificationPreference
 } from "../models";
 import { Repositories } from "../repositories";
+import { Logger } from "./Logger";
 import { DeliveryHelper } from "./DeliveryHelper";
 import { ExpoPushHelper } from "./ExpoPushHelper";
 import axios from "axios";
@@ -118,14 +119,14 @@ export class NotificationHelper {
     personId: string,
     title: string = "New Notification"
   ) => {
-    console.log("notifyUser", churchId, personId, title);
+    Logger.info(`notifyUser: ${churchId}, ${personId}, ${title}`);
     let method = "";
     const repos = Repositories.getCurrent();
     let deliveryCount = 0;
 
     // Handle web socket notifications
     const connections = await repos.connection.loadForNotification(churchId, personId);
-    console.log("connections", connections.length);
+    Logger.info(`Found ${connections.length} connections for notification`);
     if (connections.length > 0) {
       method = "socket";
       deliveryCount = await DeliveryHelper.sendMessages(connections, {
@@ -138,7 +139,7 @@ export class NotificationHelper {
 
     // Handle push notifications
     const devices: Device[] = await Repositories.getCurrent().device.loadForPerson(personId);
-    console.log("devices", devices.length);
+    Logger.info(`Found ${devices.length} devices for person`);
 
     if (devices.length > 0) {
       try {
@@ -155,9 +156,9 @@ export class NotificationHelper {
           // Send notifications in bulk for efficiency
           await ExpoPushHelper.sendBulkMessages(expoPushTokens, title, title);
           method = "push";
-          console.log(`Sent push notifications to ${expoPushTokens.length} devices`);
+          Logger.info(`Sent push notifications to ${expoPushTokens.length} devices`);
         } else {
-          console.log("No valid Expo push tokens found for user");
+          Logger.info("No valid Expo push tokens found for user");
         }
       } catch (error) {
         console.error("Error sending push notifications:", error);
@@ -174,7 +175,7 @@ export class NotificationHelper {
       await Repositories.getCurrent().notification.loadUndelivered();
     const allPMs: PrivateMessage[] =
       await Repositories.getCurrent().privateMessage.loadUndelivered();
-    console.log("allNotifications", allNotifications.length);
+    Logger.info(`Found ${allNotifications.length} undelivered notifications`);
     if (allNotifications.length === 0 && allPMs.length === 0) return;
 
     const peopleIds = ArrayHelper.getIds(allNotifications, "personId").concat(
@@ -185,7 +186,7 @@ export class NotificationHelper {
       await Repositories.getCurrent().notificationPreference.loadByPersonIds(peopleIds);
     const todoPrefs: NotificationPreference[] = [];
     peopleIds.forEach(async personId => {
-      console.log("Notifiying", personId);
+      Logger.info(`Notifying person: ${personId}`);
       const notifications: Notification[] = ArrayHelper.getAll(
         allNotifications,
         "personId",

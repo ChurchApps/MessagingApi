@@ -6,9 +6,25 @@ import { fromEnv } from "@aws-sdk/credential-providers";
 import { Environment } from "./Environment";
 
 export class Logger {
+  private static instance: Logger;
   private _logger: winston.Logger = null;
   private wc: WinstonCloudWatch;
   private pendingMessages = false;
+
+  public static getInstance(): Logger {
+    if (!Logger.instance) {
+      Logger.instance = new Logger();
+    }
+    return Logger.instance;
+  }
+
+  public static error(msg: string | object) {
+    Logger.getInstance().error(msg);
+  }
+
+  public static info(msg: string | object) {
+    Logger.getInstance().info(msg);
+  }
 
   public error(msg: string | object) {
     if (this._logger === null) this.init();

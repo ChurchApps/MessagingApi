@@ -54,7 +54,7 @@ export class DeviceRepository {
           await this.delete(existingDevice.id);
         }
       }
-      const allExisting = device.deviceId ? await this.loadByAppDevice(device.appName, device.deviceId) : this.loadByFcmToken(device.fcmToken);
+      const allExisting = device.deviceId ? await this.loadByAppDevice(device.appName, device.deviceId) : await this.loadByFcmToken(device.fcmToken);
       if (allExisting.length > 0) {
         const existing = allExisting[0];
         existing.lastActiveDate = new Date();

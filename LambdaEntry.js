@@ -1,4 +1,4 @@
-const { createServer, proxy } = require("aws-serverless-express");
+const serverlessExpress = require("@codegenie/serverless-express");
 const { init } = require("./dist/App");
 const { Environment } = require("./dist/helpers/Environment");
 const { Pool } = require("@churchapps/apihelper");
@@ -50,22 +50,16 @@ module.exports.timerMidnight = async (event, context) => {
   return await NotificationHelper.sendEmailNotifications("daily");
 };
 
-module.exports.universal = function universal(event, context) {
-  checkPool().then(() => {
-    init().then(app => {
-      const server = createServer(app);
-      return proxy(server, event, context);
-    });
-  });
+module.exports.universal = async function universal(event, context) {
+  await checkPool();
+  const app = await init();
+  return serverlessExpress({ app })(event, context);
 };
 
-module.exports.handleWeb = function handleWeb(event, context) {
-  checkPool().then(() => {
-    init().then(app => {
-      const server = createServer(app);
-      return proxy(server, event, context);
-    });
-  });
+module.exports.handleWeb = async function handleWeb(event, context) {
+  await checkPool();
+  const app = await init();
+  return serverlessExpress({ app })(event, context);
 };
 
 module.exports.handleSocket = async function handleSocket(event) {

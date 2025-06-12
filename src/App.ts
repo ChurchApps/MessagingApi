@@ -18,9 +18,32 @@ export const init = async () => {
   const app = new InversifyExpressServer(container, null, null, null, CustomAuthProvider);
 
   const configFunction = (expApp: express.Application) => {
+    // CORS configuration
+    expApp.use(cors({
+      origin: true,
+      credentials: true,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+    }));
+
+    // Handle Buffer body parsing from serverless-express
+    expApp.use((req, res, next) => {
+      if (req.body && Buffer.isBuffer(req.body)) {
+        try {
+          const bodyStr = req.body.toString('utf8');
+          if (bodyStr.startsWith('{') || bodyStr.startsWith('[')) {
+            req.body = JSON.parse(bodyStr);
+          }
+        } catch (e) {
+          // If parsing fails, leave as buffer
+        }
+      }
+      next();
+    });
+
+    // Standard body parsers
     expApp.use(bodyParser.urlencoded({ extended: true }));
-    expApp.use(bodyParser.json());
-    expApp.use(cors())
+    expApp.use(bodyParser.json({ limit: '10mb' }));
   };
 
   const server = app.setConfig(configFunction).build();

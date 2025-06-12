@@ -1,0 +1,23 @@
+{
+  "name": "messaging-api-layer",
+  "version": "1.0.0",
+  "description": "Lambda layer dependencies for messaging-api",
+  "dependencies": {
+    "@aws-sdk/client-apigatewaymanagementapi": "^3.828.0",
+    "@aws-sdk/client-cloudwatch-logs": "^3.828.0",
+    "@aws-sdk/credential-providers": "^3.828.0",
+    "@churchapps/apihelper": "0.0.24",
+    "@codegenie/serverless-express": "^4.16.0",
+    "axios": "^1.7.9",
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "inversify": "^6.2.2",
+    "inversify-express-utils": "^6.4.3",
+    "mysql": "^2.18.1",
+    "winston": "^3.15.0",
+    "winston-cloudwatch": "^6.3.0",
+    "ws": "^8.18.0"
+  }
+}

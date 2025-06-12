@@ -4,11 +4,13 @@ package:
   individually: true
   exclude:
     - node_modules/**
+    - layer/**
+    - tools/**
+    - "*.md"
+    - "*.json"
+    - ".git*"
 
 custom:
-  serverless-layers:
-    dependenciesPath: ./package.json
-    layersDeploymentBucket: "lcs-layers"
   env: ${lower(${opt:stage, self:provider.stage})}
   vpcSettings:
     prod:
@@ -20,7 +22,7 @@ custom:
 
 provider:
   name: aws
-  runtime: nodejs18.x
+  runtime: nodejs20.x
   memorySize: 1024
   timeout: 10
   region: us-east-2
@@ -29,30 +31,46 @@ provider:
   environment:
     APP_ENV: ${self:custom.env}
 
+layers:
+  dependencies:
+    path: layer
+    name: ${self:service}-dependencies-${self:custom.env}
+    description: Dependencies layer for ${self:service}
+    compatibleRuntimes:
+      - nodejs20.x
+    retain: false
+
 functions:
   web:
     handler: LambdaEntry.handleWeb
+    layers:
+      - { Ref: DependenciesLambdaLayer }
     events:
       - http: ANY {proxy+}
       - http: ANY /
     vpc: ${self:custom.vpcSettings.current}
   socket:
     handler: LambdaEntry.handleSocket
+    layers:
+      - { Ref: DependenciesLambdaLayer }
     events:
       - websocket: $default
       - websocket: $disconnect
     vpc: ${self:custom.vpcSettings.current}
   timer15Min:
     handler: LambdaEntry.timer15Min
+    layers:
+      - { Ref: DependenciesLambdaLayer }
     events:
       - schedule: rate(15 minutes)
     vpc: ${self:custom.vpcSettings.current}
   timerMidnight:
     handler: LambdaEntry.timerMidnight
+    layers:
+      - { Ref: DependenciesLambdaLayer }
     events:
       - schedule: cron(0 5 * * ? *)
     vpc: ${self:custom.vpcSettings.current}
 
 plugins:
-  - serverless-layers
   - serverless-plugin-utils

@@ -39,7 +39,7 @@ export class MessageController extends MessagingBaseController {
     });
   }
 
-  // todo remove duplicate (used by streaming live.  Just post to /)
+  // Legacy endpoint for streaming live functionality - will be consolidated with save() in future
   @httpPost("/send")
   public async send(req: express.Request<{}, {}, Message[]>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
