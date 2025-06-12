@@ -53,13 +53,37 @@ module.exports.timerMidnight = async (event, context) => {
 module.exports.universal = async function universal(event, context) {
   await checkPool();
   const app = await init();
-  return serverlessExpress({ app })(event, context);
+  return serverlessExpress({ 
+    app,
+    binarySettings: {
+      contentTypes: [
+        'application/octet-stream',
+        'font/*', 
+        'image/*',
+        'application/pdf'
+      ]
+    },
+    stripBasePath: false,
+    resolutionMode: 'PROMISE'
+  })(event, context);
 };
 
 module.exports.handleWeb = async function handleWeb(event, context) {
   await checkPool();
   const app = await init();
-  return serverlessExpress({ app })(event, context);
+  return serverlessExpress({ 
+    app,
+    binarySettings: {
+      contentTypes: [
+        'application/octet-stream',
+        'font/*', 
+        'image/*',
+        'application/pdf'
+      ]
+    },
+    stripBasePath: false,
+    resolutionMode: 'PROMISE'
+  })(event, context);
 };
 
 module.exports.handleSocket = async function handleSocket(event) {

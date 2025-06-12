@@ -26,18 +26,49 @@ export const init = async () => {
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
     }));
 
-    // Handle Buffer body parsing from serverless-express
+    // Handle body parsing from @codegenie/serverless-express
     expApp.use((req, res, next) => {
-      if (req.body && Buffer.isBuffer(req.body)) {
+      const contentType = req.headers['content-type'] || '';
+      
+      // Handle Buffer instances (most common case with serverless-express)
+      if (Buffer.isBuffer(req.body)) {
         try {
-          const bodyStr = req.body.toString('utf8');
-          if (bodyStr.startsWith('{') || bodyStr.startsWith('[')) {
-            req.body = JSON.parse(bodyStr);
+          const bodyString = req.body.toString('utf8');
+          if (contentType.includes('application/json')) {
+            req.body = JSON.parse(bodyString);
+          } else {
+            req.body = bodyString;
           }
         } catch (e) {
-          // If parsing fails, leave as buffer
+          console.error('Failed to parse Buffer body:', e.message);
+          req.body = {};
         }
       }
+      // Handle Buffer-like objects
+      else if (req.body && req.body.type === 'Buffer' && Array.isArray(req.body.data)) {
+        try {
+          const bodyString = Buffer.from(req.body.data).toString('utf8');
+          if (contentType.includes('application/json')) {
+            req.body = JSON.parse(bodyString);
+          } else {
+            req.body = bodyString;
+          }
+        } catch (e) {
+          console.error('Failed to parse Buffer-like body:', e.message);
+          req.body = {};
+        }
+      }
+      // Handle string JSON bodies
+      else if (typeof req.body === 'string' && req.body.length > 0) {
+        try {
+          if (contentType.includes('application/json')) {
+            req.body = JSON.parse(req.body);
+          }
+        } catch (e) {
+          console.error('Failed to parse string body as JSON:', e.message);
+        }
+      }
+      
       next();
     });
 
