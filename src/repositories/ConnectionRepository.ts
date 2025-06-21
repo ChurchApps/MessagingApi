@@ -5,7 +5,8 @@ import { ViewerInterface } from "../helpers/Interfaces";
 
 export class ConnectionRepository {
   public async loadAttendance(churchId: string, conversationId: string) {
-    const sql = "SELECT id, displayName, ipAddress FROM connections WHERE churchId=? AND conversationId=? ORDER BY displayName;";
+    const sql =
+      "SELECT id, displayName, ipAddress FROM connections WHERE churchId=? AND conversationId=? ORDER BY displayName;";
     const data: ViewerInterface[] = await DB.query(sql, [churchId, conversationId]);
     data.forEach((d: ViewerInterface) => {
       if (d.displayName === "") d.displayName = "Anonymous";
@@ -22,7 +23,10 @@ export class ConnectionRepository {
   }
 
   public loadForNotification(churchId: string, personId: string) {
-    return DB.query("SELECT * FROM connections WHERE churchId=? AND personId=? and conversationId='alerts'", [churchId, personId]);
+    return DB.query("SELECT * FROM connections WHERE churchId=? AND personId=? and conversationId='alerts'", [
+      churchId,
+      personId
+    ]);
   }
 
   public loadBySocketId(socketId: string) {
@@ -50,8 +54,17 @@ export class ConnectionRepository {
   private async create(connection: Connection): Promise<Connection> {
     connection.id = UniqueIdHelper.shortId();
     await this.deleteExisting(connection.churchId, connection.conversationId, connection.socketId, connection.id);
-    const sql = "INSERT INTO connections (id, churchId, conversationId, personId, displayName, timeJoined, socketId, ipAddress) VALUES (?, ?, ?, ?, ?, NOW(), ?, ?);";
-    const params = [connection.id, connection.churchId, connection.conversationId, connection.personId, connection.displayName, connection.socketId, connection.ipAddress];
+    const sql =
+      "INSERT INTO connections (id, churchId, conversationId, personId, displayName, timeJoined, socketId, ipAddress) VALUES (?, ?, ?, ?, ?, NOW(), ?, ?);";
+    const params = [
+      connection.id,
+      connection.churchId,
+      connection.conversationId,
+      connection.personId,
+      connection.displayName,
+      connection.socketId,
+      connection.ipAddress
+    ];
     await DB.query(sql, params);
     return connection;
   }
@@ -64,13 +77,22 @@ export class ConnectionRepository {
   }
 
   public convertToModel(data: any) {
-    const result: Connection = { id: data.id, churchId: data.churchId, conversationId: data.conversationId, personId: data.personId, displayName: data.displayName, timeJoined: data.timeJoined, socketId: data.socketId, ipAddress: data.ipAddress };
+    const result: Connection = {
+      id: data.id,
+      churchId: data.churchId,
+      conversationId: data.conversationId,
+      personId: data.personId,
+      displayName: data.displayName,
+      timeJoined: data.timeJoined,
+      socketId: data.socketId,
+      ipAddress: data.ipAddress
+    };
     return result;
   }
 
   public convertAllToModel(data: any[]) {
     const result: Connection[] = [];
-    data.forEach((d) => result.push(this.convertToModel(d)));
+    data.forEach(d => result.push(this.convertToModel(d)));
     return result;
   }
 }

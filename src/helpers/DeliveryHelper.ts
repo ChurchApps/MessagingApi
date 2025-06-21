@@ -3,10 +3,7 @@ import WebSocket from "ws";
 import { Repositories } from "../repositories";
 import { Connection, Conversation } from "../models";
 import { AttendanceInterface } from "../helpers/Interfaces";
-import {
-  ApiGatewayManagementApiClient,
-  PostToConnectionCommand
-} from "@aws-sdk/client-apigatewaymanagementapi";
+import { ApiGatewayManagementApiClient, PostToConnectionCommand } from "@aws-sdk/client-apigatewaymanagementapi";
 import { SocketHelper } from "./SocketHelper";
 import { LoggingHelper } from "@churchapps/apihelper";
 import { Environment } from "../helpers";
@@ -18,8 +15,7 @@ export class DeliveryHelper {
       await repos.connection.loadForConversation(payload.churchId, payload.conversationId)
     );
     const deliveryCount = await this.sendMessages(connections, payload);
-    if (deliveryCount !== connections.length)
-      DeliveryHelper.sendAttendance(payload.churchId, payload.conversationId);
+    if (deliveryCount !== connections.length) DeliveryHelper.sendAttendance(payload.churchId, payload.conversationId);
   };
 
   static sendMessages = async (connections: Connection[], payload: PayloadInterface) => {
@@ -37,19 +33,14 @@ export class DeliveryHelper {
 
   static sendMessage = async (connection: Connection, payload: PayloadInterface) => {
     let success = true;
-    if (Environment.deliveryProvider === "aws")
-      success = await DeliveryHelper.sendAws(connection, payload);
+    if (Environment.deliveryProvider === "aws") success = await DeliveryHelper.sendAws(connection, payload);
     else success = await DeliveryHelper.sendLocal(connection, payload);
-    if (!success)
-      await Repositories.getCurrent().connection.delete(connection.churchId, connection.id);
+    if (!success) await Repositories.getCurrent().connection.delete(connection.churchId, connection.id);
     return success;
   };
 
   static sendAttendance = async (churchId: string, conversationId: string) => {
-    const viewers = await Repositories.getCurrent().connection.loadAttendance(
-      churchId,
-      conversationId
-    );
+    const viewers = await Repositories.getCurrent().connection.loadAttendance(churchId, conversationId);
     const totalViewers = viewers.length;
     const data: AttendanceInterface = { conversationId, viewers, totalViewers };
     await DeliveryHelper.sendConversationMessages({
@@ -61,10 +52,7 @@ export class DeliveryHelper {
   };
 
   static sendBlockedIps = async (churchId: string, conversationId: string) => {
-    const blockedIps = await Repositories.getCurrent().blockedIp.loadByConversationId(
-      churchId,
-      conversationId
-    );
+    const blockedIps = await Repositories.getCurrent().blockedIp.loadByConversationId(churchId, conversationId);
     const data = { conversationId, ipAddresses: blockedIps };
     await DeliveryHelper.sendConversationMessages({
       churchId,
@@ -94,8 +82,7 @@ export class DeliveryHelper {
     let success = true;
     try {
       const sc = SocketHelper.getConnection(connection.socketId);
-      if (sc !== null && sc.socket.readyState === WebSocket.OPEN)
-        sc.socket.send(JSON.stringify(payload));
+      if (sc !== null && sc.socket.readyState === WebSocket.OPEN) sc.socket.send(JSON.stringify(payload));
       else success = false;
     } catch (e) {
       success = false;

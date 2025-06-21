@@ -4,7 +4,6 @@ import path from "path";
 import { AwsHelper, EnvironmentBase } from "@churchapps/apihelper";
 
 export class Environment extends EnvironmentBase {
-
   static deliveryProvider: string;
   static socketPort: number;
   static socketUrl: string;
@@ -29,9 +28,10 @@ export class Environment extends EnvironmentBase {
     this.socketUrl = data.socketUrl;
     this.membershipApi = data.membershipApi;
 
-    this.firebaseClientEmail = process.env.FIREBASE_CLIENT_EMAIL || await AwsHelper.readParameter(`/${environment}/firebase/clientEmail`);
-    this.firebasePrivateKey = process.env.FIREBASE_PRIVATE_KEY || await AwsHelper.readParameter(`/${environment}/firebase/privateKey`);
+    this.firebaseClientEmail =
+      process.env.FIREBASE_CLIENT_EMAIL || (await AwsHelper.readParameter(`/${environment}/firebase/clientEmail`));
+    this.firebasePrivateKey =
+      process.env.FIREBASE_PRIVATE_KEY || (await AwsHelper.readParameter(`/${environment}/firebase/privateKey`));
     this.firebasePrivateKey = this.firebasePrivateKey.replace(/\\n/g, "\n");
   }
-
 }

@@ -1,6 +1,6 @@
 export { Connection } from "./Connection";
 export { Conversation } from "./Conversation";
-export { Device } from "./Device"
+export { Device } from "./Device";
 export { DeviceContent } from "./DeviceContent";
 export { FcmMessage } from "./FcmMessage";
 export { Message } from "./Message";

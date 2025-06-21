@@ -1,15 +1,17 @@
 import { controller, httpGet, httpPost, interfaces } from "inversify-express-utils";
 import express from "express";
-import { MessagingBaseController } from "./MessagingBaseController"
+import { MessagingBaseController } from "./MessagingBaseController";
 import { NotificationPreference } from "../models";
 import { NotificationHelper } from "../helpers/NotificationHelper";
 
 @controller("/notificationPreferences")
 export class NotificationPreferenceController extends MessagingBaseController {
-
   @httpPost("/")
-  public async save(req: express.Request<{}, {}, NotificationPreference[]>, res: express.Response): Promise<interfaces.IHttpActionResult> {
-    return this.actionWrapper(req, res, async (au) => {
+  public async save(
+    req: express.Request<{}, {}, NotificationPreference[]>,
+    res: express.Response
+  ): Promise<interfaces.IHttpActionResult> {
+    return this.actionWrapper(req, res, async au => {
       const promises: Promise<NotificationPreference>[] = [];
       req.body.forEach(n => {
         n.churchId = au.churchId;
@@ -20,15 +22,12 @@ export class NotificationPreferenceController extends MessagingBaseController {
     });
   }
 
-
   @httpGet("/my")
   public async loadMy(req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
-    return this.actionWrapper(req, res, async (au) => {
+    return this.actionWrapper(req, res, async au => {
       let result = await this.repositories.notificationPreference.loadForPerson(au.churchId, au.personId);
       if (!result) result = await NotificationHelper.createNotificationPref(au.churchId, au.personId);
       return result;
     });
   }
-
-
 }

@@ -15,13 +15,12 @@ export class SocketHelper {
     if (port > 0) {
       SocketHelper.wss = new WebSocket.Server({ port });
 
-      SocketHelper.wss.on("connection", (socket) => {
+      SocketHelper.wss.on("connection", socket => {
         const sc: SocketConnectionInterface = { id: UniqueIdHelper.shortId(), socket };
         SocketHelper.connections.push(sc);
         const payload: PayloadInterface = { churchId: "", conversationId: "", action: "socketId", data: sc.id };
         sc.socket.send(JSON.stringify(payload));
         sc.socket.on("close", async () => {
-          // console.log("DELETING " + sc.id);
           await SocketHelper.handleDisconnect(sc.id);
         });
       });
@@ -29,8 +28,6 @@ export class SocketHelper {
   };
 
   static handleDisconnect = async (socketId: string) => {
-    // console.log("handleDisconnect");
-    // console.log(socketId);
     const connections = await Repositories.getCurrent().connection.loadBySocketId(socketId);
     await Repositories.getCurrent().connection.deleteForSocket(socketId);
     connections.forEach((c: Connection) => {
@@ -40,7 +37,7 @@ export class SocketHelper {
 
   static getConnection = (id: string) => {
     let result: SocketConnectionInterface = null;
-    SocketHelper.connections.forEach((sc) => {
+    SocketHelper.connections.forEach(sc => {
       if (sc.id === id) result = sc;
     });
     return result;

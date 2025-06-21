@@ -23,16 +23,11 @@ export class ExpoPushHelper {
         }
       });
     } catch (error) {
-      console.error("Error sending push notification:", error);
       throw error;
     }
   }
 
-  static async sendBulkMessages(
-    expoPushTokens: string[],
-    title: string,
-    body: string
-  ): Promise<void> {
+  static async sendBulkMessages(expoPushTokens: string[], title: string, body: string): Promise<void> {
     try {
       const messages = expoPushTokens.map(token => ({
         to: token,
@@ -55,7 +50,6 @@ export class ExpoPushHelper {
         });
       }
     } catch (error) {
-      console.error("Error sending bulk push notifications:", error);
       throw error;
     }
   }

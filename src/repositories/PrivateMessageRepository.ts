@@ -3,29 +3,30 @@ import { PrivateMessage } from "../models";
 import { UniqueIdHelper } from "../helpers";
 
 export class PrivateMessageRepository {
-
   public async loadUndelivered() {
     return DB.query("SELECT * FROM privateMessages WHERE notifyPersonId IS NOT NULL AND deliveryMethod<>'email';", []);
   }
 
   public async loadForPerson(churchId: string, personId: string) {
-    const sql = "SELECT c.*, pm.id as pmId, pm.fromPersonId, pm.toPersonId, pm.notifyPersonId"
-      + " FROM privateMessages pm"
-      + " INNER JOIN conversations c on c.id=pm.conversationId"
-      + " WHERE pm.churchId=? AND (pm.fromPersonId=? OR pm.toPersonId=?)"
-      + " ORDER by c.dateCreated desc";
+    const sql =
+      "SELECT c.*, pm.id as pmId, pm.fromPersonId, pm.toPersonId, pm.notifyPersonId" +
+      " FROM privateMessages pm" +
+      " INNER JOIN conversations c on c.id=pm.conversationId" +
+      " WHERE pm.churchId=? AND (pm.fromPersonId=? OR pm.toPersonId=?)" +
+      " ORDER by c.dateCreated desc";
     const data = await DB.query(sql, [churchId, personId, personId]);
     return this.convertAllToModel(data);
   }
 
   public async loadExisting(churchId: string, personId: string, otherPersonId: string) {
-    const sql = "SELECT c.*, pm.id as pmId, pm.fromPersonId, pm.toPersonId, pm.notifyPersonId"
-      + " FROM privateMessages pm"
-      + " INNER JOIN conversations c on c.id=pm.conversationId"
-      + " WHERE pm.churchId=? AND ((pm.fromPersonId=? and pm.toPersonId=?) OR (pm.fromPersonId=? AND pm.toPersonId=?))"
-      + " ORDER by c.dateCreated desc";
+    const sql =
+      "SELECT c.*, pm.id as pmId, pm.fromPersonId, pm.toPersonId, pm.notifyPersonId" +
+      " FROM privateMessages pm" +
+      " INNER JOIN conversations c on c.id=pm.conversationId" +
+      " WHERE pm.churchId=? AND ((pm.fromPersonId=? and pm.toPersonId=?) OR (pm.fromPersonId=? AND pm.toPersonId=?))" +
+      " ORDER by c.dateCreated desc";
     const data = await DB.queryOne(sql, [churchId, personId, otherPersonId, otherPersonId, personId]);
-    return (data) ? this.convertToModel(data) : null;
+    return data ? this.convertToModel(data) : null;
   }
 
   public loadById(churchId: string, id: string) {
@@ -33,7 +34,10 @@ export class PrivateMessageRepository {
   }
 
   public loadByConversationId(churchId: string, converstationId: string) {
-    return DB.queryOne("SELECT * FROM privateMessages WHERE churchId=? AND conversationId=?;", [churchId, converstationId]);
+    return DB.queryOne("SELECT * FROM privateMessages WHERE churchId=? AND conversationId=?;", [
+      churchId,
+      converstationId
+    ]);
   }
 
   public save(pm: PrivateMessage) {
@@ -42,7 +46,8 @@ export class PrivateMessageRepository {
 
   private async create(pm: PrivateMessage) {
     pm.id = UniqueIdHelper.shortId();
-    const sql = "INSERT INTO privateMessages (id, churchId, fromPersonId, toPersonId, conversationId, notifyPersonId) VALUES (?, ?, ?, ?, ?, ?);";
+    const sql =
+      "INSERT INTO privateMessages (id, churchId, fromPersonId, toPersonId, conversationId, notifyPersonId) VALUES (?, ?, ?, ?, ?, ?);";
     const params = [pm.id, pm.churchId, pm.fromPersonId, pm.toPersonId, pm.conversationId, pm.notifyPersonId];
     await DB.query(sql, params);
     return pm;
@@ -50,13 +55,14 @@ export class PrivateMessageRepository {
 
   private async update(pm: PrivateMessage) {
     const sql = "UPDATE privateMessages SET notifyPersonId=? WHERE id=? AND churchId=?;";
-    const params = [pm.notifyPersonId, pm.id, pm.churchId]
-    await DB.query(sql, params)
+    const params = [pm.notifyPersonId, pm.id, pm.churchId];
+    await DB.query(sql, params);
     return pm;
   }
 
   public async markAllRead(churchId: string, personId: string) {
-    const sql = "UPDATE privateMessages set notifyPersonId=NULL, deliveryMethod=NULL WHERE churchId=? AND notifyPersonId=?;";
+    const sql =
+      "UPDATE privateMessages set notifyPersonId=NULL, deliveryMethod=NULL WHERE churchId=? AND notifyPersonId=?;";
     return DB.query(sql, [churchId, personId]);
   }
 
@@ -92,5 +98,4 @@ export class PrivateMessageRepository {
     data.forEach(d => result.push(this.convertToModel(d)));
     return result;
   }
-
 }

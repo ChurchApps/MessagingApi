@@ -1,11 +1,4 @@
-import {
-  controller,
-  httpPost,
-  requestParam,
-  httpDelete,
-  interfaces,
-  httpGet
-} from "inversify-express-utils";
+import { controller, httpPost, requestParam, httpDelete, interfaces, httpGet } from "inversify-express-utils";
 import express from "express";
 import { MessagingBaseController } from "./MessagingBaseController";
 import { Device, DeviceContent } from "../models";
@@ -49,12 +42,8 @@ export class DeviceController extends MessagingBaseController {
       });
       const result = {
         manualPlaylistsApiUrl:
-          "https://api.lessons.church/classrooms/player/" +
-          device.churchId +
-          "?classrooms=" +
-          classRoomIds.join(","),
-        libraryApiUrl:
-          "https://contentapi.churchapps.org/sermons/public/tvWrapper/" + device.churchId
+          "https://api.lessons.church/classrooms/player/" + device.churchId + "?classrooms=" + classRoomIds.join(","),
+        libraryApiUrl: "https://contentapi.churchapps.org/sermons/public/tvWrapper/" + device.churchId
       };
       return result;
     });
@@ -127,11 +116,7 @@ export class DeviceController extends MessagingBaseController {
       const expoPushTokens = devices.map(device => device.fcmToken).filter(token => token);
 
       if (expoPushTokens.length > 0) {
-        await ExpoPushHelper.sendBulkMessages(
-          expoPushTokens,
-          req.body.title.toString(),
-          req.body.body.toString()
-        );
+        await ExpoPushHelper.sendBulkMessages(expoPushTokens, req.body.title.toString(), req.body.body.toString());
       }
 
       return { devices: expoPushTokens };
@@ -141,11 +126,7 @@ export class DeviceController extends MessagingBaseController {
   @httpPost("/tempSendManual")
   public async sendManual(req: express.Request<{}, {}, any>, res: express.Response): Promise<any> {
     return this.actionWrapperAnon(req, res, async () => {
-      await ExpoPushHelper.sendMessage(
-        req.body.fcmToken,
-        req.body.title.toString(),
-        req.body.body.toString()
-      );
+      await ExpoPushHelper.sendMessage(req.body.fcmToken, req.body.title.toString(), req.body.body.toString());
     });
   }
 

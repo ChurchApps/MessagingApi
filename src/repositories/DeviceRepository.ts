@@ -24,7 +24,10 @@ export class DeviceRepository {
   }
 
   public loadActiveForPerson(personId: string) {
-    return DB.query("SELECT * FROM devices WHERE personId=? and lastActiveDate>DATE_SUB(NOW(), INTERVAL 1 YEAR) order by lastActiveDate desc", [personId]);
+    return DB.query(
+      "SELECT * FROM devices WHERE personId=? and lastActiveDate>DATE_SUB(NOW(), INTERVAL 1 YEAR) order by lastActiveDate desc",
+      [personId]
+    );
   }
 
   public loadByFcmToken(fcmToken: string) {
@@ -54,7 +57,9 @@ export class DeviceRepository {
           await this.delete(existingDevice.id);
         }
       }
-      const allExisting = device.deviceId ? await this.loadByAppDevice(device.appName, device.deviceId) : await this.loadByFcmToken(device.fcmToken);
+      const allExisting = device.deviceId
+        ? await this.loadByAppDevice(device.appName, device.deviceId)
+        : await this.loadByFcmToken(device.fcmToken);
       if (allExisting.length > 0) {
         const existing = allExisting[0];
         existing.lastActiveDate = new Date();
@@ -69,15 +74,43 @@ export class DeviceRepository {
 
   private async create(device: Device) {
     device.id = UniqueIdHelper.shortId();
-    const sql = "INSERT INTO devices (id, appName, deviceId, churchId, personId, fcmToken, label, registrationDate, lastActiveDate, deviceInfo, admId, pairingCode, ipAddress) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?, ?, ?);";
-    const params = [device.id, device.appName, device.deviceId, device.churchId, device.personId, device.fcmToken, device.label, device.deviceInfo, device.admId, device.pairingCode, device.ipAddress];
+    const sql =
+      "INSERT INTO devices (id, appName, deviceId, churchId, personId, fcmToken, label, registrationDate, lastActiveDate, deviceInfo, admId, pairingCode, ipAddress) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?, ?, ?);";
+    const params = [
+      device.id,
+      device.appName,
+      device.deviceId,
+      device.churchId,
+      device.personId,
+      device.fcmToken,
+      device.label,
+      device.deviceInfo,
+      device.admId,
+      device.pairingCode,
+      device.ipAddress
+    ];
     await DB.query(sql, params);
     return device;
   }
 
   private async update(device: Device) {
-    const sql = "UPDATE devices SET appName=?, deviceId=?, churchId=?, personId=?, fcmToken=?, label=?, registrationDate=?, lastActiveDate=?, deviceInfo=?, admId=?, pairingCode=?, ipAddress=? WHERE id=?;";
-    const params = [device.appName, device.deviceId, device.churchId, device.personId, device.fcmToken, device.label, device.registrationDate, device.lastActiveDate, device.deviceInfo, device.admId, device.pairingCode, device.ipAddress, device.id];
+    const sql =
+      "UPDATE devices SET appName=?, deviceId=?, churchId=?, personId=?, fcmToken=?, label=?, registrationDate=?, lastActiveDate=?, deviceInfo=?, admId=?, pairingCode=?, ipAddress=? WHERE id=?;";
+    const params = [
+      device.appName,
+      device.deviceId,
+      device.churchId,
+      device.personId,
+      device.fcmToken,
+      device.label,
+      device.registrationDate,
+      device.lastActiveDate,
+      device.deviceInfo,
+      device.admId,
+      device.pairingCode,
+      device.ipAddress,
+      device.id
+    ];
     await DB.query(sql, params);
     return device;
   }
