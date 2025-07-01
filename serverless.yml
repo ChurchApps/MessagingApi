@@ -33,6 +33,10 @@ provider:
   httpApi:
     binaryMediaTypes:
       - "*/*"
+  apiGateway:
+    throttle:
+      rateLimit: 5     # 5 requests per second per IP
+      burstLimit: 20   # Allow bursts up to 20 requests per second
 
 layers:
   dependencies:
