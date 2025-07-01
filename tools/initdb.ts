@@ -9,7 +9,7 @@ const init = async () => {
   Environment.init(process.env.APP_ENV).then(() => {
     console.log("Connecting");
     Pool.initPool();
-  }));
+  });
 
 
   const tablesAndProcedure: { title: string, file: string, customDelimeter?: boolean }[] = [
