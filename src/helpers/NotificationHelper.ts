@@ -18,20 +18,21 @@ export class NotificationHelper {
       case "streamingLive":
         // don't send notifications for live stream chat room.
         break;
-      case "privateMessage":
+      case "privateMessage": {
         const pm: PrivateMessage = await Repositories.getCurrent().privateMessage.loadByConversationId(
           conversation.churchId,
           conversation.id
         );
         pm.notifyPersonId = pm.fromPersonId === senderPersonId ? pm.toPersonId : pm.fromPersonId;
         await Repositories.getCurrent().privateMessage.save(pm);
-        const method = await this.notifyUser(message.churchId, pm.notifyPersonId, title);
-        if (method) {
-          pm.deliveryMethod = method;
+        const _method = await this.notifyUser(message.churchId, pm.notifyPersonId, title);
+        if (_method) {
+          pm.deliveryMethod = _method;
           await Repositories.getCurrent().privateMessage.save(pm);
         }
         break;
-      default:
+      }
+      default: {
         const allMessages: Message[] = await Repositories.getCurrent().message.loadForConversation(
           conversation.churchId,
           conversation.id
@@ -49,8 +50,8 @@ export class NotificationHelper {
             "New message: " + conversation.title
           );
         }
-
         break;
+      }
     }
   };
 
@@ -108,14 +109,14 @@ export class NotificationHelper {
     Logger.info(`notifyUser: ${churchId}, ${personId}, ${title}`);
     let method = "";
     const repos = Repositories.getCurrent();
-    let deliveryCount = 0;
+    const _deliveryCount = 0;
 
     // Handle web socket notifications
     const connections = await repos.connection.loadForNotification(churchId, personId);
     Logger.info(`Found ${connections.length} connections for notification`);
     if (connections.length > 0) {
       method = "socket";
-      deliveryCount = await DeliveryHelper.sendMessages(connections, {
+      await DeliveryHelper.sendMessages(connections, {
         churchId,
         conversationId: "alert",
         action: "notification",
@@ -144,7 +145,7 @@ export class NotificationHelper {
         } else {
           Logger.info("No valid Expo push tokens found for user");
         }
-      } catch (error) {
+      } catch (_error) {
         // Don't throw the error - we still want to return the method if socket delivery worked
       }
     }
@@ -187,7 +188,7 @@ export class NotificationHelper {
     await Promise.all(promises);
   };
 
-  static markMethod = (notifications: Notification[], privateMessages: PrivateMessage[], method: string) => {
+  static markMethod = (notifications: Notification[], privateMessages: PrivateMessage[], _method: string) => {
     const promises: Promise<any>[] = [];
     notifications.forEach(notification => {
       notification.deliveryMethod = "none";

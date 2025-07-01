@@ -2,7 +2,6 @@ import { controller, httpGet, httpPost, interfaces } from "inversify-express-uti
 import express from "express";
 import { MessagingBaseController } from "./MessagingBaseController";
 import { Notification } from "../models";
-import { ArrayHelper } from "@churchapps/apihelper";
 import { NotificationHelper } from "../helpers/NotificationHelper";
 
 @controller("/notifications")

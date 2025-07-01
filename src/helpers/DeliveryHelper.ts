@@ -1,7 +1,7 @@
 import { PayloadInterface } from "../helpers/Interfaces";
 import WebSocket from "ws";
 import { Repositories } from "../repositories";
-import { Connection, Conversation } from "../models";
+import { Connection } from "../models";
 import { AttendanceInterface } from "../helpers/Interfaces";
 import { ApiGatewayManagementApiClient, PostToConnectionCommand } from "@aws-sdk/client-apigatewaymanagementapi";
 import { SocketHelper } from "./SocketHelper";
@@ -84,7 +84,7 @@ export class DeliveryHelper {
       const sc = SocketHelper.getConnection(connection.socketId);
       if (sc !== null && sc.socket.readyState === WebSocket.OPEN) sc.socket.send(JSON.stringify(payload));
       else success = false;
-    } catch (e) {
+    } catch (_e) {
       success = false;
     }
     if (!success) SocketHelper.deleteConnection(connection.socketId);

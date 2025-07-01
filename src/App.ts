@@ -1,5 +1,4 @@
 import dotenv from "dotenv";
-import bodyParser from "body-parser";
 import "reflect-metadata";
 import { Container } from "inversify";
 import { InversifyExpressServer } from "inversify-express-utils";
@@ -44,7 +43,7 @@ export const init = async () => {
           } else {
             req.body = bodyString;
           }
-        } catch (e) {
+        } catch (_e) {
           req.body = {};
         }
       }
@@ -57,7 +56,7 @@ export const init = async () => {
           } else {
             req.body = bodyString;
           }
-        } catch (e) {
+        } catch (_e) {
           req.body = {};
         }
       }
@@ -67,7 +66,7 @@ export const init = async () => {
           if (contentType.includes("application/json")) {
             req.body = JSON.parse(req.body);
           }
-        } catch (e) {
+        } catch (_e) {
           // Ignore JSON parsing errors and leave body as string
         }
       }
