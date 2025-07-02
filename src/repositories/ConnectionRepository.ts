@@ -92,7 +92,7 @@ export class ConnectionRepository {
 
   public convertAllToModel(data: any[]) {
     const result: Connection[] = [];
-    data.forEach(d => result.push(this.convertToModel(d)));
+    data.forEach((d) => result.push(this.convertToModel(d)));
     return result;
   }
 }

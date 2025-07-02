@@ -12,11 +12,11 @@ export class ConnectionController extends MessagingBaseController {
         connection.churchId,
         connection.conversationId
       );
-      const anonConnections = connections.filter(c => c.displayName.includes("Anonymous"));
+      const anonConnections = connections.filter((c) => c.displayName.includes("Anonymous"));
       if (anonConnections.length > 0) {
-        const displayNames = anonConnections.map(c => c.displayName);
+        const displayNames = anonConnections.map((c) => c.displayName);
         const numbers: number[] = [];
-        displayNames.forEach(name => {
+        displayNames.forEach((name) => {
           const splitName = name.split("_");
           numbers.push(Number(splitName[1]));
         });
@@ -64,7 +64,7 @@ export class ConnectionController extends MessagingBaseController {
         if (connection.personId === undefined) connection.personId = null;
         await this.updateAnonName(connection); // update 'Anonymous' names to Anonymous_1, Anonymous_2,..so on.
         promises.push(
-          this.repositories.connection.save(connection).then(async c => {
+          this.repositories.connection.save(connection).then(async (c) => {
             await DeliveryHelper.sendAttendance(c.churchId, c.conversationId);
             await DeliveryHelper.sendBlockedIps(c.churchId, c.conversationId);
             return c;
@@ -86,7 +86,7 @@ export class ConnectionController extends MessagingBaseController {
       connections.forEach((connection: Connection) => {
         connection.displayName = req.body.name;
         promises.push(
-          this.repositories.connection.save(connection).then(async c => {
+          this.repositories.connection.save(connection).then(async (c) => {
             await DeliveryHelper.sendAttendance(c.churchId, c.conversationId);
             return c;
           })

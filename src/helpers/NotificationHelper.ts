@@ -89,10 +89,10 @@ export class NotificationHelper {
     }
     if (notifications.length > 0) {
       const promises: Promise<Notification>[] = [];
-      notifications.forEach(n => {
+      notifications.forEach((n) => {
         const promise = Repositories.getCurrent()
           .notification.save(n)
-          .then(async notification => {
+          .then(async (notification) => {
             const method = await NotificationHelper.notifyUser(n.churchId, n.personId);
             notification.deliveryMethod = method;
             await Repositories.getCurrent().notification.save(notification);
@@ -133,7 +133,7 @@ export class NotificationHelper {
         // Filter out any invalid tokens and get unique tokens
         const expoPushTokens = [
           ...new Set(
-            devices.map(device => device.fcmToken).filter(token => token && token.startsWith("ExponentPushToken["))
+            devices.map((device) => device.fcmToken).filter((token) => token && token.startsWith("ExponentPushToken["))
           )
         ];
 
@@ -166,7 +166,7 @@ export class NotificationHelper {
 
     const notificationPrefs = await Repositories.getCurrent().notificationPreference.loadByPersonIds(peopleIds);
     const todoPrefs: NotificationPreference[] = [];
-    peopleIds.forEach(async personId => {
+    peopleIds.forEach(async (personId) => {
       Logger.info(`Notifying person: ${personId}`);
       const notifications: Notification[] = ArrayHelper.getAll(allNotifications, "personId", personId);
       const pms: PrivateMessage[] = ArrayHelper.getAll(allPMs, "notifyPersonId", personId);
@@ -178,7 +178,7 @@ export class NotificationHelper {
 
     if (todoPrefs.length > 0) {
       const allEmailData = await this.getEmailData(todoPrefs);
-      todoPrefs.forEach(pref => {
+      todoPrefs.forEach((pref) => {
         const notifications: Notification[] = ArrayHelper.getAll(allNotifications, "personId", pref.personId);
         const pms: PrivateMessage[] = ArrayHelper.getAll(allPMs, "notifyPersonId", pref.personId);
         const emailData = ArrayHelper.getOne(allEmailData, "id", pref.personId);
@@ -190,11 +190,11 @@ export class NotificationHelper {
 
   static markMethod = (notifications: Notification[], privateMessages: PrivateMessage[], _method: string) => {
     const promises: Promise<any>[] = [];
-    notifications.forEach(notification => {
+    notifications.forEach((notification) => {
       notification.deliveryMethod = "none";
       promises.push(Repositories.getCurrent().notification.save(notification));
     });
-    privateMessages.forEach(pm => {
+    privateMessages.forEach((pm) => {
       pm.deliveryMethod = "none";
       promises.push(Repositories.getCurrent().privateMessage.save(pm));
     });

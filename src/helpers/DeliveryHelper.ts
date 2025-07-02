@@ -20,12 +20,12 @@ export class DeliveryHelper {
 
   static sendMessages = async (connections: Connection[], payload: PayloadInterface) => {
     const promises: Promise<boolean>[] = [];
-    connections.forEach(connection => {
+    connections.forEach((connection) => {
       promises.push(DeliveryHelper.sendMessage(connection, payload));
     });
     const results = await Promise.all(promises);
     let deliveryCount = 0;
-    results.forEach(r => {
+    results.forEach((r) => {
       if (r) deliveryCount++;
     });
     return deliveryCount;

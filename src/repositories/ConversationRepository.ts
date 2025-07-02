@@ -120,7 +120,7 @@ export class ConversationRepository {
 
   public convertAllToModel(data: any[]) {
     const result: Conversation[] = [];
-    data.forEach(d => result.push(this.convertToModel(d)));
+    data.forEach((d) => result.push(this.convertToModel(d)));
     return result;
   }
 }

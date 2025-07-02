@@ -8,7 +8,7 @@ import { ExpoPushHelper } from "../helpers/ExpoPushHelper";
 export class DeviceController extends MessagingBaseController {
   @httpGet("/my")
   public async loadMy(req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       return this.repositories.device.loadActiveForPerson(au.personId);
     });
   }
@@ -51,7 +51,7 @@ export class DeviceController extends MessagingBaseController {
 
   @httpPost("/register")
   public async register(req: express.Request<{}, {}, Device>, res: express.Response): Promise<any> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       let device: Device = req.body;
       if (au) {
         device.personId = au.personId;
@@ -64,9 +64,9 @@ export class DeviceController extends MessagingBaseController {
 
   @httpPost("/")
   public async save(req: express.Request<{}, {}, Device[]>, res: express.Response): Promise<any> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       const promises: Promise<Device>[] = [];
-      req.body.forEach(device => {
+      req.body.forEach((device) => {
         device.personId = au.personId;
         promises.push(this.repositories.device.save(device));
       });
@@ -81,7 +81,7 @@ export class DeviceController extends MessagingBaseController {
     req: express.Request<{}, {}, {}>,
     res: express.Response
   ): Promise<interfaces.IHttpActionResult> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       let success = false;
       const existing = await this.repositories.device.loadByPairingCode(pairingCode);
       if (existing) {
@@ -97,7 +97,7 @@ export class DeviceController extends MessagingBaseController {
 
   @httpPost("/enroll")
   public async enroll(req: express.Request<{}, {}, Device>, res: express.Response): Promise<any> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       let result = await this.repositories.device.loadByDeviceId(req.body.deviceId);
       if (result) {
         result.pairingCode = req.body.pairingCode;
@@ -113,7 +113,7 @@ export class DeviceController extends MessagingBaseController {
     return this.actionWrapperAnon(req, res, async () => {
       const result: string[] = [];
       const devices: Device[] = await this.repositories.device.loadForPerson(req.body.personId);
-      const expoPushTokens = devices.map(device => device.fcmToken).filter(token => token);
+      const expoPushTokens = devices.map((device) => device.fcmToken).filter((token) => token);
 
       if (expoPushTokens.length > 0) {
         await ExpoPushHelper.sendBulkMessages(expoPushTokens, req.body.title.toString(), req.body.body.toString());
@@ -136,7 +136,7 @@ export class DeviceController extends MessagingBaseController {
     req: express.Request<{}, {}, null>,
     res: express.Response
   ): Promise<interfaces.IHttpActionResult> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       await this.repositories.device.delete(id);
       return this.json({});
     });

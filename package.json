@@ -15,7 +15,7 @@
     "exec-deploy-prod": "serverless deploy --stage Prod",
     "deploy-prod": "npm-run-all build build-layer exec-deploy-prod",
     "initdb": "ts-node tools/initdb",
-    "lint": "eslint src --fix",
+    "lint": "eslint src --fix && prettier --write src/**/*.ts",
     "tsc": "tsc",
     "build": "npm-run-all clean lint tsc",
     "dev:start": "npm-run-all build start",

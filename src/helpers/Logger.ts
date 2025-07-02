@@ -63,7 +63,7 @@ export class Logger {
   }
 
   public flush() {
-    const promise = new Promise<void>(resolve => {
+    const promise = new Promise<void>((resolve) => {
       if (this.pendingMessages) {
         this.wc.kthxbye(() => {
           this._logger = null;

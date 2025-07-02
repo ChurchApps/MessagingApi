@@ -11,9 +11,9 @@ export class NotificationController extends MessagingBaseController {
     req: express.Request<{}, {}, Notification[]>,
     res: express.Response
   ): Promise<interfaces.IHttpActionResult> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       const promises: Promise<Notification>[] = [];
-      req.body.forEach(n => {
+      req.body.forEach((n) => {
         n.churchId = au.churchId;
         promises.push(this.repositories.notification.save(n));
       });
@@ -24,7 +24,7 @@ export class NotificationController extends MessagingBaseController {
 
   @httpPost("/create")
   public async create(req: express.Request<{}, {}, any>, res: express.Response): Promise<interfaces.IHttpActionResult> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       return await NotificationHelper.createNotifications(
         req.body.peopleIds,
         au.churchId,
@@ -61,7 +61,7 @@ export class NotificationController extends MessagingBaseController {
 
   @httpGet("/my")
   public async loadMy(req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       const existing = await this.repositories.notification.loadForPerson(au.churchId, au.personId);
       await this.repositories.notification.markALlRead(au.churchId, au.personId);
       return existing || {};
@@ -70,7 +70,7 @@ export class NotificationController extends MessagingBaseController {
 
   @httpGet("/unreadCount")
   public async loadMyUnread(req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       const existing = await this.repositories.notification.loadNewCounts(au.churchId, au.personId);
       return existing || {};
     });

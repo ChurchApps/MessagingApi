@@ -57,7 +57,7 @@ export class BlockedIpRepository {
 
   public convertAllToModel(data: any[]) {
     const result: BlockedIp[] = [];
-    data.forEach(d => result.push(this.convertToModel(d)));
+    data.forEach((d) => result.push(this.convertToModel(d)));
     return result;
   }
 }

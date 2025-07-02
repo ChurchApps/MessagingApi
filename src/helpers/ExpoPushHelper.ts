@@ -24,7 +24,7 @@ export class ExpoPushHelper {
   }
 
   static async sendBulkMessages(expoPushTokens: string[], title: string, body: string): Promise<void> {
-    const messages = expoPushTokens.map(token => ({
+    const messages = expoPushTokens.map((token) => ({
       to: token,
       sound: "default",
       title,

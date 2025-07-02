@@ -95,7 +95,7 @@ export class PrivateMessageRepository {
 
   public convertAllToModel(data: any[]) {
     const result: PrivateMessage[] = [];
-    data.forEach(d => result.push(this.convertToModel(d)));
+    data.forEach((d) => result.push(this.convertToModel(d)));
     return result;
   }
 }

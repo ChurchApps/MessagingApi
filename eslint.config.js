@@ -1,44 +1,43 @@
-const js = require('@eslint/js');
 const tsParser = require('@typescript-eslint/parser');
 const tsPlugin = require('@typescript-eslint/eslint-plugin');
 
 module.exports = [
-  js.configs.recommended,
   {
     files: ['src/**/*.ts'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
-        ecmaVersion: 2022,
-        sourceType: 'module',
-        project: './tsconfig.json'
-      },
-      globals: {
-        __dirname: 'readonly',
-        process: 'readonly',
-        console: 'readonly',
-        Buffer: 'readonly',
-        global: 'readonly',
-        require: 'readonly',
-        module: 'readonly',
-        exports: 'readonly'
+        project: './tsconfig.json',
+        tsconfigRootDir: __dirname,
+        ecmaVersion: 2020,
+        sourceType: 'module'
       }
     },
     plugins: {
       '@typescript-eslint': tsPlugin
     },
     rules: {
-      'no-console': 'error',
-      'no-undef': 'off',
+      // TypeScript-specific rules
+      '@typescript-eslint/no-unused-vars': [
+        'warn', 
+        { 
+          argsIgnorePattern: '^_|^req$|^res$|^au$|^ex$|^e$|^bind$',
+          varsIgnorePattern: '^_|^start$|^result$|^app$',
+          caughtErrorsIgnorePattern: '^_'
+        }
+      ],
       '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-unused-vars': ['error', { 
-        argsIgnorePattern: '^_|^req$|^res$|^au$|^ex$|^e$|^bind$',
-        varsIgnorePattern: '^_|^start$|^result$|^app$',
-        caughtErrorsIgnorePattern: '^_'
-      }],
-      'no-unused-vars': 'off',
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/no-require-imports': 'error',
+      '@typescript-eslint/no-inferrable-types': 'off',
+      
+      // General rules
+      'no-console': 'error',
       'prefer-const': 'error',
-      'no-trailing-spaces': 'error',
+      
+      // Code style (enforced by Prettier, but useful for linting)
+      'semi': ['error', 'always'],
+      'quotes': ['error', 'double'],
       'comma-dangle': ['error', 'never']
     }
   }

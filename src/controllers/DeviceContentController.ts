@@ -19,9 +19,9 @@ export class DeviceContentController extends MessagingBaseController {
 
   @httpPost("/")
   public async save(req: express.Request<{}, {}, DeviceContent[]>, res: express.Response): Promise<any> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       const promises: Promise<DeviceContent>[] = [];
-      req.body.forEach(deviceContent => {
+      req.body.forEach((deviceContent) => {
         deviceContent.churchId = au.churchId;
         promises.push(this.repositories.deviceContent.save(deviceContent));
       });
@@ -36,7 +36,7 @@ export class DeviceContentController extends MessagingBaseController {
     req: express.Request<{}, {}, null>,
     res: express.Response
   ): Promise<interfaces.IHttpActionResult> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       await this.repositories.deviceContent.delete(id);
       return this.json({});
     });

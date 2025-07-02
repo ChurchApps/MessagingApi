@@ -9,7 +9,7 @@ import { NotificationHelper } from "../helpers/NotificationHelper";
 export class MessageController extends MessagingBaseController {
   @httpPost("/")
   public async save(req: express.Request<{}, {}, Message[]>, res: express.Response): Promise<any> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       const promises: Promise<Message>[] = [];
       req.body.forEach((message: Message) => {
         message.messageType = "message";
@@ -46,7 +46,7 @@ export class MessageController extends MessagingBaseController {
   // Legacy endpoint for streaming live functionality - will be consolidated with save() in future
   @httpPost("/send")
   public async send(req: express.Request<{}, {}, Message[]>, res: express.Response): Promise<any> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       const promises: Promise<Message>[] = [];
       req.body.forEach((message: Message) => {
         message.messageType = "message";
@@ -77,7 +77,7 @@ export class MessageController extends MessagingBaseController {
 
   @httpPost("/setCallout")
   public async setCallout(req: express.Request<{}, {}, Message>, res: express.Response): Promise<any> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       // if (!au.checkAccess(Permissions.chat.host)) return this.json({}, 401);
       // else {
       req.body.messageType = "callout";
@@ -99,7 +99,7 @@ export class MessageController extends MessagingBaseController {
     req: express.Request<{}, {}, null>,
     res: express.Response
   ): Promise<interfaces.IHttpActionResult> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       // if (!au.checkAccess(Permissions.chat.host)) return this.json({}, 401);
       // else {
       const m = await this.repositories.message.loadById(au.churchId, id);
@@ -125,7 +125,7 @@ export class MessageController extends MessagingBaseController {
     req: express.Request<{}, {}, []>,
     res: express.Response
   ): Promise<any> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       const messages: Message[] = await this.repositories.message.loadForConversation(au.churchId, conversationId);
       return this.repositories.message.convertAllToModel(messages);
     });
@@ -150,7 +150,7 @@ export class MessageController extends MessagingBaseController {
     req: express.Request<{}, {}, null>,
     res: express.Response
   ): Promise<interfaces.IHttpActionResult> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       return await this.repositories.message.loadById(au.churchId, id);
     });
   }

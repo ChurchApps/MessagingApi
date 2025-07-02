@@ -41,7 +41,7 @@ export class ConversationController extends MessagingBaseController {
     req: express.Request<{}, {}, null>,
     res: express.Response
   ): Promise<interfaces.IHttpActionResult> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       const ids = req.query.ids.toString().split(",");
       const result = await this.repositories.conversation.loadByIds(au.churchId, ids);
       await this.appendMessages(result, au.churchId);
@@ -55,7 +55,7 @@ export class ConversationController extends MessagingBaseController {
     req: express.Request<{}, {}, null>,
     res: express.Response
   ): Promise<interfaces.IHttpActionResult> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       const result = await this.repositories.conversation.loadPosts(au.churchId, [groupId]);
       await this.appendMessages(result, au.churchId);
       return result;
@@ -67,7 +67,7 @@ export class ConversationController extends MessagingBaseController {
     req: express.Request<{}, {}, null>,
     res: express.Response
   ): Promise<interfaces.IHttpActionResult> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       const result = await this.repositories.conversation.loadPosts(au.churchId, au.groupIds);
       await this.appendMessages(result, au.churchId);
       return result;
@@ -83,7 +83,7 @@ export class ConversationController extends MessagingBaseController {
     >,
     res: express.Response
   ): Promise<interfaces.IHttpActionResult> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       const c: Conversation = {
         churchId: au.churchId,
         contentType: req.body.contentType,
@@ -118,9 +118,9 @@ export class ConversationController extends MessagingBaseController {
     req: express.Request<{}, {}, Conversation[]>,
     res: express.Response
   ): Promise<interfaces.IHttpActionResult> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       const promises: Promise<Conversation>[] = [];
-      req.body.forEach(conv => {
+      req.body.forEach((conv) => {
         conv.churchId = au.churchId;
         promises.push(this.repositories.conversation.save(conv));
       });
@@ -182,7 +182,7 @@ export class ConversationController extends MessagingBaseController {
     req: express.Request<{}, {}, []>,
     res: express.Response
   ): Promise<any> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       // Permissions are controlled outside of MessagingApi.  If we need to restrict these actions, encrypt the room id in streaminglive app and pass it here to prove access.
 
       // if (!au.checkAccess(Permissions.chat.host)) return this.json({}, 401);
@@ -208,20 +208,20 @@ export class ConversationController extends MessagingBaseController {
     req: express.Request<{}, {}, []>,
     res: express.Response
   ): Promise<any> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       const conversations: Conversation[] = await this.repositories.conversation.loadForContent(
         au.churchId,
         contentType,
         contentId
       );
       const messageIds: string[] = [];
-      conversations.forEach(c => {
+      conversations.forEach((c) => {
         if (messageIds.indexOf(c.firstPostId) === -1) messageIds.push(c.firstPostId);
         if (messageIds.indexOf(c.lastPostId) === -1) messageIds.push(c.lastPostId);
       });
       if (messageIds.length > 0) {
         const allMessages = await this.repositories.message.loadByIds(au.churchId, messageIds);
-        conversations.forEach(c => {
+        conversations.forEach((c) => {
           c.messages = [];
           let msg = ArrayHelper.getOne(allMessages, "id", c.firstPostId);
           if (msg) c.messages.push(msg);
@@ -274,7 +274,7 @@ export class ConversationController extends MessagingBaseController {
     req: express.Request<{}, {}, null>,
     res: express.Response
   ): Promise<interfaces.IHttpActionResult> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       return await this.repositories.conversation.loadById(au.churchId, id);
     });
   }

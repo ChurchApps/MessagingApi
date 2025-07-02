@@ -11,9 +11,9 @@ export class NotificationPreferenceController extends MessagingBaseController {
     req: express.Request<{}, {}, NotificationPreference[]>,
     res: express.Response
   ): Promise<interfaces.IHttpActionResult> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       const promises: Promise<NotificationPreference>[] = [];
-      req.body.forEach(n => {
+      req.body.forEach((n) => {
         n.churchId = au.churchId;
         promises.push(this.repositories.notificationPreference.save(n));
       });
@@ -24,7 +24,7 @@ export class NotificationPreferenceController extends MessagingBaseController {
 
   @httpGet("/my")
   public async loadMy(req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       let result = await this.repositories.notificationPreference.loadForPerson(au.churchId, au.personId);
       if (!result) result = await NotificationHelper.createNotificationPref(au.churchId, au.personId);
       return result;

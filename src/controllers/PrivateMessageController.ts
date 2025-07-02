@@ -12,12 +12,12 @@ export class PrivateMessageController extends MessagingBaseController {
     req: express.Request<{}, {}, PrivateMessage[]>,
     res: express.Response
   ): Promise<interfaces.IHttpActionResult> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       const promises: Promise<PrivateMessage>[] = [];
-      req.body.forEach(conv => {
+      req.body.forEach((conv) => {
         conv.churchId = au.churchId;
-        const promise = this.repositories.privateMessage.save(conv).then(c => {
-          NotificationHelper.notifyUser(au.churchId, c.toPersonId).then(method => {
+        const promise = this.repositories.privateMessage.save(conv).then((c) => {
+          NotificationHelper.notifyUser(au.churchId, c.toPersonId).then((method) => {
             if (method) {
               c.deliveryMethod = method;
               this.repositories.privateMessage.save(c);
@@ -34,18 +34,18 @@ export class PrivateMessageController extends MessagingBaseController {
 
   @httpGet("/")
   public async getAll(req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       const privateMessages: PrivateMessage[] = await this.repositories.privateMessage.loadForPerson(
         au.churchId,
         au.personId
       );
       const messageIds: string[] = [];
-      privateMessages.forEach(pm => {
+      privateMessages.forEach((pm) => {
         if (messageIds.indexOf(pm.conversation.lastPostId) === -1) messageIds.push(pm.conversation.lastPostId);
       });
       if (messageIds.length > 0) {
         const allMessages = await this.repositories.message.loadByIds(au.churchId, messageIds);
-        privateMessages.forEach(pm => {
+        privateMessages.forEach((pm) => {
           pm.conversation.messages = [ArrayHelper.getOne(allMessages, "id", pm.conversation.lastPostId)];
         });
       }
@@ -62,7 +62,7 @@ export class PrivateMessageController extends MessagingBaseController {
     req: express.Request<{}, {}, []>,
     res: express.Response
   ): Promise<any> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       const existing = await this.repositories.privateMessage.loadExisting(au.churchId, au.personId, personId);
       return existing || {};
     });
@@ -74,7 +74,7 @@ export class PrivateMessageController extends MessagingBaseController {
     req: express.Request<{}, {}, null>,
     res: express.Response
   ): Promise<interfaces.IHttpActionResult> {
-    return this.actionWrapper(req, res, async au => {
+    return this.actionWrapper(req, res, async (au) => {
       const result = await this.repositories.privateMessage.loadById(au.churchId, id);
       if (result.notifyPersonId === au.personId) {
         result.notifyPersonId = null;
