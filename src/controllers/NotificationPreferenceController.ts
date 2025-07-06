@@ -7,10 +7,7 @@ import { NotificationHelper } from "../helpers/NotificationHelper";
 @controller("/notificationPreferences")
 export class NotificationPreferenceController extends MessagingBaseController {
   @httpPost("/")
-  public async save(
-    req: express.Request<{}, {}, NotificationPreference[]>,
-    res: express.Response
-  ): Promise<interfaces.IHttpActionResult> {
+  public async save(req: express.Request<{}, {}, NotificationPreference[]>, res: express.Response): Promise<unknown> {
     return this.actionWrapper(req, res, async (au) => {
       const promises: Promise<NotificationPreference>[] = [];
       req.body.forEach((n) => {

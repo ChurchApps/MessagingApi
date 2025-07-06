@@ -4,7 +4,11 @@ import { UniqueIdHelper } from "../helpers";
 
 export class NotificationRepository {
   public async loadUndelivered() {
-    return DB.query("SELECT * FROM notifications WHERE isNew=1 and deliveryMethod not in ('email', 'none');", []);
+    const result: any = await DB.query(
+      "SELECT * FROM notifications WHERE isNew=1 and deliveryMethod not in ('email', 'none');",
+      []
+    );
+    return result.rows || result || [];
   }
 
   public async loadNewCounts(churchId: string, personId: string) {
@@ -14,17 +18,20 @@ export class NotificationRepository {
       ") AS notificationCount, (" +
       "  SELECT COUNT(*) FROM privateMessages where churchId=? and notifyPersonId=?" +
       ") AS pmCount";
-    return DB.queryOne(sql, [churchId, personId, churchId, personId]);
+    const result: any = await DB.queryOne(sql, [churchId, personId, churchId, personId]);
+    return result.rows || result || {};
   }
 
   public async loadForPerson(churchId: string, personId: string) {
     const sql = "SELECT * FROM notifications WHERE churchId=? AND personId=? ORDER BY timeSent DESC;";
-    return DB.query(sql, [churchId, personId]);
+    const result: any = await DB.query(sql, [churchId, personId]);
+    return result.rows || result || [];
   }
 
   public async loadExistingUnread(churchId: string, contentType: string, contentId: string) {
     const sql = "SELECT * FROM notifications WHERE churchId=? AND contentType=? AND contentId=? AND isNew=1;";
-    return DB.query(sql, [churchId, contentType, contentId]);
+    const result: any = await DB.query(sql, [churchId, contentType, contentId]);
+    return result.rows || result || [];
   }
 
   public async markALlRead(churchId: string, personId: string) {

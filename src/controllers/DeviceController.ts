@@ -18,7 +18,7 @@ export class DeviceController extends MessagingBaseController {
     @requestParam("deviceId") deviceId: string,
     req: express.Request<{}, {}, {}>,
     res: express.Response
-  ): Promise<interfaces.IHttpActionResult> {
+  ): Promise<unknown> {
     return this.actionWrapperAnon(req, res, async () => {
       const device = await this.repositories.device.loadByDeviceId(deviceId);
       device.paired = device.personId !== null;
@@ -80,7 +80,7 @@ export class DeviceController extends MessagingBaseController {
     @requestParam("pairingCode") pairingCode: string,
     req: express.Request<{}, {}, {}>,
     res: express.Response
-  ): Promise<interfaces.IHttpActionResult> {
+  ): Promise<unknown> {
     return this.actionWrapper(req, res, async (au) => {
       let success = false;
       const existing = await this.repositories.device.loadByPairingCode(pairingCode);
@@ -135,7 +135,7 @@ export class DeviceController extends MessagingBaseController {
     @requestParam("id") id: string,
     req: express.Request<{}, {}, null>,
     res: express.Response
-  ): Promise<interfaces.IHttpActionResult> {
+  ): Promise<unknown> {
     return this.actionWrapper(req, res, async (au) => {
       await this.repositories.device.delete(id);
       return this.json({});
@@ -147,7 +147,7 @@ export class DeviceController extends MessagingBaseController {
     @requestParam("deviceId") deviceId: string,
     req: express.Request<{}, {}, {}>,
     res: express.Response
-  ): Promise<interfaces.IHttpActionResult> {
+  ): Promise<unknown> {
     return this.actionWrapperAnon(req, res, async () => {
       const device = await this.repositories.device.loadById(deviceId);
       if (!device || !device.fcmToken) return { error: "Device not found or has no FCM token" };

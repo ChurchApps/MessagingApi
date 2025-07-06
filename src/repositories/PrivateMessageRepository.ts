@@ -4,7 +4,11 @@ import { UniqueIdHelper } from "../helpers";
 
 export class PrivateMessageRepository {
   public async loadUndelivered() {
-    return DB.query("SELECT * FROM privateMessages WHERE notifyPersonId IS NOT NULL AND deliveryMethod<>'email';", []);
+    const result: any = await DB.query(
+      "SELECT * FROM privateMessages WHERE notifyPersonId IS NOT NULL AND deliveryMethod<>'email';",
+      []
+    );
+    return result.rows || result || [];
   }
 
   public async loadForPerson(churchId: string, personId: string) {
@@ -14,7 +18,8 @@ export class PrivateMessageRepository {
       " INNER JOIN conversations c on c.id=pm.conversationId" +
       " WHERE pm.churchId=? AND (pm.fromPersonId=? OR pm.toPersonId=?)" +
       " ORDER by c.dateCreated desc";
-    const data = await DB.query(sql, [churchId, personId, personId]);
+    const result: any = await DB.query(sql, [churchId, personId, personId]);
+    const data = result.rows || result || [];
     return this.convertAllToModel(data);
   }
 
@@ -25,19 +30,22 @@ export class PrivateMessageRepository {
       " INNER JOIN conversations c on c.id=pm.conversationId" +
       " WHERE pm.churchId=? AND ((pm.fromPersonId=? and pm.toPersonId=?) OR (pm.fromPersonId=? AND pm.toPersonId=?))" +
       " ORDER by c.dateCreated desc";
-    const data = await DB.queryOne(sql, [churchId, personId, otherPersonId, otherPersonId, personId]);
+    const result: any = await DB.queryOne(sql, [churchId, personId, otherPersonId, otherPersonId, personId]);
+    const data = result.rows || result || {};
     return data ? this.convertToModel(data) : null;
   }
 
-  public loadById(churchId: string, id: string) {
-    return DB.queryOne("SELECT * FROM privateMessages WHERE id=? AND churchId=?;", [id, churchId]);
+  public async loadById(churchId: string, id: string) {
+    const result: any = await DB.queryOne("SELECT * FROM privateMessages WHERE id=? AND churchId=?;", [id, churchId]);
+    return result.rows || result || {};
   }
 
-  public loadByConversationId(churchId: string, converstationId: string) {
-    return DB.queryOne("SELECT * FROM privateMessages WHERE churchId=? AND conversationId=?;", [
+  public async loadByConversationId(churchId: string, converstationId: string) {
+    const result: any = await DB.queryOne("SELECT * FROM privateMessages WHERE churchId=? AND conversationId=?;", [
       churchId,
       converstationId
     ]);
+    return result.rows || result || {};
   }
 
   public save(pm: PrivateMessage) {

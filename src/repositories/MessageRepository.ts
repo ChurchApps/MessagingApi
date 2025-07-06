@@ -3,19 +3,22 @@ import { Message } from "../models";
 import { UniqueIdHelper } from "../helpers";
 
 export class MessageRepository {
-  public loadById(churchId: string, id: string) {
-    return DB.queryOne("SELECT * FROM messages WHERE id=? AND churchId=?;", [id, churchId]);
+  public async loadById(churchId: string, id: string) {
+    const result: any = await DB.queryOne("SELECT * FROM messages WHERE id=? AND churchId=?;", [id, churchId]);
+    return result.rows || result || {};
   }
 
-  public loadByIds(churchId: string, ids: string[]) {
-    return DB.query("SELECT * FROM messages WHERE id IN (?) AND churchId=?;", [ids, churchId]);
+  public async loadByIds(churchId: string, ids: string[]) {
+    const result: any = await DB.query("SELECT * FROM messages WHERE id IN (?) AND churchId=?;", [ids, churchId]);
+    return result.rows || result || [];
   }
 
-  public loadForConversation(churchId: string, conversationId: string) {
-    return DB.query("SELECT * FROM messages WHERE churchId=? AND conversationId=? ORDER BY timeSent", [
-      churchId,
-      conversationId
-    ]);
+  public async loadForConversation(churchId: string, conversationId: string) {
+    const result: any = await DB.query(
+      "SELECT * FROM messages WHERE churchId=? AND conversationId=? ORDER BY timeSent",
+      [churchId, conversationId]
+    );
+    return result.rows || result || [];
   }
 
   public delete(churchId: string, id: string) {

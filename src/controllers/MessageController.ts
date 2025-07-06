@@ -98,7 +98,7 @@ export class MessageController extends MessagingBaseController {
     @requestParam("id") id: string,
     req: express.Request<{}, {}, null>,
     res: express.Response
-  ): Promise<interfaces.IHttpActionResult> {
+  ): Promise<unknown> {
     return this.actionWrapper(req, res, async (au) => {
       // if (!au.checkAccess(Permissions.chat.host)) return this.json({}, 401);
       // else {
@@ -149,7 +149,7 @@ export class MessageController extends MessagingBaseController {
     @requestParam("id") id: string,
     req: express.Request<{}, {}, null>,
     res: express.Response
-  ): Promise<interfaces.IHttpActionResult> {
+  ): Promise<unknown> {
     return this.actionWrapper(req, res, async (au) => {
       return await this.repositories.message.loadById(au.churchId, id);
     });

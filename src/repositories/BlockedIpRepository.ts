@@ -5,20 +5,26 @@ export class BlockedIpRepository {
   public async loadByConversationId(churchId: string, conversationId: string) {
     const sql = "SELECT * FROM blockedIps WHERE churchId=? AND conversationId=?;";
     const params = [churchId, conversationId];
-    const data = await DB.query(sql, params);
+    const result: any = await DB.query(sql, params);
+    const data = result.rows || result || [];
     const ips = data.map((d: BlockedIp) => d.ipAddress);
     return ips;
   }
 
-  public loadByServiceId(churchId: string, serviceId: string) {
-    return DB.query("SELECT * FROM blockedIps WHERE churchId=? AND serviceId=?;", [churchId, serviceId]);
+  public async loadByServiceId(churchId: string, serviceId: string) {
+    const result: any = await DB.query("SELECT * FROM blockedIps WHERE churchId=? AND serviceId=?;", [
+      churchId,
+      serviceId
+    ]);
+    return result.rows || result || [];
   }
 
   public async save(blockedIp: BlockedIp) {
-    const existingIp = await DB.query(
+    const result: any = await DB.query(
       "SELECT id FROM blockedIps WHERE churchId=? AND conversationId=? AND ipAddress=?;",
       [blockedIp.churchId, blockedIp.conversationId, blockedIp.ipAddress]
     );
+    const existingIp = result.rows || result || [];
     return existingIp[0]?.id ? this.deleteExisting(existingIp[0].id) : this.create(blockedIp);
   }
 

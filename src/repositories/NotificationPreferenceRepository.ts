@@ -5,12 +5,14 @@ import { UniqueIdHelper } from "../helpers";
 export class NotificationPreferenceRepository {
   public async loadForPerson(churchId: string, personId: string) {
     const sql = "SELECT * FROM notificationPreferences WHERE churchId=? AND personId = ?;";
-    return DB.queryOne(sql, [churchId, personId]);
+    const result: any = await DB.queryOne(sql, [churchId, personId]);
+    return result.rows || result || {};
   }
 
   public async loadByPersonIds(personIds: string[]) {
     const sql = "SELECT * FROM notificationPreferences WHERE personId IN (?);";
-    return DB.query(sql, [personIds]);
+    const result: any = await DB.query(sql, [personIds]);
+    return result.rows || result || [];
   }
 
   public async save(preference: NotificationPreference) {

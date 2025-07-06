@@ -8,10 +8,7 @@ import { NotificationHelper } from "../helpers/NotificationHelper";
 @controller("/privateMessages")
 export class PrivateMessageController extends MessagingBaseController {
   @httpPost("/")
-  public async save(
-    req: express.Request<{}, {}, PrivateMessage[]>,
-    res: express.Response
-  ): Promise<interfaces.IHttpActionResult> {
+  public async save(req: express.Request<{}, {}, PrivateMessage[]>, res: express.Response): Promise<unknown> {
     return this.actionWrapper(req, res, async (au) => {
       const promises: Promise<PrivateMessage>[] = [];
       req.body.forEach((conv) => {
@@ -73,9 +70,9 @@ export class PrivateMessageController extends MessagingBaseController {
     @requestParam("id") id: string,
     req: express.Request<{}, {}, null>,
     res: express.Response
-  ): Promise<interfaces.IHttpActionResult> {
+  ): Promise<unknown> {
     return this.actionWrapper(req, res, async (au) => {
-      const result = await this.repositories.privateMessage.loadById(au.churchId, id);
+      const result = (await this.repositories.privateMessage.loadById(au.churchId, id)) as any;
       if (result.notifyPersonId === au.personId) {
         result.notifyPersonId = null;
         await this.repositories.privateMessage.save(result);

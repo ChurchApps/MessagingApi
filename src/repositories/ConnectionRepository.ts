@@ -7,30 +7,38 @@ export class ConnectionRepository {
   public async loadAttendance(churchId: string, conversationId: string) {
     const sql =
       "SELECT id, displayName, ipAddress FROM connections WHERE churchId=? AND conversationId=? ORDER BY displayName;";
-    const data: ViewerInterface[] = await DB.query(sql, [churchId, conversationId]);
+    const result: any = await DB.query(sql, [churchId, conversationId]);
+    const data: ViewerInterface[] = result.rows || result || [];
     data.forEach((d: ViewerInterface) => {
       if (d.displayName === "") d.displayName = "Anonymous";
     });
     return data;
   }
 
-  public loadById(churchId: string, id: string) {
-    return DB.queryOne("SELECT * FROM connections WHERE id=? and churchId=?;", [id, churchId]);
+  public async loadById(churchId: string, id: string) {
+    const result: any = await DB.queryOne("SELECT * FROM connections WHERE id=? and churchId=?;", [id, churchId]);
+    return result.rows || result || {};
   }
 
-  public loadForConversation(churchId: string, conversationId: string) {
-    return DB.query("SELECT * FROM connections WHERE churchId=? AND conversationId=?", [churchId, conversationId]);
-  }
-
-  public loadForNotification(churchId: string, personId: string) {
-    return DB.query("SELECT * FROM connections WHERE churchId=? AND personId=? and conversationId='alerts'", [
+  public async loadForConversation(churchId: string, conversationId: string) {
+    const result: any = await DB.query("SELECT * FROM connections WHERE churchId=? AND conversationId=?", [
       churchId,
-      personId
+      conversationId
     ]);
+    return result.rows || result || [];
   }
 
-  public loadBySocketId(socketId: string) {
-    return DB.query("SELECT * FROM connections WHERE socketId=?", [socketId]);
+  public async loadForNotification(churchId: string, personId: string) {
+    const result: any = await DB.query(
+      "SELECT * FROM connections WHERE churchId=? AND personId=? and conversationId='alerts'",
+      [churchId, personId]
+    );
+    return result.rows || result || [];
+  }
+
+  public async loadBySocketId(socketId: string) {
+    const result: any = await DB.query("SELECT * FROM connections WHERE socketId=?", [socketId]);
+    return result.rows || result || [];
   }
 
   public delete(churchId: string, id: string) {

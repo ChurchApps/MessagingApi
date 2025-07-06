@@ -37,13 +37,10 @@ export class ConversationController extends MessagingBaseController {
   }
 
   @httpGet("/timeline/ids")
-  public async getTimelineByIds(
-    req: express.Request<{}, {}, null>,
-    res: express.Response
-  ): Promise<interfaces.IHttpActionResult> {
+  public async getTimelineByIds(req: express.Request<{}, {}, null>, res: express.Response): Promise<unknown> {
     return this.actionWrapper(req, res, async (au) => {
       const ids = req.query.ids.toString().split(",");
-      const result = await this.repositories.conversation.loadByIds(au.churchId, ids);
+      const result = (await this.repositories.conversation.loadByIds(au.churchId, ids)) as Conversation[];
       await this.appendMessages(result, au.churchId);
       return result;
     });
@@ -54,7 +51,7 @@ export class ConversationController extends MessagingBaseController {
     @requestParam("groupId") groupId: string,
     req: express.Request<{}, {}, null>,
     res: express.Response
-  ): Promise<interfaces.IHttpActionResult> {
+  ): Promise<unknown> {
     return this.actionWrapper(req, res, async (au) => {
       const result = await this.repositories.conversation.loadPosts(au.churchId, [groupId]);
       await this.appendMessages(result, au.churchId);
@@ -63,10 +60,7 @@ export class ConversationController extends MessagingBaseController {
   }
 
   @httpGet("/posts")
-  public async getPosts(
-    req: express.Request<{}, {}, null>,
-    res: express.Response
-  ): Promise<interfaces.IHttpActionResult> {
+  public async getPosts(req: express.Request<{}, {}, null>, res: express.Response): Promise<unknown> {
     return this.actionWrapper(req, res, async (au) => {
       const result = await this.repositories.conversation.loadPosts(au.churchId, au.groupIds);
       await this.appendMessages(result, au.churchId);
@@ -82,7 +76,7 @@ export class ConversationController extends MessagingBaseController {
       { groupId: string; contentType: string; contentId: string; title: string; comment: string }
     >,
     res: express.Response
-  ): Promise<interfaces.IHttpActionResult> {
+  ): Promise<unknown> {
     return this.actionWrapper(req, res, async (au) => {
       const c: Conversation = {
         churchId: au.churchId,
@@ -114,10 +108,7 @@ export class ConversationController extends MessagingBaseController {
   }
 
   @httpPost("/")
-  public async save(
-    req: express.Request<{}, {}, Conversation[]>,
-    res: express.Response
-  ): Promise<interfaces.IHttpActionResult> {
+  public async save(req: express.Request<{}, {}, Conversation[]>, res: express.Response): Promise<unknown> {
     return this.actionWrapper(req, res, async (au) => {
       const promises: Promise<Conversation>[] = [];
       req.body.forEach((conv) => {
@@ -137,7 +128,7 @@ export class ConversationController extends MessagingBaseController {
     res: express.Response
   ): Promise<any> {
     return this.actionWrapperAnon(req, res, async () => {
-      const conversation = await this.repositories.conversation.loadById(churchId, conversationId);
+      const conversation = (await this.repositories.conversation.loadById(churchId, conversationId)) as Conversation;
       const hostConversation = await this.getOrCreate(
         churchId,
         "streamingLiveHost",
@@ -209,11 +200,11 @@ export class ConversationController extends MessagingBaseController {
     res: express.Response
   ): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
-      const conversations: Conversation[] = await this.repositories.conversation.loadForContent(
+      const conversations = (await this.repositories.conversation.loadForContent(
         au.churchId,
         contentType,
         contentId
-      );
+      )) as Conversation[];
       const messageIds: string[] = [];
       conversations.forEach((c) => {
         if (messageIds.indexOf(c.firstPostId) === -1) messageIds.push(c.firstPostId);
@@ -273,7 +264,7 @@ export class ConversationController extends MessagingBaseController {
     @requestParam("id") id: string,
     req: express.Request<{}, {}, null>,
     res: express.Response
-  ): Promise<interfaces.IHttpActionResult> {
+  ): Promise<unknown> {
     return this.actionWrapper(req, res, async (au) => {
       return await this.repositories.conversation.loadById(au.churchId, id);
     });

@@ -3,39 +3,49 @@ import { Device } from "../models";
 import { UniqueIdHelper } from "../helpers";
 
 export class DeviceRepository {
-  public loadByPairingCode(pairingCode: string) {
-    return DB.queryOne("SELECT * FROM devices WHERE pairingCode=?;", [pairingCode]);
+  public async loadByPairingCode(pairingCode: string) {
+    const result: any = await DB.queryOne("SELECT * FROM devices WHERE pairingCode=?;", [pairingCode]);
+    return result.rows || result || {};
   }
 
-  public loadByDeviceId(deviceId: string) {
-    return DB.queryOne("SELECT * FROM devices WHERE deviceId=?;", [deviceId]);
+  public async loadByDeviceId(deviceId: string) {
+    const result: any = await DB.queryOne("SELECT * FROM devices WHERE deviceId=?;", [deviceId]);
+    return result.rows || result || {};
   }
 
-  public loadById(id: string) {
-    return DB.queryOne("SELECT * FROM devices WHERE id=?;", [id]);
+  public async loadById(id: string) {
+    const result: any = await DB.queryOne("SELECT * FROM devices WHERE id=?;", [id]);
+    return result.rows || result || {};
   }
 
-  public loadByIds(ids: string[]) {
-    return DB.query("SELECT * FROM devices WHERE id IN (?);", [ids]);
+  public async loadByIds(ids: string[]) {
+    const result: any = await DB.query("SELECT * FROM devices WHERE id IN (?);", [ids]);
+    return result.rows || result || [];
   }
 
-  public loadForPerson(personId: string) {
-    return DB.query("SELECT * FROM devices WHERE personId=? order by lastActiveDate desc", [personId]);
+  public async loadForPerson(personId: string) {
+    const result: any = await DB.query("SELECT * FROM devices WHERE personId=? order by lastActiveDate desc", [
+      personId
+    ]);
+    return result.rows || result || [];
   }
 
-  public loadActiveForPerson(personId: string) {
-    return DB.query(
+  public async loadActiveForPerson(personId: string) {
+    const result: any = await DB.query(
       "SELECT * FROM devices WHERE personId=? and lastActiveDate>DATE_SUB(NOW(), INTERVAL 1 YEAR) order by lastActiveDate desc",
       [personId]
     );
+    return result.rows || result || [];
   }
 
-  public loadByFcmToken(fcmToken: string) {
-    return DB.query("SELECT * FROM devices WHERE fcmToken=?", [fcmToken]);
+  public async loadByFcmToken(fcmToken: string) {
+    const result: any = await DB.query("SELECT * FROM devices WHERE fcmToken=?", [fcmToken]);
+    return result.rows || result || [];
   }
 
-  public loadByAppDevice(appName: string, deviceId: string) {
-    return DB.query("SELECT * FROM devices WHERE appName=? AND deviceId=?", [appName, deviceId]);
+  public async loadByAppDevice(appName: string, deviceId: string) {
+    const result: any = await DB.query("SELECT * FROM devices WHERE appName=? AND deviceId=?", [appName, deviceId]);
+    return result.rows || result || [];
   }
 
   public delete(id: string) {

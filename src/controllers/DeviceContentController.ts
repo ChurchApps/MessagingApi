@@ -10,7 +10,7 @@ export class DeviceContentController extends MessagingBaseController {
     @requestParam("deviceId") deviceId: string,
     req: express.Request<{}, {}, {}>,
     res: express.Response
-  ): Promise<interfaces.IHttpActionResult> {
+  ): Promise<unknown> {
     return this.actionWrapperAnon(req, res, async () => {
       const deviceContent = await this.repositories.deviceContent.loadByDeviceId(deviceId);
       return deviceContent;
@@ -35,7 +35,7 @@ export class DeviceContentController extends MessagingBaseController {
     @requestParam("id") id: string,
     req: express.Request<{}, {}, null>,
     res: express.Response
-  ): Promise<interfaces.IHttpActionResult> {
+  ): Promise<unknown> {
     return this.actionWrapper(req, res, async (au) => {
       await this.repositories.deviceContent.delete(id);
       return this.json({});

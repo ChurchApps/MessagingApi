@@ -7,10 +7,7 @@ import { NotificationHelper } from "../helpers/NotificationHelper";
 @controller("/notifications")
 export class NotificationController extends MessagingBaseController {
   @httpPost("/")
-  public async save(
-    req: express.Request<{}, {}, Notification[]>,
-    res: express.Response
-  ): Promise<interfaces.IHttpActionResult> {
+  public async save(req: express.Request<{}, {}, Notification[]>, res: express.Response): Promise<unknown> {
     return this.actionWrapper(req, res, async (au) => {
       const promises: Promise<Notification>[] = [];
       req.body.forEach((n) => {
@@ -23,7 +20,7 @@ export class NotificationController extends MessagingBaseController {
   }
 
   @httpPost("/create")
-  public async create(req: express.Request<{}, {}, any>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+  public async create(req: express.Request<{}, {}, any>, res: express.Response): Promise<unknown> {
     return this.actionWrapper(req, res, async (au) => {
       return await NotificationHelper.createNotifications(
         req.body.peopleIds,
@@ -37,7 +34,7 @@ export class NotificationController extends MessagingBaseController {
   }
 
   @httpPost("/ping")
-  public async ping(req: express.Request<{}, {}, any>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+  public async ping(req: express.Request<{}, {}, any>, res: express.Response): Promise<unknown> {
     return this.actionWrapperAnon(req, res, async () => {
       return await NotificationHelper.createNotifications(
         [req.body.personId],
@@ -50,10 +47,7 @@ export class NotificationController extends MessagingBaseController {
   }
 
   @httpGet("/tmpEmail")
-  public async tmpEmail(
-    req: express.Request<{}, {}, any>,
-    res: express.Response
-  ): Promise<interfaces.IHttpActionResult> {
+  public async tmpEmail(req: express.Request<{}, {}, any>, res: express.Response): Promise<unknown> {
     return this.actionWrapperAnon(req, res, async () => {
       return await NotificationHelper.sendEmailNotifications("daily");
     });

@@ -7,8 +7,8 @@ export class ConversationRepository {
     const sql =
       "select id, firstPostId, lastPostId, postCount" + " FROM conversations" + " WHERE churchId=? and id IN (?)";
     const params = [churchId, ids];
-    const result = await DB.query(sql, params);
-    return result;
+    const result: any = await DB.query(sql, params);
+    return result.rows || result || [];
   }
 
   public async loadPosts(churchId: string, groupIds: string[]) {
@@ -20,8 +20,8 @@ export class ConversationRepository {
       " WHERE c.churchId=? and c.groupId IN (?)" +
       " AND lp.timeSent>DATE_SUB(NOW(), INTERVAL 365 DAY)";
     const params = [churchId, groupIds];
-    const result = await DB.query(sql, params);
-    return result;
+    const result: any = await DB.query(sql, params);
+    return result.rows || result || [];
   }
 
   private cleanup() {

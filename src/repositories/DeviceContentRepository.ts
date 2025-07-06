@@ -3,16 +3,19 @@ import { DeviceContent } from "../models";
 import { UniqueIdHelper } from "../helpers";
 
 export class DeviceContentRepository {
-  public loadByDeviceId(deviceId: string) {
-    return DB.query("SELECT * FROM deviceContents WHERE deviceId=?;", [deviceId]);
+  public async loadByDeviceId(deviceId: string) {
+    const result: any = await DB.query("SELECT * FROM deviceContents WHERE deviceId=?;", [deviceId]);
+    return result.rows || result || [];
   }
 
-  public loadById(id: string) {
-    return DB.queryOne("SELECT * FROM deviceContents WHERE id=?;", [id]);
+  public async loadById(id: string) {
+    const result: any = await DB.queryOne("SELECT * FROM deviceContents WHERE id=?;", [id]);
+    return result.rows || result || {};
   }
 
-  public loadByIds(ids: string[]) {
-    return DB.query("SELECT * FROM deviceContents WHERE id IN (?);", [ids]);
+  public async loadByIds(ids: string[]) {
+    const result: any = await DB.query("SELECT * FROM deviceContents WHERE id IN (?);", [ids]);
+    return result.rows || result || [];
   }
 
   public delete(id: string) {
