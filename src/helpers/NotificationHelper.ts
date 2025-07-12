@@ -106,14 +106,13 @@ export class NotificationHelper {
   };
 
   static notifyUser = async (churchId: string, personId: string, title: string = "New Notification") => {
-    Logger.info(`notifyUser: ${churchId}, ${personId}, ${title}`);
+    // Removed excessive logging to reduce CloudWatch costs
     let method = "";
     const repos = Repositories.getCurrent();
     const _deliveryCount = 0;
 
     // Handle web socket notifications
     const connections = await repos.connection.loadForNotification(churchId, personId);
-    Logger.info(`Found ${connections.length} connections for notification`);
     if (connections.length > 0) {
       method = "socket";
       await DeliveryHelper.sendMessages(connections, {
@@ -126,7 +125,6 @@ export class NotificationHelper {
 
     // Handle push notifications
     const devices: Device[] = await Repositories.getCurrent().device.loadForPerson(personId);
-    Logger.info(`Found ${devices.length} devices for person`);
 
     if (devices.length > 0) {
       try {
@@ -141,9 +139,7 @@ export class NotificationHelper {
           // Send notifications in bulk for efficiency
           await ExpoPushHelper.sendBulkMessages(expoPushTokens, title, title);
           method = "push";
-          Logger.info(`Sent push notifications to ${expoPushTokens.length} devices`);
-        } else {
-          Logger.info("No valid Expo push tokens found for user");
+          // Only log significant events or errors, not routine operations
         }
       } catch (_error) {
         // Don't throw the error - we still want to return the method if socket delivery worked
@@ -157,7 +153,7 @@ export class NotificationHelper {
     let promises: Promise<any>[] = [];
     const allNotifications: Notification[] = await Repositories.getCurrent().notification.loadUndelivered();
     const allPMs: PrivateMessage[] = await Repositories.getCurrent().privateMessage.loadUndelivered();
-    Logger.info(`Found ${allNotifications.length} undelivered notifications`);
+    // Removed excessive logging - only log significant batch operations
     if (allNotifications.length === 0 && allPMs.length === 0) return;
 
     const peopleIds = ArrayHelper.getIds(allNotifications, "personId").concat(
@@ -167,7 +163,7 @@ export class NotificationHelper {
     const notificationPrefs = await Repositories.getCurrent().notificationPreference.loadByPersonIds(peopleIds);
     const todoPrefs: NotificationPreference[] = [];
     peopleIds.forEach(async (personId) => {
-      Logger.info(`Notifying person: ${personId}`);
+      // Removed per-person logging to reduce CloudWatch noise
       const notifications: Notification[] = ArrayHelper.getAll(allNotifications, "personId", personId);
       const pms: PrivateMessage[] = ArrayHelper.getAll(allPMs, "notifyPersonId", personId);
       let pref = ArrayHelper.getOne(notificationPrefs, "personId", personId);

@@ -59,7 +59,7 @@ export class Logger {
       });
       this._logger = winston.createLogger({ transports: [this.wc], format: winston.format.json() });
     }
-    this._logger.info("Logger initialized");
+    // Removed logger initialization message to reduce CloudWatch noise
   }
 
   public flush() {

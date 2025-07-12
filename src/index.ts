@@ -9,7 +9,8 @@ Environment.init(process.env.APP_ENV).then(() => {
 
   init().then(app => {
     app.listen(port, () => {
-      Logger.info(`Server running at http://localhost:${port}/`);
+      // Removed server startup logging to reduce CloudWatch noise
+      // Only essential operational logs should go to CloudWatch in production
     });
   });
 });
