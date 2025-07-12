@@ -23,20 +23,23 @@ custom:
 provider:
   name: aws
   runtime: nodejs20.x
-  memorySize: 1024
+  memorySize: 1024 # Keep 1024MB for WebSocket handling
   timeout: 10
   region: us-east-2
   iam:
     role: arn:aws:iam::428019619026:role/ChurchAppsRole
   environment:
     APP_ENV: ${self:custom.env}
+  logs:
+    httpApi:
+      logRetentionInDays: 1
   httpApi:
     binaryMediaTypes:
       - "*/*"
   apiGateway:
     throttle:
-      rateLimit: 5     # 5 requests per second per IP
-      burstLimit: 20   # Allow bursts up to 20 requests per second
+      rateLimit: 5 # 5 requests per second per IP
+      burstLimit: 20 # Allow bursts up to 20 requests per second
 
 layers:
   dependencies:
@@ -50,6 +53,7 @@ layers:
 functions:
   web:
     handler: LambdaEntry.handleWeb
+    memorySize: 512 # Reduced from 1024MB for HTTP API
     layers:
       - { Ref: DependenciesLambdaLayer }
     events:
@@ -72,13 +76,17 @@ functions:
     vpc: ${self:custom.vpcSettings.current}
   timer15Min:
     handler: LambdaEntry.timer15Min
+    memorySize: 256 # Reduced from 1024MB for lightweight timer
+    timeout: 60 # Add explicit timeout for scheduled task
     layers:
       - { Ref: DependenciesLambdaLayer }
     events:
-      - schedule: rate(15 minutes)
+      - schedule: rate(30 minutes) # Reduced frequency from 15 to 30 minutes for cost optimization
     vpc: ${self:custom.vpcSettings.current}
   timerMidnight:
     handler: LambdaEntry.timerMidnight
+    memorySize: 256 # Reduced from 1024MB for lightweight timer
+    timeout: 120 # Add explicit timeout for scheduled task
     layers:
       - { Ref: DependenciesLambdaLayer }
     events:
