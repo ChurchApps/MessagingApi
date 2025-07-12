@@ -25,7 +25,13 @@ export class NotificationHelper {
         );
         pm.notifyPersonId = pm.fromPersonId === senderPersonId ? pm.toPersonId : pm.fromPersonId;
         await Repositories.getCurrent().privateMessage.save(pm);
-        const _method = await this.notifyUser(message.churchId, pm.notifyPersonId, title);
+        const _method = await this.notifyUserForPrivateMessage(
+          message.churchId,
+          pm.notifyPersonId,
+          message.displayName,
+          message.content,
+          conversation.id
+        );
         if (_method) {
           pm.deliveryMethod = _method;
           await Repositories.getCurrent().privateMessage.save(pm);
@@ -93,7 +99,12 @@ export class NotificationHelper {
         const promise = Repositories.getCurrent()
           .notification.save(n)
           .then(async (notification) => {
-            const method = await NotificationHelper.notifyUser(n.churchId, n.personId);
+            const method = await NotificationHelper.notifyUserForGeneralNotification(
+              n.churchId,
+              n.personId,
+              n.message,
+              notification.id
+            );
             notification.deliveryMethod = method;
             await Repositories.getCurrent().notification.save(notification);
             return notification;
@@ -140,6 +151,120 @@ export class NotificationHelper {
           await ExpoPushHelper.sendBulkMessages(expoPushTokens, title, title);
           method = "push";
           // Only log significant events or errors, not routine operations
+        }
+      } catch (_error) {
+        // Don't throw the error - we still want to return the method if socket delivery worked
+      }
+    }
+
+    return method;
+  };
+
+  static notifyUserForPrivateMessage = async (
+    churchId: string,
+    personId: string,
+    senderName: string,
+    messageContent: string,
+    conversationId: string
+  ) => {
+    let method = "";
+    const repos = Repositories.getCurrent();
+
+    // Handle web socket notifications
+    const connections = await repos.connection.loadForNotification(churchId, personId);
+    if (connections.length > 0) {
+      method = "socket";
+      await DeliveryHelper.sendMessages(connections, {
+        churchId,
+        conversationId: "alert",
+        action: "notification",
+        data: {}
+      });
+    }
+
+    // Handle push notifications
+    const devices: Device[] = await Repositories.getCurrent().device.loadForPerson(personId);
+
+    if (devices.length > 0) {
+      try {
+        // Filter out any invalid tokens and get unique tokens
+        const expoPushTokens = [
+          ...new Set(
+            devices.map((device) => device.fcmToken).filter((token) => token && token.startsWith("ExponentPushToken["))
+          )
+        ];
+
+        if (expoPushTokens.length > 0) {
+          const title = `New Message from ${senderName}`;
+          await ExpoPushHelper.sendBulkTypedMessages(
+            expoPushTokens,
+            title,
+            messageContent,
+            "privateMessage",
+            conversationId
+          );
+          method = "push";
+        }
+      } catch (_error) {
+        // Don't throw the error - we still want to return the method if socket delivery worked
+      }
+    }
+
+    return method;
+  };
+
+  static notifyUserForGeneralNotification = async (
+    churchId: string,
+    personId: string,
+    notificationMessage: string,
+    notificationId: string
+  ) => {
+    let method = "";
+    const repos = Repositories.getCurrent();
+
+    // Handle web socket notifications
+    const connections = await repos.connection.loadForNotification(churchId, personId);
+    if (connections.length > 0) {
+      method = "socket";
+      await DeliveryHelper.sendMessages(connections, {
+        churchId,
+        conversationId: "alert",
+        action: "notification",
+        data: {}
+      });
+    }
+
+    // Handle push notifications
+    const devices: Device[] = await Repositories.getCurrent().device.loadForPerson(personId);
+
+    if (devices.length > 0) {
+      try {
+        // Filter out any invalid tokens and get unique tokens
+        const expoPushTokens = [
+          ...new Set(
+            devices.map((device) => device.fcmToken).filter((token) => token && token.startsWith("ExponentPushToken["))
+          )
+        ];
+
+        if (expoPushTokens.length > 0) {
+          // Extract title from notification message or use default
+          let title = "New Notification";
+          if (notificationMessage.includes("Volunteer Requests:")) {
+            title = "New Plan Assignment";
+          } else if (notificationMessage.startsWith("New message:")) {
+            title = notificationMessage;
+          } else {
+            title = notificationMessage;
+          }
+
+          await ExpoPushHelper.sendBulkTypedMessages(
+            expoPushTokens,
+            title,
+            notificationMessage,
+            "notification",
+            notificationId
+          );
+          method = "push";
         }
       } catch (_error) {
         // Don't throw the error - we still want to return the method if socket delivery worked

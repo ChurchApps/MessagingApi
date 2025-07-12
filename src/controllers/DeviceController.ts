@@ -116,7 +116,18 @@ export class DeviceController extends MessagingBaseController {
       const expoPushTokens = devices.map((device) => device.fcmToken).filter((token) => token);
 
       if (expoPushTokens.length > 0) {
-        await ExpoPushHelper.sendBulkMessages(expoPushTokens, req.body.title.toString(), req.body.body.toString());
+        // Use typed message if type and contextId are provided, otherwise use legacy method
+        if (req.body.type && req.body.contextId) {
+          await ExpoPushHelper.sendBulkTypedMessages(
+            expoPushTokens,
+            req.body.title.toString(),
+            req.body.body.toString(),
+            req.body.type,
+            req.body.contextId
+          );
+        } else {
+          await ExpoPushHelper.sendBulkMessages(expoPushTokens, req.body.title.toString(), req.body.body.toString());
+        }
       }
 
       return { devices: expoPushTokens };
@@ -126,7 +137,18 @@ export class DeviceController extends MessagingBaseController {
   @httpPost("/tempSendManual")
   public async sendManual(req: express.Request<{}, {}, any>, res: express.Response): Promise<any> {
     return this.actionWrapperAnon(req, res, async () => {
-      await ExpoPushHelper.sendMessage(req.body.fcmToken, req.body.title.toString(), req.body.body.toString());
+      // Use typed message if type and contextId are provided, otherwise use legacy method
+      if (req.body.type && req.body.contextId) {
+        await ExpoPushHelper.sendTypedMessage(
+          req.body.fcmToken,
+          req.body.title.toString(),
+          req.body.body.toString(),
+          req.body.type,
+          req.body.contextId
+        );
+      } else {
+        await ExpoPushHelper.sendMessage(req.body.fcmToken, req.body.title.toString(), req.body.body.toString());
+      }
     });
   }
 

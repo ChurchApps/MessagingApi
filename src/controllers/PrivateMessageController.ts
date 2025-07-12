@@ -14,7 +14,9 @@ export class PrivateMessageController extends MessagingBaseController {
       req.body.forEach((conv) => {
         conv.churchId = au.churchId;
         const promise = this.repositories.privateMessage.save(conv).then((c) => {
-          NotificationHelper.notifyUser(au.churchId, c.toPersonId).then((method) => {
+          // For direct private message API, use generic notification since we don't have message content
+          // Private messages through conversations use the typed notification in checkShouldNotify
+          NotificationHelper.notifyUser(au.churchId, c.toPersonId, "New Private Message").then((method) => {
             if (method) {
               c.deliveryMethod = method;
               this.repositories.privateMessage.save(c);
