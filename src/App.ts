@@ -30,6 +30,10 @@ export const init = async () => {
     // Explicit OPTIONS handler
     expApp.options("*", cors());
 
+    // Add standard Express body parsing for local development
+    expApp.use(express.json({ limit: '10mb' }));
+    expApp.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
     // Handle body parsing from @codegenie/serverless-express
     expApp.use((req, res, next) => {
       const contentType = req.headers["content-type"] || "";

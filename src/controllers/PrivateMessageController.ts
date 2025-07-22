@@ -40,12 +40,23 @@ export class PrivateMessageController extends MessagingBaseController {
       );
       const messageIds: string[] = [];
       privateMessages.forEach((pm) => {
-        if (messageIds.indexOf(pm.conversation.lastPostId) === -1) messageIds.push(pm.conversation.lastPostId);
+        if (pm.conversation.lastPostId && messageIds.indexOf(pm.conversation.lastPostId) === -1) {
+          messageIds.push(pm.conversation.lastPostId);
+        }
       });
       if (messageIds.length > 0) {
         const allMessages = await this.repositories.message.loadByIds(au.churchId, messageIds);
         privateMessages.forEach((pm) => {
-          pm.conversation.messages = [ArrayHelper.getOne(allMessages, "id", pm.conversation.lastPostId)];
+          if (pm.conversation.lastPostId) {
+            pm.conversation.messages = [ArrayHelper.getOne(allMessages, "id", pm.conversation.lastPostId)];
+          } else {
+            pm.conversation.messages = [];
+          }
+        });
+      } else {
+        // No messages to fetch, set empty arrays
+        privateMessages.forEach((pm) => {
+          pm.conversation.messages = [];
         });
       }
 

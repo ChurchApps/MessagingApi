@@ -13,11 +13,12 @@ export class PrivateMessageRepository {
 
   public async loadForPerson(churchId: string, personId: string) {
     const sql =
-      "SELECT c.*, pm.id as pmId, pm.fromPersonId, pm.toPersonId, pm.notifyPersonId" +
+      "SELECT c.*, pm.id as pmId, pm.fromPersonId, pm.toPersonId, pm.notifyPersonId, m.timeSent as lastMessageTime" +
       " FROM privateMessages pm" +
       " INNER JOIN conversations c on c.id=pm.conversationId" +
+      " LEFT JOIN messages m on m.id=c.lastPostId" +
       " WHERE pm.churchId=? AND (pm.fromPersonId=? OR pm.toPersonId=?)" +
-      " ORDER by c.dateCreated desc";
+      " ORDER by COALESCE(m.timeSent, c.dateCreated) desc";
     const result: any = await DB.query(sql, [churchId, personId, personId]);
     const data = result.rows || result || [];
     return this.convertAllToModel(data);
@@ -25,11 +26,12 @@ export class PrivateMessageRepository {
 
   public async loadExisting(churchId: string, personId: string, otherPersonId: string) {
     const sql =
-      "SELECT c.*, pm.id as pmId, pm.fromPersonId, pm.toPersonId, pm.notifyPersonId" +
+      "SELECT c.*, pm.id as pmId, pm.fromPersonId, pm.toPersonId, pm.notifyPersonId, m.timeSent as lastMessageTime" +
       " FROM privateMessages pm" +
       " INNER JOIN conversations c on c.id=pm.conversationId" +
+      " LEFT JOIN messages m on m.id=c.lastPostId" +
       " WHERE pm.churchId=? AND ((pm.fromPersonId=? and pm.toPersonId=?) OR (pm.fromPersonId=? AND pm.toPersonId=?))" +
-      " ORDER by c.dateCreated desc";
+      " ORDER by COALESCE(m.timeSent, c.dateCreated) desc";
     const result: any = await DB.queryOne(sql, [churchId, personId, otherPersonId, otherPersonId, personId]);
     const data = result.rows || result || {};
     return data ? this.convertToModel(data) : null;
@@ -85,7 +87,7 @@ export class PrivateMessageRepository {
 
       conversation: {
         id: data.id,
-        churchId: data.id,
+        churchId: data.churchId,
         contentType: data.contentType,
         contentId: data.contentId,
         title: data.title,

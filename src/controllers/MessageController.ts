@@ -10,19 +10,23 @@ export class MessageController extends MessagingBaseController {
   @httpPost("/")
   public async save(req: express.Request<{}, {}, Message[]>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
+      if (!req.body || !Array.isArray(req.body)) {
+        return res.status(400).json({ error: "Request body must be an array of messages" });
+      }
+      
       const promises: Promise<Message>[] = [];
-      req.body.forEach((message: Message) => {
+      for (const message of req.body) {
         message.messageType = "message";
         if (message?.id && message.personId !== au.personId) {
-          res.status(403).send("You can not edit the message sent by others.");
-          return;
+          return res.status(403).json({ error: "You can not edit the message sent by others." });
         }
-        if (au?.id) {
-          message.personId = au.personId;
-          message.displayName = au.firstName + " " + au.lastName;
-          message.personId = au.personId;
-          message.churchId = au.churchId;
+        if (!au || !au.personId) {
+          return res.status(401).json({ error: "Authentication required" });
         }
+        
+        message.personId = au.personId;
+        message.displayName = au.firstName + " " + au.lastName;
+        message.churchId = au.churchId;
 
         promises.push(
           this.repositories.message.save(message).then(async (m: Message) => {
@@ -38,8 +42,14 @@ export class MessageController extends MessagingBaseController {
             return m;
           })
         );
-      });
-      return this.repositories.message.convertAllToModel(await Promise.all(promises));
+      }
+      try {
+        const results = await Promise.all(promises);
+        return this.repositories.message.convertAllToModel(results);
+      } catch (error) {
+        console.error("Error saving messages:", error);
+        return res.status(500).json({ error: "Failed to save messages" });
+      }
     });
   }
 
@@ -47,14 +57,19 @@ export class MessageController extends MessagingBaseController {
   @httpPost("/send")
   public async send(req: express.Request<{}, {}, Message[]>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
+      if (!req.body || !Array.isArray(req.body)) {
+        return res.status(400).json({ error: "Request body must be an array of messages" });
+      }
+      
       const promises: Promise<Message>[] = [];
-      req.body.forEach((message: Message) => {
+      for (const message of req.body) {
         message.messageType = "message";
-        if (au?.id) {
-          message.personId = au.personId;
-          message.displayName = au.firstName + " " + au.lastName;
-          message.personId = au.personId;
+        if (!au || !au.personId) {
+          return res.status(401).json({ error: "Authentication required" });
         }
+        
+        message.personId = au.personId;
+        message.displayName = au.firstName + " " + au.lastName;
 
         promises.push(
           this.repositories.message.save(message).then(async (m: Message) => {
@@ -70,8 +85,14 @@ export class MessageController extends MessagingBaseController {
             return m;
           })
         );
-      });
-      return this.repositories.message.convertAllToModel(await Promise.all(promises));
+      }
+      try {
+        const results = await Promise.all(promises);
+        return this.repositories.message.convertAllToModel(results);
+      } catch (error) {
+        console.error("Error sending messages:", error);
+        return res.status(500).json({ error: "Failed to send messages" });
+      }
     });
   }
 

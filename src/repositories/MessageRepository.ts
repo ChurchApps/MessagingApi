@@ -77,7 +77,9 @@ export class MessageRepository {
 
   public convertAllToModel(data: any[]) {
     const result: Message[] = [];
-    data.forEach((d) => result.push(this.convertToModel(d)));
+    if (data && Array.isArray(data)) {
+      data.forEach((d) => result.push(this.convertToModel(d)));
+    }
     return result;
   }
 }
