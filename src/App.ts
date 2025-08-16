@@ -30,11 +30,8 @@ export const init = async () => {
     // Explicit OPTIONS handler
     expApp.options("*", cors());
 
-    // Add standard Express body parsing for local development
-    expApp.use(express.json({ limit: '10mb' }));
-    expApp.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
     // Handle body parsing from @codegenie/serverless-express
+    // This middleware handles both Lambda and localhost environments
     expApp.use((req, res, next) => {
       const contentType = req.headers["content-type"] || "";
 
@@ -74,12 +71,36 @@ export const init = async () => {
           // Ignore JSON parsing errors and leave body as string
         }
       }
+      // Handle localhost development - parse raw body stream
+      else if (!req.body && req.readable) {
+        // For localhost, we need to manually parse the body
+        let data = "";
+        req.setEncoding("utf8");
+        req.on("data", (chunk) => {
+          data += chunk;
+        });
+        req.on("end", () => {
+          try {
+            if (contentType.includes("application/json") && data) {
+              req.body = JSON.parse(data);
+            } else if (contentType.includes("application/x-www-form-urlencoded") && data) {
+              req.body = Object.fromEntries(new URLSearchParams(data));
+            } else {
+              req.body = data || {};
+            }
+          } catch (_e) {
+            req.body = {};
+          }
+          next();
+        });
+        return; // Don't call next() here, it will be called in the 'end' event
+      }
 
       next();
     });
 
     // Note: No standard body-parser middleware needed
-    // Custom buffer handling above replaces the need for body-parser
+    // Custom middleware above handles both Lambda (Buffer) and localhost (stream) body parsing
   };
 
   const server = app.setConfig(configFunction).build();

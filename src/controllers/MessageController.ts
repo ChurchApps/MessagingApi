@@ -13,7 +13,7 @@ export class MessageController extends MessagingBaseController {
       if (!req.body || !Array.isArray(req.body)) {
         return res.status(400).json({ error: "Request body must be an array of messages" });
       }
-      
+
       const promises: Promise<Message>[] = [];
       for (const message of req.body) {
         message.messageType = "message";
@@ -23,7 +23,7 @@ export class MessageController extends MessagingBaseController {
         if (!au || !au.personId) {
           return res.status(401).json({ error: "Authentication required" });
         }
-        
+
         message.personId = au.personId;
         message.displayName = au.firstName + " " + au.lastName;
         message.churchId = au.churchId;
@@ -60,14 +60,14 @@ export class MessageController extends MessagingBaseController {
       if (!req.body || !Array.isArray(req.body)) {
         return res.status(400).json({ error: "Request body must be an array of messages" });
       }
-      
+
       const promises: Promise<Message>[] = [];
       for (const message of req.body) {
         message.messageType = "message";
         if (!au || !au.personId) {
           return res.status(401).json({ error: "Authentication required" });
         }
-        
+
         message.personId = au.personId;
         message.displayName = au.firstName + " " + au.lastName;
 
