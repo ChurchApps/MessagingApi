@@ -1,8 +1,8 @@
-import { controller, httpGet, httpPost, requestParam } from "inversify-express-utils";
 import express from "express";
-import { MessagingBaseController } from "./MessagingBaseController";
-import { Connection } from "../models";
+import { controller, httpGet, httpPost, requestParam } from "inversify-express-utils";
 import { DeliveryHelper } from "../helpers/DeliveryHelper";
+import { Connection } from "../models";
+import { MessagingBaseController } from "./MessagingBaseController";
 
 @controller("/connections")
 export class ConnectionController extends MessagingBaseController {

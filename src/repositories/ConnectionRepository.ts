@@ -1,7 +1,7 @@
 import { DB } from "@churchapps/apihelper";
-import { Connection } from "../models";
 import { UniqueIdHelper } from "../helpers";
 import { ViewerInterface } from "../helpers/Interfaces";
+import { Connection } from "../models";
 
 export class ConnectionRepository {
   public async loadAttendance(churchId: string, conversationId: string) {
@@ -71,8 +71,10 @@ export class ConnectionRepository {
       connection.personId,
       connection.displayName,
       connection.socketId,
-      connection.ipAddress
+      connection.ipAddress || ""
     ];
+
+    console.log(sql, params);
     await DB.query(sql, params);
     return connection;
   }

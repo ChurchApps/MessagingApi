@@ -1,12 +1,11 @@
-import { PayloadInterface } from "../helpers/Interfaces";
-import WebSocket from "ws";
-import { Repositories } from "../repositories";
-import { Connection } from "../models";
-import { AttendanceInterface } from "../helpers/Interfaces";
 import { ApiGatewayManagementApiClient, PostToConnectionCommand } from "@aws-sdk/client-apigatewaymanagementapi";
-import { SocketHelper } from "./SocketHelper";
 import { LoggingHelper } from "@churchapps/apihelper";
+import WebSocket from "ws";
 import { Environment } from "../helpers";
+import { AttendanceInterface, PayloadInterface } from "../helpers/Interfaces";
+import { Connection } from "../models";
+import { Repositories } from "../repositories";
+import { SocketHelper } from "./SocketHelper";
 
 export class DeliveryHelper {
   static sendConversationMessages = async (payload: PayloadInterface) => {
@@ -35,7 +34,9 @@ export class DeliveryHelper {
     let success = true;
     if (Environment.deliveryProvider === "aws") success = await DeliveryHelper.sendAws(connection, payload);
     else success = await DeliveryHelper.sendLocal(connection, payload);
-    if (!success) await Repositories.getCurrent().connection.delete(connection.churchId, connection.id);
+
+    //TODO: temporary.  Need to bring this back.
+    //if (!success) await Repositories.getCurrent().connection.delete(connection.churchId, connection.id);
     return success;
   };
 
