@@ -1,4 +1,4 @@
-import { init } from "./App";
+import { init } from "./app";
 import { Pool } from "@churchapps/apihelper";
 import { Environment } from "./helpers/Environment";
 import { Logger } from "./helpers/Logger";

@@ -10,10 +10,18 @@ import { SocketHelper } from "./helpers/SocketHelper";
 import { Environment } from "./helpers";
 
 export const init = async () => {
+  console.log("🚀 Starting MessagingApi initialization...");
   dotenv.config();
+  console.log("✅ Environment variables loaded");
+  
   const container = new Container();
+  console.log("📦 Container created");
+  
   await container.loadAsync(bindings);
+  console.log("🔗 Bindings loaded");
+  
   const app = new InversifyExpressServer(container, null, null, null, CustomAuthProvider);
+  console.log("🌐 Express server created");
 
   const configFunction = (expApp: express.Application) => {
     // CORS configuration
@@ -103,9 +111,19 @@ export const init = async () => {
     // Custom middleware above handles both Lambda (Buffer) and localhost (stream) body parsing
   };
 
+  console.log("⚙️ Configuring server...");
   const server = app.setConfig(configFunction).build();
+  console.log("✅ Server configured and built");
 
-  if (Environment.deliveryProvider === "local") SocketHelper.init();
+  console.log(`🔌 Checking delivery provider: ${Environment.deliveryProvider}`);
+  if (Environment.deliveryProvider === "local") {
+    console.log("💬 Initializing SocketHelper...");
+    SocketHelper.init();
+    console.log("✅ SocketHelper initialized");
+  } else {
+    console.log("⏭️ Skipping SocketHelper (not local mode)");
+  }
 
+  console.log("🎉 MessagingApi initialization complete!");
   return server;
 };
