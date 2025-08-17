@@ -1,11 +1,8 @@
 const serverlessExpress = require("@codegenie/serverless-express");
-const { init } = require("./dist/app");
+const { init } = require("./dist/App");
 const { Environment } = require("./dist/helpers/Environment");
 const { Pool } = require("@churchapps/apihelper");
-const {
-  ApiGatewayManagementApiClient,
-  PostToConnectionCommand
-} = require("@aws-sdk/client-apigatewaymanagementapi");
+const { ApiGatewayManagementApiClient, PostToConnectionCommand } = require("@aws-sdk/client-apigatewaymanagementapi");
 const { Logger } = require("./dist/helpers/Logger");
 const { SocketHelper } = require("./dist/helpers/SocketHelper");
 const { NotificationHelper } = require("./dist/helpers/NotificationHelper");
@@ -26,10 +23,10 @@ const getApiGatewayManagementClient = (event) => {
   // For AWS Lambda WebSocket, construct the correct API Gateway endpoint from event context
   if (event && event.requestContext && event.requestContext.domainName) {
     const { domainName, stage, apiId } = event.requestContext;
-    
+
     let endpoint;
     // If using custom domain, we need to use the actual API Gateway endpoint
-    if (domainName.includes('churchapps.org')) {
+    if (domainName.includes("churchapps.org")) {
       // For custom domains, use the API Gateway's regional endpoint
       endpoint = `https://${apiId}.execute-api.us-east-2.amazonaws.com/${stage}`;
       console.log(`Using API Gateway endpoint for custom domain: ${endpoint}`);
@@ -38,7 +35,7 @@ const getApiGatewayManagementClient = (event) => {
       endpoint = `https://${domainName}/${stage}`;
       console.log(`Using direct API Gateway endpoint: ${endpoint}`);
     }
-    
+
     return new ApiGatewayManagementApiClient({
       apiVersion: "2020-04-16",
       endpoint: endpoint
@@ -46,10 +43,13 @@ const getApiGatewayManagementClient = (event) => {
   }
   // Fallback to the global client (for local/non-AWS environments)
   console.log(`Using fallback client with endpoint: ${Environment.socketUrl}`);
-  return gwManagement || new ApiGatewayManagementApiClient({
-    apiVersion: "2020-04-16",
-    endpoint: Environment.socketUrl || "ws://localhost:8087"
-  });
+  return (
+    gwManagement ||
+    new ApiGatewayManagementApiClient({
+      apiVersion: "2020-04-16",
+      endpoint: Environment.socketUrl || "ws://localhost:8087"
+    })
+  );
 };
 
 initEnv();
@@ -81,24 +81,19 @@ let handler;
 
 const universal = async function universal(event, context) {
   await checkPool();
-  
+
   if (!handler) {
     const app = await init();
-    handler = serverlessExpress({ 
+    handler = serverlessExpress({
       app,
       binarySettings: {
-        contentTypes: [
-          'application/octet-stream',
-          'font/*', 
-          'image/*',
-          'application/pdf'
-        ]
+        contentTypes: ["application/octet-stream", "font/*", "image/*", "application/pdf"]
       },
       stripBasePath: false,
-      resolutionMode: 'PROMISE'
+      resolutionMode: "PROMISE"
     });
   }
-  
+
   return handler(event, context);
 };
 
@@ -117,7 +112,7 @@ module.exports.handleSocket = async function handleSocket(event) {
     console.log(`WebSocket ${eventType} for connection ${connectionId}`);
 
     await checkPool();
-    
+
     if (eventType == "DISCONNECT") {
       await SocketHelper.handleDisconnect(connectionId);
     } else if (eventType == "MESSAGE") {
@@ -127,17 +122,17 @@ module.exports.handleSocket = async function handleSocket(event) {
         action: "socketId",
         data: rc.connectionId
       };
-      
+
       try {
         // Use the correct API Gateway Management client with proper endpoint
         const apiGwClient = getApiGatewayManagementClient(event);
         console.log(`Using API Gateway endpoint from event context`);
-        
+
         const command = new PostToConnectionCommand({
           ConnectionId: rc.connectionId,
           Data: JSON.stringify(payload)
         });
-        
+
         await apiGwClient.send(command);
         console.log(`Successfully sent socketId response to connection ${rc.connectionId}`);
       } catch (e) {
@@ -147,7 +142,7 @@ module.exports.handleSocket = async function handleSocket(event) {
         // Don't throw here - return success even if send fails
       }
     }
-    
+
     console.log(`Lambda function completed successfully`);
     return {
       statusCode: 200,
