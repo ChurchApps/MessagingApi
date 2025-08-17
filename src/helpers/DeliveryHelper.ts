@@ -63,8 +63,39 @@ export class DeliveryHelper {
     });
   };
 
+  private static getApiGatewayEndpoint(): string {
+    // For AWS WebSocket message delivery, we need the actual API Gateway endpoint,
+    // not the custom domain. This matches the pattern used in LambdaEntry.js
+
+    // Extract environment and construct the proper API Gateway endpoint
+    const env = process.env.APP_ENV || "staging";
+    const region = "us-east-2"; // From serverless.yml
+
+    // Map environment to API Gateway ID
+    // These are the actual API Gateway IDs for each environment
+    const apiGatewayIds: { [key: string]: string } = {
+      staging: "vqu18129j0", // From the working URL we identified
+      prod: "vqu18129j0", // Update this when you have prod API ID
+      dev: "vqu18129j0" // Update this when you have dev API ID
+    };
+
+    const apiId = apiGatewayIds[env] || apiGatewayIds["staging"];
+    const stage = env.charAt(0).toUpperCase() + env.slice(1); // "staging" -> "Staging"
+
+    const endpoint = `https://${apiId}.execute-api.${region}.amazonaws.com/${stage}`;
+
+    console.log(`DeliveryHelper: Using API Gateway endpoint for WebSocket delivery: ${endpoint}`);
+    return endpoint;
+  }
+
   private static sendAws = async (connection: Connection, payload: PayloadInterface) => {
-    const client = new ApiGatewayManagementApiClient({ endpoint: Environment.socketUrl });
+    // Use the correct API Gateway endpoint instead of the custom domain
+    const endpoint = DeliveryHelper.getApiGatewayEndpoint();
+    const client = new ApiGatewayManagementApiClient({
+      apiVersion: "2020-04-16",
+      endpoint: endpoint
+    });
+
     let success = true;
     try {
       const input = {
