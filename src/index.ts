@@ -1,7 +1,6 @@
-import { init } from "./app";
 import { Pool } from "@churchapps/apihelper";
+import { init } from "./App";
 import { Environment } from "./helpers/Environment";
-import { Logger } from "./helpers/Logger";
 
 const port = process.env.SERVER_PORT;
 Environment.init(process.env.APP_ENV).then(() => {
