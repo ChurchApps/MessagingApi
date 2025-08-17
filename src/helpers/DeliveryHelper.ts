@@ -75,7 +75,7 @@ export class DeliveryHelper {
     // These are the actual API Gateway IDs for each environment
     const apiGatewayIds: { [key: string]: string } = {
       staging: "vqu18129j0", // From the working URL we identified
-      prod: "vqu18129j0", // Update this when you have prod API ID
+      prod: "e3dpltbpr1", // Production API Gateway ID from serverless info
       dev: "vqu18129j0" // Update this when you have dev API ID
     };
 
